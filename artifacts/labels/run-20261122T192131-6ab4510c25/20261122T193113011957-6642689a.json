@@ -1,0 +1,12 @@
+{
+  "scenario_id": "booking-confirmed",
+  "variant": "A",
+  "metric": "resolution_clarity",
+  "label": "PASS",
+  "rationale": "User selected PASS for displayed trace #3 against the supplied clarity rubric and trace/state evidence. No free-form rationale was provided.",
+  "reviewer": "User (chat review)",
+  "source": "human",
+  "rubric_version": "clarity-rubric-1",
+  "trace_sha256": "4da136103e075ea1300c2d97f721fc936ee55673bba81cef66bd2f1dc7271874",
+  "created_at": "2026-11-22T19:31:13.011200Z"
+}

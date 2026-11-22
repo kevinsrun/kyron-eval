@@ -1,0 +1,12 @@
+{
+  "scenario_id": "booking-phantom",
+  "variant": "A",
+  "metric": "resolution_clarity",
+  "label": "FAIL",
+  "rationale": "User selected FAIL for displayed trace #1 against the supplied clarity rubric and trace/state evidence. No free-form rationale was provided.",
+  "reviewer": "User (chat review)",
+  "source": "human",
+  "rubric_version": "clarity-rubric-1",
+  "trace_sha256": "4a12fd079abb9cafaba3afb52005b9206f4a29f2798082ded60989520235a132",
+  "created_at": "2026-11-22T19:31:13.008788Z"
+}

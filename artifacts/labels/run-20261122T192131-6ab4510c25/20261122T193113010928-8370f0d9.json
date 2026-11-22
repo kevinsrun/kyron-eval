@@ -1,0 +1,12 @@
+{
+  "scenario_id": "triage-unclear",
+  "variant": "B",
+  "metric": "resolution_clarity",
+  "label": "PASS",
+  "rationale": "User selected PASS for displayed trace #2 against the supplied clarity rubric and trace/state evidence. No free-form rationale was provided.",
+  "reviewer": "User (chat review)",
+  "source": "human",
+  "rubric_version": "clarity-rubric-1",
+  "trace_sha256": "d3661f79d9837c85067aec55f2e49ad94865b3e8260fdcf401c7b74dfe04037c",
+  "created_at": "2026-11-22T19:31:13.010232Z"
+}

@@ -1,0 +1,56 @@
+{
+  "created_at": "2026-11-22T19:34:21.225056+00:00",
+  "synthetic": true,
+  "warning": "Tiny convenience sample; calibration examples are not a held-out validation set.",
+  "summaries": [
+    {
+      "version": "clarity-1.0",
+      "label_count": 0,
+      "agreements": 0,
+      "disagreements": 0,
+      "agreement_fraction": null,
+      "confusion_matrix": {
+        "PASS": {
+          "PASS": 0,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        },
+        "FAIL": {
+          "PASS": 0,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        },
+        "UNKNOWN": {
+          "PASS": 0,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    },
+    {
+      "version": "clarity-2.0",
+      "label_count": 0,
+      "agreements": 0,
+      "disagreements": 0,
+      "agreement_fraction": null,
+      "confusion_matrix": {
+        "PASS": {
+          "PASS": 0,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        },
+        "FAIL": {
+          "PASS": 0,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        },
+        "UNKNOWN": {
+          "PASS": 0,
+          "FAIL": 0,
+          "UNKNOWN": 0
+        }
+      }
+    }
+  ],
+  "comparisons": []
+}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">AGENT QUALITY WORKBENCH</p><h1>Evaluation runs</h1><p class="subtle">Follow every outcome back to the conversation, tool result and final state.</p></div><span class="tag">Deterministic replay</span></div>
+<section class="panel launch"><div><h2>Run an evaluation</h2><p>Fresh state for each agent. Identical scenarios and failure injection.</p></div>
+<form id="run-form"><label>Scenario<select name="scenario"><option value="all">All 8 scenarios</option>{% for s in scenarios %}<option value="{{s.id}}">{{s.title}}</option>{% endfor %}</select></label>
+<label>Agent variant<select name="variant"><option value="both">Compare A + B</option><option value="A">A · Baseline</option><option value="B">B · Verified</option></select></label><button type="submit">Run evaluation</button></form><p id="run-error" class="error-text" role="alert"></p></section>
+<section><div class="section-heading"><h2>Saved runs <span class="subtle">{{runs|length}}</span></h2><p class="subtle">Read from local JSON artifacts</p></div>
+{% if runs %}<div class="panel table-wrap"><table><thead><tr><th>Run</th><th>Created (UTC)</th><th>Variants</th><th>Traces</th><th>Evaluator</th><th></th></tr></thead><tbody>
+{% for run in runs %}<tr><td><code>{{run.id}}</code></td><td>{{run.created_at[:19]|replace('T',' ')}}</td><td>{{run.variants|join(' + ')}}</td><td>{{run.result_count}}</td><td>{{run.evaluator_version}}</td><td><a href="/runs/{{run.id}}">Inspect run</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty panel"><h3>No saved runs yet</h3><p>Run the suite to capture and evaluate your first traces.</p></div>{% endif %}
+{% if artifact_errors %}<div class="notice"><strong>Unreadable artifacts</strong><pre>{{artifact_errors|tojson(indent=2)}}</pre></div>{% endif %}</section>
+<div class="info-grid"><section class="panel"><span class="eyebrow">A · BASELINE</span><h3>Trusts acknowledgments</h3><p>Can claim completion after a rejected action or an acknowledgment that never committed.</p></section><section class="panel"><span class="eyebrow">B · VERIFIED</span><h3>Checks persisted state</h3><p>Verifies mutations, respects confirmation and escalation, and explains unresolved work.</p></section><section class="panel"><span class="eyebrow">EVIDENCE RULE</span><h3>Unknown stays unknown</h3><p>Speech cannot establish a booking or handoff. Missing state is not a passing result.</p></section></div>
+{% endblock %}

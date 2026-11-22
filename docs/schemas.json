@@ -1,0 +1,1455 @@
+{
+  "Scenario": {
+    "$defs": {
+      "AppointmentSlot": {
+        "additionalProperties": false,
+        "properties": {
+          "slot_id": {
+            "minLength": 1,
+            "title": "Slot Id",
+            "type": "string"
+          },
+          "provider_id": {
+            "minLength": 1,
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "location_id": {
+            "minLength": 1,
+            "title": "Location Id",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/$defs/AvailabilityKind"
+          }
+        },
+        "required": [
+          "slot_id",
+          "provider_id",
+          "location_id",
+          "starts_at",
+          "ends_at",
+          "kind"
+        ],
+        "title": "AppointmentSlot",
+        "type": "object"
+      },
+      "AvailabilityKind": {
+        "enum": [
+          "OPEN",
+          "SAME_DAY",
+          "CANCELLATION",
+          "SHORT_VISIT",
+          "ALTERNATIVE_PROVIDER",
+          "NEXT_AVAILABLE",
+          "TELEHEALTH"
+        ],
+        "title": "AvailabilityKind",
+        "type": "string"
+      },
+      "Booking": {
+        "additionalProperties": false,
+        "properties": {
+          "appointment_id": {
+            "title": "Appointment Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "slot": {
+            "$ref": "#/$defs/AppointmentSlot"
+          },
+          "confirmation_event_id": {
+            "title": "Confirmation Event Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "appointment_id",
+          "patient_id",
+          "slot",
+          "confirmation_event_id"
+        ],
+        "title": "Booking",
+        "type": "object"
+      },
+      "CallerTurn": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "facts": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Facts",
+            "type": "object"
+          },
+          "confirms_offer": {
+            "default": false,
+            "title": "Confirms Offer",
+            "type": "boolean"
+          },
+          "elapsed_seconds": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Elapsed Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CallerTurn",
+        "type": "object"
+      },
+      "Disposition": {
+        "enum": [
+          "EMERGENCY",
+          "URGENT_SAME_DAY",
+          "SOON",
+          "ROUTINE",
+          "ADMINISTRATIVE",
+          "HUMAN_REVIEW"
+        ],
+        "title": "Disposition",
+        "type": "string"
+      },
+      "Expectations": {
+        "additionalProperties": false,
+        "properties": {
+          "acceptable_outcomes": {
+            "items": {
+              "enum": [
+                "BOOKED",
+                "NOT_BOOKED",
+                "EMERGENCY",
+                "REVIEW_QUEUED"
+              ],
+              "type": "string"
+            },
+            "title": "Acceptable Outcomes",
+            "type": "array"
+          },
+          "disposition": {
+            "$ref": "#/$defs/Disposition"
+          },
+          "critical_entities": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Critical Entities",
+            "type": "object"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "acceptable_outcomes",
+          "disposition",
+          "critical_entities",
+          "explanation"
+        ],
+        "title": "Expectations",
+        "type": "object"
+      },
+      "Review": {
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "reason_code": {
+            "title": "Reason Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_id",
+          "patient_id",
+          "reason_code"
+        ],
+        "title": "Review",
+        "type": "object"
+      },
+      "SystemState": {
+        "additionalProperties": false,
+        "properties": {
+          "patient_id": {
+            "pattern": "^synthetic-",
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/$defs/AppointmentSlot"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "bookings": {
+            "items": {
+              "$ref": "#/$defs/Booking"
+            },
+            "title": "Bookings",
+            "type": "array"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/$defs/Review"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "disposition": {
+            "$ref": "#/$defs/Disposition",
+            "default": "ROUTINE"
+          }
+        },
+        "required": [
+          "patient_id",
+          "slots"
+        ],
+        "title": "SystemState",
+        "type": "object"
+      },
+      "ToolBehavior": {
+        "additionalProperties": false,
+        "properties": {
+          "booking": {
+            "default": "commit",
+            "enum": [
+              "commit",
+              "failure",
+              "ack_without_commit"
+            ],
+            "title": "Booking",
+            "type": "string"
+          },
+          "review": {
+            "default": "commit",
+            "enum": [
+              "commit",
+              "failure",
+              "ack_without_commit"
+            ],
+            "title": "Review",
+            "type": "string"
+          },
+          "snapshot_ttl_seconds": {
+            "default": 300,
+            "minimum": 1,
+            "title": "Snapshot Ttl Seconds",
+            "type": "integer"
+          }
+        },
+        "title": "ToolBehavior",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "pattern": "^[a-z0-9-]+$",
+        "title": "Id",
+        "type": "string"
+      },
+      "version": {
+        "title": "Version",
+        "type": "string"
+      },
+      "synthetic": {
+        "const": true,
+        "default": true,
+        "title": "Synthetic",
+        "type": "boolean"
+      },
+      "title": {
+        "title": "Title",
+        "type": "string"
+      },
+      "workflow": {
+        "enum": [
+          "scheduling",
+          "triage"
+        ],
+        "title": "Workflow",
+        "type": "string"
+      },
+      "caller_goal": {
+        "title": "Caller Goal",
+        "type": "string"
+      },
+      "script": {
+        "items": {
+          "$ref": "#/$defs/CallerTurn"
+        },
+        "minItems": 1,
+        "title": "Script",
+        "type": "array"
+      },
+      "clock": {
+        "format": "date-time",
+        "title": "Clock",
+        "type": "string"
+      },
+      "initial_state": {
+        "$ref": "#/$defs/SystemState"
+      },
+      "tools": {
+        "$ref": "#/$defs/ToolBehavior"
+      },
+      "policy_id": {
+        "title": "Policy Id",
+        "type": "string"
+      },
+      "policy_version": {
+        "title": "Policy Version",
+        "type": "string"
+      },
+      "expected": {
+        "$ref": "#/$defs/Expectations"
+      },
+      "transcript_cannot_prove": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "title": "Transcript Cannot Prove",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "version",
+      "title",
+      "workflow",
+      "caller_goal",
+      "script",
+      "clock",
+      "initial_state",
+      "policy_id",
+      "policy_version",
+      "expected",
+      "transcript_cannot_prove"
+    ],
+    "title": "Scenario",
+    "type": "object"
+  },
+  "Trace": {
+    "$defs": {
+      "AppointmentSlot": {
+        "additionalProperties": false,
+        "properties": {
+          "slot_id": {
+            "minLength": 1,
+            "title": "Slot Id",
+            "type": "string"
+          },
+          "provider_id": {
+            "minLength": 1,
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "location_id": {
+            "minLength": 1,
+            "title": "Location Id",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/$defs/AvailabilityKind"
+          }
+        },
+        "required": [
+          "slot_id",
+          "provider_id",
+          "location_id",
+          "starts_at",
+          "ends_at",
+          "kind"
+        ],
+        "title": "AppointmentSlot",
+        "type": "object"
+      },
+      "AvailabilityKind": {
+        "enum": [
+          "OPEN",
+          "SAME_DAY",
+          "CANCELLATION",
+          "SHORT_VISIT",
+          "ALTERNATIVE_PROVIDER",
+          "NEXT_AVAILABLE",
+          "TELEHEALTH"
+        ],
+        "title": "AvailabilityKind",
+        "type": "string"
+      },
+      "Booking": {
+        "additionalProperties": false,
+        "properties": {
+          "appointment_id": {
+            "title": "Appointment Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "slot": {
+            "$ref": "#/$defs/AppointmentSlot"
+          },
+          "confirmation_event_id": {
+            "title": "Confirmation Event Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "appointment_id",
+          "patient_id",
+          "slot",
+          "confirmation_event_id"
+        ],
+        "title": "Booking",
+        "type": "object"
+      },
+      "Disposition": {
+        "enum": [
+          "EMERGENCY",
+          "URGENT_SAME_DAY",
+          "SOON",
+          "ROUTINE",
+          "ADMINISTRATIVE",
+          "HUMAN_REVIEW"
+        ],
+        "title": "Disposition",
+        "type": "string"
+      },
+      "Event": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "seq": {
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "caller",
+              "agent",
+              "tool",
+              "policy",
+              "state",
+              "error",
+              "disposition"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "at",
+          "kind"
+        ],
+        "title": "Event",
+        "type": "object"
+      },
+      "Review": {
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "reason_code": {
+            "title": "Reason Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_id",
+          "patient_id",
+          "reason_code"
+        ],
+        "title": "Review",
+        "type": "object"
+      },
+      "SystemState": {
+        "additionalProperties": false,
+        "properties": {
+          "patient_id": {
+            "pattern": "^synthetic-",
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/$defs/AppointmentSlot"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "bookings": {
+            "items": {
+              "$ref": "#/$defs/Booking"
+            },
+            "title": "Bookings",
+            "type": "array"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/$defs/Review"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "disposition": {
+            "$ref": "#/$defs/Disposition",
+            "default": "ROUTINE"
+          }
+        },
+        "required": [
+          "patient_id",
+          "slots"
+        ],
+        "title": "SystemState",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "default": "1.0",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "harness_version": {
+        "default": "replay-1.0",
+        "title": "Harness Version",
+        "type": "string"
+      },
+      "evidence_class": {
+        "const": "SYNTHETIC_EVALUATION_TRACE",
+        "default": "SYNTHETIC_EVALUATION_TRACE",
+        "title": "Evidence Class",
+        "type": "string"
+      },
+      "scenario_id": {
+        "title": "Scenario Id",
+        "type": "string"
+      },
+      "scenario_version": {
+        "title": "Scenario Version",
+        "type": "string"
+      },
+      "scenario_sha256": {
+        "title": "Scenario Sha256",
+        "type": "string"
+      },
+      "variant": {
+        "enum": [
+          "A",
+          "B"
+        ],
+        "title": "Variant",
+        "type": "string"
+      },
+      "agent_version": {
+        "title": "Agent Version",
+        "type": "string"
+      },
+      "policy_id": {
+        "title": "Policy Id",
+        "type": "string"
+      },
+      "policy_version": {
+        "title": "Policy Version",
+        "type": "string"
+      },
+      "policy_sha256": {
+        "title": "Policy Sha256",
+        "type": "string"
+      },
+      "state_before": {
+        "$ref": "#/$defs/SystemState"
+      },
+      "state_after": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/SystemState"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "events": {
+        "items": {
+          "$ref": "#/$defs/Event"
+        },
+        "title": "Events",
+        "type": "array"
+      },
+      "final_disposition": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Disposition"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      }
+    },
+    "required": [
+      "scenario_id",
+      "scenario_version",
+      "scenario_sha256",
+      "variant",
+      "agent_version",
+      "policy_id",
+      "policy_version",
+      "policy_sha256",
+      "state_before"
+    ],
+    "title": "Trace",
+    "type": "object"
+  },
+  "Run": {
+    "$defs": {
+      "AppointmentSlot": {
+        "additionalProperties": false,
+        "properties": {
+          "slot_id": {
+            "minLength": 1,
+            "title": "Slot Id",
+            "type": "string"
+          },
+          "provider_id": {
+            "minLength": 1,
+            "title": "Provider Id",
+            "type": "string"
+          },
+          "location_id": {
+            "minLength": 1,
+            "title": "Location Id",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/$defs/AvailabilityKind"
+          }
+        },
+        "required": [
+          "slot_id",
+          "provider_id",
+          "location_id",
+          "starts_at",
+          "ends_at",
+          "kind"
+        ],
+        "title": "AppointmentSlot",
+        "type": "object"
+      },
+      "AvailabilityKind": {
+        "enum": [
+          "OPEN",
+          "SAME_DAY",
+          "CANCELLATION",
+          "SHORT_VISIT",
+          "ALTERNATIVE_PROVIDER",
+          "NEXT_AVAILABLE",
+          "TELEHEALTH"
+        ],
+        "title": "AvailabilityKind",
+        "type": "string"
+      },
+      "Booking": {
+        "additionalProperties": false,
+        "properties": {
+          "appointment_id": {
+            "title": "Appointment Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "slot": {
+            "$ref": "#/$defs/AppointmentSlot"
+          },
+          "confirmation_event_id": {
+            "title": "Confirmation Event Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "appointment_id",
+          "patient_id",
+          "slot",
+          "confirmation_event_id"
+        ],
+        "title": "Booking",
+        "type": "object"
+      },
+      "CallerTurn": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "facts": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Facts",
+            "type": "object"
+          },
+          "confirms_offer": {
+            "default": false,
+            "title": "Confirms Offer",
+            "type": "boolean"
+          },
+          "elapsed_seconds": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Elapsed Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "CallerTurn",
+        "type": "object"
+      },
+      "Disposition": {
+        "enum": [
+          "EMERGENCY",
+          "URGENT_SAME_DAY",
+          "SOON",
+          "ROUTINE",
+          "ADMINISTRATIVE",
+          "HUMAN_REVIEW"
+        ],
+        "title": "Disposition",
+        "type": "string"
+      },
+      "Event": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "seq": {
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "caller",
+              "agent",
+              "tool",
+              "policy",
+              "state",
+              "error",
+              "disposition"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "at",
+          "kind"
+        ],
+        "title": "Event",
+        "type": "object"
+      },
+      "Expectations": {
+        "additionalProperties": false,
+        "properties": {
+          "acceptable_outcomes": {
+            "items": {
+              "enum": [
+                "BOOKED",
+                "NOT_BOOKED",
+                "EMERGENCY",
+                "REVIEW_QUEUED"
+              ],
+              "type": "string"
+            },
+            "title": "Acceptable Outcomes",
+            "type": "array"
+          },
+          "disposition": {
+            "$ref": "#/$defs/Disposition"
+          },
+          "critical_entities": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Critical Entities",
+            "type": "object"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "acceptable_outcomes",
+          "disposition",
+          "critical_entities",
+          "explanation"
+        ],
+        "title": "Expectations",
+        "type": "object"
+      },
+      "Metric": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/$defs/Status"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Refs",
+            "type": "array"
+          },
+          "evaluator_version": {
+            "title": "Evaluator Version",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "reason",
+          "evidence_refs",
+          "evaluator_version"
+        ],
+        "title": "Metric",
+        "type": "object"
+      },
+      "Result": {
+        "additionalProperties": false,
+        "properties": {
+          "scenario": {
+            "$ref": "#/$defs/Scenario"
+          },
+          "trace": {
+            "$ref": "#/$defs/Trace"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/$defs/Metric"
+            },
+            "title": "Metrics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scenario",
+          "trace",
+          "metrics"
+        ],
+        "title": "Result",
+        "type": "object"
+      },
+      "Review": {
+        "additionalProperties": false,
+        "properties": {
+          "record_id": {
+            "title": "Record Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "reason_code": {
+            "title": "Reason Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "record_id",
+          "patient_id",
+          "reason_code"
+        ],
+        "title": "Review",
+        "type": "object"
+      },
+      "Scenario": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "synthetic": {
+            "const": true,
+            "default": true,
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "workflow": {
+            "enum": [
+              "scheduling",
+              "triage"
+            ],
+            "title": "Workflow",
+            "type": "string"
+          },
+          "caller_goal": {
+            "title": "Caller Goal",
+            "type": "string"
+          },
+          "script": {
+            "items": {
+              "$ref": "#/$defs/CallerTurn"
+            },
+            "minItems": 1,
+            "title": "Script",
+            "type": "array"
+          },
+          "clock": {
+            "format": "date-time",
+            "title": "Clock",
+            "type": "string"
+          },
+          "initial_state": {
+            "$ref": "#/$defs/SystemState"
+          },
+          "tools": {
+            "$ref": "#/$defs/ToolBehavior"
+          },
+          "policy_id": {
+            "title": "Policy Id",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "expected": {
+            "$ref": "#/$defs/Expectations"
+          },
+          "transcript_cannot_prove": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Transcript Cannot Prove",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "title",
+          "workflow",
+          "caller_goal",
+          "script",
+          "clock",
+          "initial_state",
+          "policy_id",
+          "policy_version",
+          "expected",
+          "transcript_cannot_prove"
+        ],
+        "title": "Scenario",
+        "type": "object"
+      },
+      "Status": {
+        "enum": [
+          "PASS",
+          "FAIL",
+          "UNKNOWN",
+          "N/A",
+          "ERROR"
+        ],
+        "title": "Status",
+        "type": "string"
+      },
+      "SystemState": {
+        "additionalProperties": false,
+        "properties": {
+          "patient_id": {
+            "pattern": "^synthetic-",
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/$defs/AppointmentSlot"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "bookings": {
+            "items": {
+              "$ref": "#/$defs/Booking"
+            },
+            "title": "Bookings",
+            "type": "array"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/$defs/Review"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "disposition": {
+            "$ref": "#/$defs/Disposition",
+            "default": "ROUTINE"
+          }
+        },
+        "required": [
+          "patient_id",
+          "slots"
+        ],
+        "title": "SystemState",
+        "type": "object"
+      },
+      "ToolBehavior": {
+        "additionalProperties": false,
+        "properties": {
+          "booking": {
+            "default": "commit",
+            "enum": [
+              "commit",
+              "failure",
+              "ack_without_commit"
+            ],
+            "title": "Booking",
+            "type": "string"
+          },
+          "review": {
+            "default": "commit",
+            "enum": [
+              "commit",
+              "failure",
+              "ack_without_commit"
+            ],
+            "title": "Review",
+            "type": "string"
+          },
+          "snapshot_ttl_seconds": {
+            "default": 300,
+            "minimum": 1,
+            "title": "Snapshot Ttl Seconds",
+            "type": "integer"
+          }
+        },
+        "title": "ToolBehavior",
+        "type": "object"
+      },
+      "Trace": {
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "harness_version": {
+            "default": "replay-1.0",
+            "title": "Harness Version",
+            "type": "string"
+          },
+          "evidence_class": {
+            "const": "SYNTHETIC_EVALUATION_TRACE",
+            "default": "SYNTHETIC_EVALUATION_TRACE",
+            "title": "Evidence Class",
+            "type": "string"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "scenario_version": {
+            "title": "Scenario Version",
+            "type": "string"
+          },
+          "scenario_sha256": {
+            "title": "Scenario Sha256",
+            "type": "string"
+          },
+          "variant": {
+            "enum": [
+              "A",
+              "B"
+            ],
+            "title": "Variant",
+            "type": "string"
+          },
+          "agent_version": {
+            "title": "Agent Version",
+            "type": "string"
+          },
+          "policy_id": {
+            "title": "Policy Id",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "policy_sha256": {
+            "title": "Policy Sha256",
+            "type": "string"
+          },
+          "state_before": {
+            "$ref": "#/$defs/SystemState"
+          },
+          "state_after": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SystemState"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "events": {
+            "items": {
+              "$ref": "#/$defs/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "final_disposition": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Disposition"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "scenario_id",
+          "scenario_version",
+          "scenario_sha256",
+          "variant",
+          "agent_version",
+          "policy_id",
+          "policy_version",
+          "policy_sha256",
+          "state_before"
+        ],
+        "title": "Trace",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "schema_version": {
+        "default": "1.0",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "synthetic": {
+        "const": true,
+        "default": true,
+        "title": "Synthetic",
+        "type": "boolean"
+      },
+      "id": {
+        "title": "Id",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "title": "Created At",
+        "type": "string"
+      },
+      "dataset_sha256": {
+        "title": "Dataset Sha256",
+        "type": "string"
+      },
+      "implementation_sha256": {
+        "title": "Implementation Sha256",
+        "type": "string"
+      },
+      "runtime": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Runtime",
+        "type": "object"
+      },
+      "policy_manifest": {
+        "additionalProperties": true,
+        "title": "Policy Manifest",
+        "type": "object"
+      },
+      "evaluator_version": {
+        "title": "Evaluator Version",
+        "type": "string"
+      },
+      "variants": {
+        "items": {
+          "enum": [
+            "A",
+            "B"
+          ],
+          "type": "string"
+        },
+        "title": "Variants",
+        "type": "array"
+      },
+      "results": {
+        "items": {
+          "$ref": "#/$defs/Result"
+        },
+        "title": "Results",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "created_at",
+      "dataset_sha256",
+      "implementation_sha256",
+      "evaluator_version",
+      "variants",
+      "results"
+    ],
+    "title": "Run",
+    "type": "object"
+  },
+  "HumanLabel": {
+    "additionalProperties": false,
+    "properties": {
+      "scenario_id": {
+        "title": "Scenario Id",
+        "type": "string"
+      },
+      "variant": {
+        "enum": [
+          "A",
+          "B"
+        ],
+        "title": "Variant",
+        "type": "string"
+      },
+      "metric": {
+        "const": "resolution_clarity",
+        "default": "resolution_clarity",
+        "title": "Metric",
+        "type": "string"
+      },
+      "label": {
+        "enum": [
+          "PASS",
+          "FAIL",
+          "UNKNOWN"
+        ],
+        "title": "Label",
+        "type": "string"
+      },
+      "rationale": {
+        "maxLength": 4000,
+        "minLength": 5,
+        "title": "Rationale",
+        "type": "string"
+      },
+      "reviewer": {
+        "maxLength": 100,
+        "minLength": 1,
+        "title": "Reviewer",
+        "type": "string"
+      },
+      "source": {
+        "const": "human",
+        "default": "human",
+        "title": "Source",
+        "type": "string"
+      },
+      "rubric_version": {
+        "default": "clarity-rubric-1",
+        "title": "Rubric Version",
+        "type": "string"
+      },
+      "trace_sha256": {
+        "title": "Trace Sha256",
+        "type": "string"
+      },
+      "created_at": {
+        "format": "date-time",
+        "title": "Created At",
+        "type": "string"
+      }
+    },
+    "required": [
+      "scenario_id",
+      "variant",
+      "label",
+      "rationale",
+      "reviewer",
+      "trace_sha256",
+      "created_at"
+    ],
+    "title": "HumanLabel",
+    "type": "object"
+  }
+}

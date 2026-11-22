@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "review_status": "EXAMPLE_UNREVIEWED",
+  "warning": "Synthetic examples only; not clinical validation or medical guidance.",
+  "scheduling": {
+    "policy_id": "synthetic-scheduling",
+    "version": "1.0-example",
+    "normal_kind_order": [
+      "OPEN"
+    ],
+    "offer_ttl_seconds": 300
+  },
+  "triage": {
+    "policy_id": "synthetic-stroke-demo",
+    "version": "0.1.0-example",
+    "rule_id": "focal_neurologic_deficit",
+    "all_of": {
+      "right_arm_weakness": "yes",
+      "speech_abnormality": "yes"
+    },
+    "on_match": "EMERGENCY",
+    "otherwise": "HUMAN_REVIEW",
+    "scheduling_prohibited": [
+      "EMERGENCY",
+      "HUMAN_REVIEW"
+    ],
+    "source": "Guava demo/emergency.py; retained without clinical expansion"
+  }
+}

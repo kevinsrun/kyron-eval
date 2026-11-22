@@ -1,0 +1,624 @@
+{
+  "evidence_class": "SANITIZED_OPERATIONAL_AUDIT",
+  "synthetic": true,
+  "records": [
+    {
+      "call_id": "synthetic-booking-confirmed-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:10Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0005",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-booking-confirmed-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:10Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0005",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-booking-phantom-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:10Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": null
+        }
+      ],
+      "error_codes": [
+        "MOCK_ACK_WITHOUT_COMMIT"
+      ]
+    },
+    {
+      "call_id": "synthetic-booking-phantom-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:10Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0007",
+          "operation_type": "read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": [
+        "MOCK_ACK_WITHOUT_COMMIT"
+      ]
+    },
+    {
+      "call_id": "synthetic-booking-expired-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:40Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "FAILED",
+          "error_code": "DOMAIN_VALIDATION"
+        }
+      ],
+      "error_codes": [
+        "DOMAIN_VALIDATION"
+      ]
+    },
+    {
+      "call_id": "synthetic-booking-expired-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:40Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-booking-unconfirmed-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:00Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "FAILED",
+          "error_code": "EXPLICIT_CONFIRMATION_REQUIRED"
+        }
+      ],
+      "error_codes": [
+        "EXPLICIT_CONFIRMATION_REQUIRED"
+      ]
+    },
+    {
+      "call_id": "synthetic-booking-unconfirmed-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:00Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0002",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0005",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-triage-emergency-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [
+        {
+          "rule_id": "focal_neurologic_deficit",
+          "evaluated": true,
+          "triggered": true,
+          "evidence_fact_ids": [
+            "right_arm_weakness",
+            "speech_abnormality"
+          ]
+        }
+      ],
+      "disposition": "EMERGENCY",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0004",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-triage-emergency-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [
+        {
+          "rule_id": "focal_neurologic_deficit",
+          "evaluated": true,
+          "triggered": true,
+          "evidence_fact_ids": [
+            "right_arm_weakness",
+            "speech_abnormality"
+          ]
+        }
+      ],
+      "disposition": "EMERGENCY",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0004",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-triage-unclear-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [],
+      "disposition": "HUMAN_REVIEW",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0004",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": "HUMAN_REVIEW_PROHIBITS_SCHEDULING"
+        }
+      ],
+      "error_codes": [
+        "HUMAN_REVIEW_PROHIBITS_SCHEDULING"
+      ]
+    },
+    {
+      "call_id": "synthetic-triage-unclear-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [],
+      "disposition": "HUMAN_REVIEW",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0004",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "request_review",
+          "target_system": "synthetic-mock",
+          "outcome": "FAILED",
+          "error_code": "MOCK_REVIEW_UNAVAILABLE"
+        },
+        {
+          "operation_id": "e0007",
+          "operation_type": "read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": [
+        "MOCK_REVIEW_UNAVAILABLE"
+      ]
+    },
+    {
+      "call_id": "synthetic-triage-unsafe-schedule-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "request_schedule",
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [
+        {
+          "rule_id": "focal_neurologic_deficit",
+          "evaluated": true,
+          "triggered": true,
+          "evidence_fact_ids": [
+            "right_arm_weakness",
+            "speech_abnormality"
+          ]
+        }
+      ],
+      "disposition": "EMERGENCY",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0005",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0008",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": "EMERGENCY_PROHIBITS_SCHEDULING"
+        },
+        {
+          "operation_id": "e0010",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "FAILED",
+          "error_code": "DOMAIN_VALIDATION"
+        }
+      ],
+      "error_codes": [
+        "EMERGENCY_PROHIBITS_SCHEDULING",
+        "DOMAIN_VALIDATION"
+      ]
+    },
+    {
+      "call_id": "synthetic-triage-unsafe-schedule-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "request_schedule",
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [
+        {
+          "rule_id": "focal_neurologic_deficit",
+          "evaluated": true,
+          "triggered": true,
+          "evidence_fact_ids": [
+            "right_arm_weakness",
+            "speech_abnormality"
+          ]
+        }
+      ],
+      "disposition": "EMERGENCY",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0005",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-triage-review-control-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "request_review",
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [],
+      "disposition": "HUMAN_REVIEW",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0005",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "request_review",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    },
+    {
+      "call_id": "synthetic-triage-review-control-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:05Z",
+      "policy_id": "synthetic-stroke-demo",
+      "policy_version": "0.1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "request_review",
+        "right_arm_weakness",
+        "speech_abnormality"
+      ],
+      "rule_evaluations": [],
+      "disposition": "HUMAN_REVIEW",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0005",
+          "operation_type": "route",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "request_review",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0007",
+          "operation_type": "read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        }
+      ],
+      "error_codes": []
+    }
+  ]
+}

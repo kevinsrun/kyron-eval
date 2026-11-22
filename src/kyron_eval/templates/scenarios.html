@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">VERSIONED FIXTURES</p><h1>Eight synthetic scenarios</h1><p class="subtle">Four appointment workflows. Four triage and escalation workflows. Controls and difficult cases.</p></div></div>
+<div class="scenario-grid">{% for s in scenarios %}<section class="panel"><p class="eyebrow">{{s.workflow}} · v{{s.version}}</p><h2>{{s.title}}</h2><p>{{s.caller_goal}}</p><p><strong>Acceptable resolution:</strong> {{s.expected.acceptable_outcomes|join(', ')}}</p><p class="subtle">{{s.expected.explanation}}</p><details><summary>Scenario definition and hidden evidence</summary><pre>{{s.model_dump(mode='json')|tojson(indent=2)}}</pre></details></section>{% endfor %}</div>
+{% endblock %}

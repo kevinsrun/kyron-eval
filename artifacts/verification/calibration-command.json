@@ -1,0 +1,50 @@
+[
+  {
+    "version": "clarity-1.0",
+    "label_count": 4,
+    "agreements": 2,
+    "disagreements": 2,
+    "agreement_fraction": 0.5,
+    "confusion_matrix": {
+      "PASS": {
+        "PASS": 2,
+        "FAIL": 0,
+        "UNKNOWN": 0
+      },
+      "FAIL": {
+        "PASS": 2,
+        "FAIL": 0,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "PASS": 0,
+        "FAIL": 0,
+        "UNKNOWN": 0
+      }
+    }
+  },
+  {
+    "version": "clarity-2.0",
+    "label_count": 4,
+    "agreements": 4,
+    "disagreements": 0,
+    "agreement_fraction": 1.0,
+    "confusion_matrix": {
+      "PASS": {
+        "PASS": 2,
+        "FAIL": 0,
+        "UNKNOWN": 0
+      },
+      "FAIL": {
+        "PASS": 0,
+        "FAIL": 2,
+        "UNKNOWN": 0
+      },
+      "UNKNOWN": {
+        "PASS": 0,
+        "FAIL": 0,
+        "UNKNOWN": 0
+      }
+    }
+  }
+]

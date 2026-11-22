@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Kyron Eval{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">K<span class="brand-dot">/</span> <span>KYRON <small>EVAL</small></span></a>
+    <nav aria-label="Main navigation"><a href="/">Runs</a><a href="/scenarios">Scenarios</a><a href="/calibration">Human review</a><a href="/findings">Findings</a></nav>
+    <span class="mode">OFFLINE · SYNTHETIC</span>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>Synthetic evaluation workbench. Example policies are unreviewed and are not clinical validation. No live calls or EHR connections.</footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body></html>
