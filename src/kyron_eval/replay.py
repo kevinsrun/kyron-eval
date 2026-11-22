@@ -32,7 +32,12 @@ from kyron_eval.ehr.mock import SYNTHETIC_DOB, SYNTHETIC_PHONE
 from kyron_eval.models import Event, Scenario, SystemState, Trace
 
 DATA = Path(__file__).parent / "data"
-AGENT_VERSIONS = {"A": "baseline-1.0", "B": "verified-ehr-2.1", "LLM": "llm-text-1.0"}
+AGENT_VERSIONS = {
+    "A": "baseline-1.0",
+    "B": "verified-ehr-2.1",
+    "LLM": "llm-text-1.0",
+    "VOICE": "guava-voice-1.0",
+}
 
 
 def digest(value: Any) -> str:

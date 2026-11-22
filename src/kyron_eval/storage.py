@@ -88,8 +88,9 @@ class Store:
         adapter_name="mock",
         model_client=None,
     ):
-        if not variants or len(set(variants)) != len(variants) or set(variants) - {"A", "B", "LLM"}:
-            raise ValueError("Choose A, B, LLM, or a distinct pair")
+        allowed_variants = {"A", "B", "LLM", "VOICE"}
+        if not variants or len(set(variants)) != len(variants) or set(variants) - allowed_variants:
+            raise ValueError("Choose A, B, LLM, VOICE, or a distinct subset")
         if "LLM" in variants and adapter_name not in {"mock", "openemr"}:
             raise ValueError("LLM mode is restricted to synthetic mock EHR data")
         resolved_clarity = clarity_version or "clarity-ehr-3.3"
@@ -114,6 +115,11 @@ class Store:
                     from kyron_eval.llm_agent import execute_llm
 
                     trace = execute_llm(scenario, adapter=provider, model_client=model_client)
+                elif variant == "VOICE":
+                    from kyron_eval.voice.runner import execute_guava_voice
+
+                    res = execute_guava_voice(scenario, adapter=provider)
+                    trace = res.trace
                 else:
                     trace = replay(scenario, variant, adapter=provider)
                 try:

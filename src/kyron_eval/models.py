@@ -100,11 +100,13 @@ class Event(Model):
 class Trace(Model):
     schema_version: str = "1.0"
     harness_version: str = "replay-1.0"
-    evidence_class: Literal["SYNTHETIC_EVALUATION_TRACE"] = "SYNTHETIC_EVALUATION_TRACE"
+    evidence_class: Literal[
+        "SYNTHETIC_EVALUATION_TRACE", "VOICE_LIVE_SYNTHETIC"
+    ] = "SYNTHETIC_EVALUATION_TRACE"
     scenario_id: str
     scenario_version: str
     scenario_sha256: str
-    variant: Literal["A", "B", "LLM"]
+    variant: Literal["A", "B", "LLM", "VOICE"]
     agent_version: str
     policy_id: str
     policy_version: str
@@ -141,14 +143,14 @@ class Run(Model):
     runtime: dict[str, str] = Field(default_factory=dict)
     policy_manifest: dict[str, Any] = Field(default_factory=dict)
     evaluator_version: str
-    variants: list[Literal["A", "B", "LLM"]]
+    variants: list[Literal["A", "B", "LLM", "VOICE"]]
     configuration: dict[str, Any] = Field(default_factory=dict)
     results: list[Result]
 
 
 class HumanLabel(Model):
     scenario_id: str
-    variant: Literal["A", "B", "LLM"]
+    variant: Literal["A", "B", "LLM", "VOICE"]
     metric: Literal["resolution_clarity"] = "resolution_clarity"
     label: Literal["PASS", "FAIL", "UNKNOWN"]
     rationale: str = Field(min_length=5, max_length=4000)
