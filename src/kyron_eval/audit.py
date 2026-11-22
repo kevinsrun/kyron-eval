@@ -11,6 +11,11 @@ from kyron_eval.models import Result
 
 def operational_audit(result: Result) -> AuditRecord:
     trace = result.trace
+    from kyron_eval.ehr_evaluate import write_judgments
+
+    verified_writes = (
+        {j["event_id"]: j["status"] for j in write_judgments(trace)} if trace.ehr else {}
+    )
     operations = []
     for event in trace.events:
         if event.kind != "tool":
@@ -19,7 +24,27 @@ def operational_audit(result: Result) -> AuditRecord:
         completed = response.get("completed", False) or (
             event.name == "route" and "disposition" in response
         )
-        if event.name in {"book", "request_review"}:
+        if event.id in verified_writes:
+            status = verified_writes[event.id]
+            outcome = (
+                OperationOutcome.COMPLETED
+                if status == "PASS"
+                else OperationOutcome.FAILED
+                if status == "FAIL"
+                else OperationOutcome.ATTEMPTED
+            )
+        elif (event.name or "").startswith("ehr."):
+            outcome = (
+                OperationOutcome.COMPLETED
+                if response.get("status") == "OK"
+                else OperationOutcome.FAILED
+                if response.get("status") in {"ERROR", "UNSUPPORTED"}
+                else OperationOutcome.ATTEMPTED
+            )
+        elif trace.ehr and event.name in {"book", "request_review", "cancel"}:
+            # Public wrappers are attempts; the provider operation carries verified effect status.
+            outcome = OperationOutcome.ATTEMPTED
+        elif event.name in {"book", "request_review"}:
             collection = "bookings" if event.name == "book" else "reviews"
             # A successful acknowledgment without an effect remains ATTEMPTED telemetry.
             committed = (
@@ -38,7 +63,8 @@ def operational_audit(result: Result) -> AuditRecord:
             AuditedOperation(
                 operation_id=event.id,
                 operation_type=event.name,
-                target_system="synthetic-mock",
+                target_system="synthetic-"
+                + trace.ehr.get("capabilities", {}).get("adapter", "mock"),
                 outcome=outcome,
                 error_code=response.get("failure_code"),
             )

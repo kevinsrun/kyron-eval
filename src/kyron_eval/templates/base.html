@@ -8,9 +8,9 @@
 <body>
   <header class="topbar"><a class="brand" href="/">K<span class="brand-dot">/</span> <span>KYRON <small>EVAL</small></span></a>
     <nav aria-label="Main navigation"><a href="/">Runs</a><a href="/scenarios">Scenarios</a><a href="/calibration">Human review</a><a href="/findings">Findings</a></nav>
-    <span class="mode">OFFLINE · SYNTHETIC</span>
+    <span class="mode">SYNTHETIC · LOCAL</span>
   </header>
   <main>{% block content %}{% endblock %}</main>
-  <footer>Synthetic evaluation workbench. Example policies are unreviewed and are not clinical validation. No live calls or EHR connections.</footer>
+  <footer>Synthetic evaluation workbench. Example policies are unreviewed and are not clinical validation. Mock persistence and optional read-only synthetic FHIR. No live calls.</footer>
   <div id="toast" role="status" aria-live="polite"></div>
 </body></html>

@@ -1,0 +1,40 @@
+{
+  "verified_at": "2026-11-22T20:32:32.507462+00:00",
+  "base_commit": "56b0a8e",
+  "original_tests_preserved": 68,
+  "final_tests_passed": 125,
+  "lint": "PASS",
+  "warning": "Existing Starlette/httpx TestClient deprecation",
+  "original_evidence_files_unchanged": 32,
+  "original_human_labels": 4,
+  "legacy_calibration_agreements": [
+    2,
+    4
+  ],
+  "latest_controlled_experiment": "artifacts/ehr-experiment-20261122T202950-29c8372a.json",
+  "latest_controlled_traces": 37,
+  "current_source_matches_latest_experiment": true,
+  "implementation_sha256": "f6de28366e84a6b371a275affde8ca0a89ad06ee7435d58bf3bdc7e1c0bf1928",
+  "wheel_verification": {
+    "clean_environment": "/tmp/kyron-ehr-wheel-verify",
+    "installed_module": "/tmp/kyron-ehr-wheel-verify/lib/python3.11/site-packages/kyron_eval/__init__.py",
+    "run_id": "run-20261122T203118-4daaaad608",
+    "saved_mock_traces": 2,
+    "api_created": 201,
+    "html_and_static": 200,
+    "model_prompt_packaged": true
+  },
+  "browser": {
+    "mock_unknown_readback_run": "run-20261122T202443-bac17c5a4b",
+    "initial_fhir_run": "run-20261122T202500-46a0b3e07e",
+    "final_fhir_run": "run-20261122T203140-b01eb7518b",
+    "probe": "Synthetic fixture capabilities and normalized reads returned OK",
+    "console_errors_on_initial_flow": [],
+    "screenshot": "artifacts/verification/ehr-integration-final.jpg"
+  },
+  "real_openemr_verified": false,
+  "real_ehr_write_verified": false,
+  "actual_llm_called": false,
+  "deadline": "2026-11-22T20:00:00-05:00",
+  "video_recorded_by_assistant": false
+}

@@ -1,69 +1,55 @@
 # Kyron Eval
 
-An offline, synthetic evaluation workbench for a simplified healthcare voice agent. FastAPI, Pydantic, Jinja2 and plain JavaScript connect **scenario → replay → trace → evaluation → saved JSON → inspection UI**.
-
-All scenarios, policies, patient identifiers and outcomes are synthetic. The example triage rule is unreviewed and is **not clinical validation**. No telephone calls, speech APIs, external EHR, credentials or deployment are needed.
+A synthetic healthcare voice-agent evaluation platform built on the existing FastAPI/Pydantic/Jinja workbench at `56b0a8e`. The working path is **scenario → agent → guarded EHR tools → captured trace → authoritative readback → versioned evaluation → saved artifact → inspection UI**. Audio is optional and omitted.
 
 ## Run
 
-Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/). From this repository:
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/):
 
 ```sh
 ./start.sh
 ```
 
-Open **http://127.0.0.1:8000**. Saved example runs and four genuine user labels are included. Select a scenario and A, B, or A + B; **Run evaluation** executes the backend and persists a new run. Inspect both agents' metrics, dialogue, tool inputs/results, errors and state transitions. Human labels annotate exact traces without changing the original scores.
+Open **http://127.0.0.1:8000**. If occupied, use `KYRON_PORT=8002 ./start.sh`. Installation may download locked packages; afterward the default deterministic/mock path requires no external service or API key. `uv sync --frozen --offline` works when packages are cached.
 
-Equivalent minimal commands:
+Select a scenario, **Mock · read + write**, A/B comparison, and an optional fault. A new run saves actual tool responses, per-run mock state, final readback, and metric evidence. Inspect the EHR panel and trace. Human annotations remain separate from immutable automated outcomes. Historical runs and four genuine user labels are included and preserved.
 
-```sh
-uv sync --frozen
-uv run --frozen uvicorn kyron_eval.web:app --host 127.0.0.1 --port 8000
-```
+## EHR and agent modes
 
-First installation may download the locked dependencies. After installation, application execution, replay and evaluation use no external service. `uv sync --frozen --offline` works when its required packages are cached; this is not a vendored, universally offline installer. Change the port with `KYRON_PORT=8002 ./start.sh`.
+| Mode | Implemented | Verification boundary |
+|---|---|---|
+| MockEHRAdapter | All eight required operations, state readback, booking idempotency, cancellation, review queue, deterministic fault injection | Run-scoped synthetic state persisted under `artifacts/ehr/`; **not real EHR persistence** |
+| FHIRAdapter | Authenticated GETs, FHIR R4 capability discovery, patient/identity, appointments, availability, clinical codes | Read only. Explicit unsupported errors for booking, cancellation and review mutations. Local synthetic fixture tested; actual OpenEMR remains unverified. |
+| Deterministic A/B | Existing baseline and verified agent replay through EHR tools | Fully functional without a key. Original 68 tests retained. |
+| Optional LLM text agent | Environment-configured OpenAI-compatible tool loop; actual results fed back before the next response; bounded calls and raw events | Restricted to curated synthetic mock data. Protocol tested with scripted responses; no actual model performance experiment has been run. |
 
-## Inspect the evidence
-
-- [Experiment and product recommendation](docs/experiment.md): observed paired results, regressions, limitations and a booking failure investigated end to end.
-- [Rubric and metric definitions](docs/evaluation.md): evidence requirements, PASS/FAIL/UNKNOWN/N/A meanings, human-label provenance and calibration.
-- [Walkthrough outline](docs/walkthrough.md): actual five-minute demo steps. **No video has been recorded by the assistant.**
-- [Production priorities](docs/production.md), [AI disclosure and time allocation](docs/submission-notes.md), [engineering evidence log](docs/engineering-log.md).
-- Fixtures: `src/kyron_eval/data/scenarios.json`; example policies: `src/kyron_eval/data/policies.json`.
-- Saved runs: `artifacts/runs/`; separate sanitized telemetry: `artifacts/operational_audit/`; human labels: `artifacts/labels/`; raw judgments and confusion matrices: `artifacts/calibration/`.
-
-The summary in `artifacts/experiment.json` is generated from a stored run, not dashboard constants. Historical runs preserve the initial evaluator's mistakes. The latest paired run uses the corrected evaluator; see the report for its exact ID.
+See [configuration](docs/configuration.md) for the local FHIR fixture, synthetic OpenEMR setup requirements, authentication and optional model variables. No real patients, production endpoints, real provider information or production credentials are allowed. External FHIR data cannot enter an LLM prompt.
 
 ## Commands
 
 ```sh
-uv run --frozen kyron-eval run                         # all eight scenarios, both agents
-uv run --frozen kyron-eval run --variant B --scenario booking-phantom
-uv run --frozen kyron-eval run --clarity-version clarity-1.0
-uv run --frozen kyron-eval calibrate                   # preserve raw judgments + comparisons
+uv run --frozen kyron-eval run
+uv run --frozen kyron-eval run --variant B --scenario booking-confirmed --fault read_state=readback_failure
+uv run --frozen kyron-eval run --variant B --adapter fhir --scenario booking-confirmed
+uv run --frozen kyron-eval run --variant LLM --scenario booking-confirmed
+uv run --frozen kyron-eval calibrate
 uv run --frozen pytest -q
 uv run --frozen ruff check src/kyron_eval tests scripts
+uv run --frozen python scripts/ehr_experiment.py
 ```
 
-`KYRON_ARTIFACT_DIR=/some/directory` selects a different artifact store. The default is `./artifacts`, relative to the process working directory. Tests use temporary stores and do not add test annotations to submission evidence.
+`KYRON_ARTIFACT_DIR` selects a separate artifact store. Default `./artifacts` is relative to the working directory. The optional commands require their explicit configuration; the first/default command does not. API: `POST /api/runs`, `GET /api/runs/{id}`, `GET /api/ehr/status`, `POST /api/ehr/probe` (read-only configured endpoint).
 
-## What is real, simplified and omitted
+## Evidence and limitations
 
-The backend, guarded tool execution, validation, evaluation, persistence and UI controls are real. Agents A and B are **executable deterministic state machines**, not LLMs or a replay of a production model. Caller turns contain prestructured facts; natural language extraction is omitted. The in-memory EHR and human-review queue are mocks reset independently for every scenario and variant. A queued request does not mean a human accepted a transfer or reviewed symptoms. Emergency completion measures a recorded routing disposition, not an actual emergency connection.
+- [Current EHR experiment](docs/ehr-experiment.md): actual paired suite, fault matrix, evaluator revisions, regressions and unresolved verification.
+- [Architecture and evidence rules](docs/architecture.md), [original rubric/calibration](docs/evaluation.md), [production priorities](docs/production.md).
+- [Original experiment](docs/experiment.md) and `artifacts/experiment.json` remain historical evidence, unchanged.
+- [AI-use disclosure and time allocation](docs/submission-notes.md), [five-minute walkthrough](docs/walkthrough.md).
+- Fixtures/prompt: `src/kyron_eval/data/`; full raw runs: `artifacts/runs/`; mock snapshots: `artifacts/ehr/`; annotations: `artifacts/labels/`; calibration: `artifacts/calibration/`; verification: `artifacts/verification/`.
 
-The clarity evaluator applies an explicit interpretive rubric through transparent offline heuristics. It is limited to recognizable language patterns and abstains on unsupported language; it is not a general language judge. Four user-reviewed examples informed its revision and do not establish independent accuracy. There is no audio, ASR, general clinical reasoning, production dataset, authentication, cloud hosting, database service or live integration.
+Missing or ambiguous state is `UNKNOWN`. A success acknowledgment is not a persisted write. Tool failure, agent policy violations, unresolved task completion and truthful patient-facing recovery are separate judgments. Recognizable English heuristics implement clarity; they are not a general language judge. Four original human labels do not establish holdout accuracy, and the new EHR clarity extensions have no independent human validation.
 
-## Layout and reuse
+The two workflows use eight purposive synthetic scenarios and scripted caller facts/consent annotations. The optional model receives caller text, while existing tool guards use those known simulator annotations; this does not test speech recognition or natural-language extraction. No live calls, actual transfers, clinical validation, production prevalence, authentication, deployment or real EHR write is claimed. Synthetic policies are unreviewed examples.
 
-```
-src/kyron_eval/        models, guarded mock tools, two agents, evaluators, storage, API and UI
-src/clinical_triage/   attributed Guava domain contracts, scheduling policy and emergency rule
-tests/                retained source contracts plus state/evidence/API/calibration checks
-scripts/              fixture authoring, schema export, actual chat-label import, report generation
-docs/                 findings, definitions, roadmap, provenance and walkthrough
-artifacts/            immutable runs and separate annotations/comparisons
-```
-
-Adapted from [saquer916/guava-hackathon](https://github.com/saquer916/guava-hackathon/tree/c708acbbb03b8424313b4aeb0eeacb32fed64af4), revision `c708acb`. [Provenance](docs/upstream-provenance.json) identifies copied files and checksums. The domain and scheduling modules and emergency rule are unchanged; new tools wrap their validators. No Guava SDK, `main.py`, or OpenEMR adapter is used or installed here. No upstream changes were pushed.
-
-This local JSON store is intended for one review workstation. See the production notes for multi-user storage, ingestion, privacy and release gates. JSON files are atomically replaced, runs use unique IDs, and labels are separate revisions. Historical source code is identified by hashes; only the final implementation is bundled, so do not assume every early evaluator version can be rerun unchanged.
+Guava domain/scheduling validators and the emergency rule remain unchanged, attributed at [revision c708acb](https://github.com/saquer916/guava-hackathon/tree/c708acbbb03b8424313b4aeb0eeacb32fed64af4); see [file provenance](docs/upstream-provenance.json). The new FHIR adapter draws on its read-only OpenEMR adapter's boundaries; it is not copied wholesale. No Guava SDK or upstream changes are required.

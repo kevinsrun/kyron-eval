@@ -1,6 +1,18 @@
 # Submission notes and AI-use disclosure
 
-## Ownership and attribution
+## EHR upgrade after commit 56b0a8e
+
+The user subsequently requested an EHR abstraction, optional LLM text execution, read-only FHIR integration and new EHR-aware evidence checks while preserving the existing platform. **The current consequential user choice is to prioritize a working mock EHR tool path and state verification before external connectivity and live voice infrastructure.** This was an explicit user instruction, not an inferred personal action. The historical offline-only scope below describes the earlier phase and is superseded where noted here.
+
+Codex audited the base commit, reran all 68 tests, inspected Guava's read-only OpenEMR adapter/provider contracts, then implemented the adapters, tool loop, EHR evaluator, UI, additional tests and experiment reports. No new human labels were created; the original four user judgments and their provenance are unchanged. Protocol tests use scripted responses, identified as tests rather than actual model outcomes. No external LLM was invoked. No actual OpenEMR instance or EHR write was verified. A local synthetic FHIR fixture exercised the HTTP read boundary and explicit unsupported mutations.
+
+Evidence caused further AI output corrections: private mock snapshots initially let a timed-out write appear supported to an agent that had not observed a result; a versioned EHR check now separates final persistence from agent-visible evidence. Full-state unavailability initially hid valid partial FHIR appointment evidence; B now uses the independently authoritative collection. Model response shape validation, explicit cancellation consent, synthetic patient binding and stale-response handling were tested. Earlier experimental revisions were retained, not rewritten. See [current experiment](ehr-experiment.md) and [architecture](architecture.md).
+
+The upgrade began about 2:55 p.m. Eastern on November 22. Baseline/audit and mock/readback came first, external read-only FHIR and optional model protocol next, then UI, controlled experiments and documentation/verification. Final verification files record actual completion times. These are AI-assisted session phases, not invented candidate labor hours. The same hard 8:00 p.m. Eastern deadline applies; no deadline extension was assumed.
+
+Live voice/Guava SDK, real clinical records, actual OpenEMR installation, real EHR mutations, independent human validation of the new EHR clarity extensions, deployment and video recording remain omitted. The candidate must review and defend the implementation, record the single-take video and submit before the deadline. With more time: verify a separately seeded synthetic OpenEMR sandbox, run an explicitly configured real model experiment, add independently labeled paraphrase/negation holdouts and intermediate transaction receipts.
+
+## Historical ownership and attribution at 56b0a8e
 
 The user explicitly chose deterministic offline evaluation, the Python/FastAPI/Pydantic/Jinja stack, state-backed evidence, preserved Guava safety validators, a separate repository, and no live voice/EHR/deployment. **The consequential user decision represented here is to prioritize a reviewable offline state-verification workbench over live integration realism.** This is supported by their explicit request; it is not an invented later personal action.
 

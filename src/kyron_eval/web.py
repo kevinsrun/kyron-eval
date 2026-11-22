@@ -13,6 +13,9 @@ from pydantic import Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from kyron_eval.calibration import compare_labels
+from kyron_eval.ehr.config import configuration_status, create_adapter
+from kyron_eval.ehr.contracts import OPERATIONS, Fault
+from kyron_eval.llm_agent import model_status
 from kyron_eval.models import HumanLabel, Model
 from kyron_eval.replay import digest, load_scenarios, trace_hash
 from kyron_eval.storage import Store
@@ -21,13 +24,15 @@ ROOT = Path(__file__).parent
 
 
 class RunRequest(Model):
-    variants: list[Literal["A", "B"]] = Field(default=["A", "B"], min_length=1, max_length=2)
+    variants: list[Literal["A", "B", "LLM"]] = Field(default=["A", "B"], min_length=1, max_length=3)
     scenario_ids: list[str] | None = Field(default=None, min_length=1, max_length=8)
+    adapter: Literal["mock", "fhir"] = "mock"
+    ehr_faults: dict[str, Fault] = Field(default_factory=dict, max_length=9)
 
 
 class LabelRequest(Model):
     scenario_id: str
-    variant: Literal["A", "B"]
+    variant: Literal["A", "B", "LLM"]
     label: Literal["PASS", "FAIL", "UNKNOWN"]
     rationale: str = Field(min_length=5, max_length=4000)
     reviewer: str = Field(min_length=1, max_length=100)
@@ -80,7 +85,12 @@ def create_app(artifact_root=None):
         return templates.TemplateResponse(
             request=request,
             name="index.html",
-            context={**store.list(), "scenarios": load_scenarios()},
+            context={
+                **store.list(),
+                "scenarios": load_scenarios(),
+                "integration": configuration_status(),
+                "model": model_status(),
+            },
         )
 
     @app.get("/scenarios", response_class=HTMLResponse)
@@ -116,6 +126,38 @@ def create_app(artifact_root=None):
     @app.get("/api/scenarios")
     def api_scenarios():
         return load_scenarios()
+
+    @app.get("/api/ehr/status")
+    def ehr_status():
+        scenario = load_scenarios()[0]
+        provider = create_adapter("mock", scenario)
+        try:
+            return {
+                **configuration_status(),
+                "mock": provider.capabilities(),
+                "model": model_status(),
+            }
+        finally:
+            provider.close()
+
+    @app.post("/api/ehr/probe")
+    def ehr_probe():
+        scenario = load_scenarios()[0]
+        try:
+            provider = create_adapter("fhir", scenario)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        try:
+            patient_id = scenario.initial_state.patient_id
+            return {
+                "capabilities": provider.capabilities(),
+                "patient": provider.get_patient(patient_id),
+                "appointments": provider.get_appointments(patient_id),
+                "availability": provider.get_availability(scenario.clock),
+                "clinical_context": provider.get_clinical_context(patient_id),
+            }
+        finally:
+            provider.close()
 
     @app.get("/calibration", response_class=HTMLResponse)
     def calibration_page(request: Request):
@@ -155,8 +197,15 @@ def create_app(artifact_root=None):
     def execute(body: RunRequest):
         if len(body.variants) != len(set(body.variants)):
             raise HTTPException(422, "Duplicate variants")
+        if set(body.ehr_faults) - set(OPERATIONS):
+            raise HTTPException(422, "Unknown EHR fault operation")
         try:
-            return store.execute(body.variants, body.scenario_ids)
+            return store.execute(
+                body.variants,
+                body.scenario_ids,
+                adapter_name=body.adapter,
+                ehr_faults=body.ehr_faults,
+            )
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
 

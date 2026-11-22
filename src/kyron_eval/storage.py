@@ -11,7 +11,8 @@ from pathlib import Path
 from uuid import uuid4
 
 from kyron_eval.audit import operational_audit
-from kyron_eval.evaluate import CLARITY_VERSION, EVALUATOR_VERSION, evaluate
+from kyron_eval.ehr.config import create_adapter
+from kyron_eval.evaluate import EVALUATOR_VERSION, evaluate
 from kyron_eval.models import Metric, Result, Run, Status
 from kyron_eval.replay import DATA, digest, load_scenarios, replay, trace_hash
 
@@ -77,9 +78,21 @@ class Store:
                 errors.append({"file": path.name, "error": str(exc)})
         return {"runs": rows, "artifact_errors": errors}
 
-    def execute(self, variants, scenario_ids=None, *, clarity_version=CLARITY_VERSION):
-        if not variants or len(set(variants)) != len(variants) or set(variants) - {"A", "B"}:
-            raise ValueError("Choose A, B, or both exactly once")
+    def execute(
+        self,
+        variants,
+        scenario_ids=None,
+        *,
+        clarity_version=None,
+        ehr_faults=None,
+        adapter_name="mock",
+        model_client=None,
+    ):
+        if not variants or len(set(variants)) != len(variants) or set(variants) - {"A", "B", "LLM"}:
+            raise ValueError("Choose A, B, LLM, or a distinct pair")
+        if "LLM" in variants and adapter_name != "mock":
+            raise ValueError("LLM mode is restricted to synthetic mock EHR data")
+        resolved_clarity = clarity_version or "clarity-ehr-3.2"
         scenarios = load_scenarios()
         known = {s.id for s in scenarios}
         if scenario_ids and set(scenario_ids) - known:
@@ -88,9 +101,15 @@ class Store:
         results = []
         for scenario in selected:
             for variant in variants:
-                trace = replay(scenario, variant)
+                provider = create_adapter(adapter_name, scenario, ehr_faults)
+                if variant == "LLM":
+                    from kyron_eval.llm_agent import execute_llm
+
+                    trace = execute_llm(scenario, adapter=provider, model_client=model_client)
+                else:
+                    trace = replay(scenario, variant, adapter=provider)
                 try:
-                    metrics = evaluate(scenario, trace, clarity_version=clarity_version)
+                    metrics = evaluate(scenario, trace, clarity_version=resolved_clarity)
                 except Exception as exc:
                     # A judge implementation failure must never look like an agent failure.
                     metrics = [
@@ -104,19 +123,38 @@ class Store:
                     ]
                 results.append(Result(scenario=scenario, trace=trace, metrics=metrics))
         run = Run(
+            schema_version="2.0",
             id=f"run-{datetime.now(UTC):%Y%m%dT%H%M%S}-{uuid4().hex[:10]}",
             created_at=datetime.now(UTC),
             dataset_sha256=digest(json.loads((DATA / "scenarios.json").read_text())),
             implementation_sha256=implementation_digest(),
             runtime={
                 "python": platform.python_version(),
-                **{name: version(name) for name in ("fastapi", "pydantic", "jinja2", "uvicorn")},
+                **{
+                    name: version(name)
+                    for name in ("fastapi", "pydantic", "jinja2", "uvicorn", "httpx")
+                },
             },
             policy_manifest=json.loads((DATA / "policies.json").read_text()),
-            evaluator_version=f"{EVALUATOR_VERSION}+{clarity_version}",
+            evaluator_version=f"{EVALUATOR_VERSION}+{resolved_clarity}+ehr-1.1",
             variants=variants,
             results=results,
+            configuration={
+                "adapter": adapter_name,
+                "ehr_faults": ehr_faults or {},
+                "agent_modes": variants,
+            },
         )
+        for result in results:
+            snapshot = result.trace.ehr.get("mock_storage")
+            if snapshot:
+                atomic_json(
+                    self.root
+                    / "ehr"
+                    / run.id
+                    / f"{result.scenario.id}-{result.trace.variant}.json",
+                    snapshot,
+                )
         atomic_json(
             self.root / "operational_audit" / f"{run.id}.json",
             {

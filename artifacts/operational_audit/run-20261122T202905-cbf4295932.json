@@ -1,0 +1,191 @@
+{
+  "evidence_class": "SANITIZED_OPERATIONAL_AUDIT",
+  "synthetic": true,
+  "records": [
+    {
+      "call_id": "synthetic-booking-confirmed-A",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:10Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0001",
+          "operation_type": "ehr.get_patient",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0002",
+          "operation_type": "ehr.verify_identity",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0003",
+          "operation_type": "ehr.get_appointments",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0004",
+          "operation_type": "ehr.get_clinical_context",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "ehr.get_availability",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0007",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0010",
+          "operation_type": "ehr.create_appointment",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0011",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0014",
+          "operation_type": "ehr.read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": "MOCK_READBACK_UNAVAILABLE"
+        }
+      ],
+      "error_codes": [
+        "MOCK_READBACK_UNAVAILABLE"
+      ]
+    },
+    {
+      "call_id": "synthetic-booking-confirmed-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:10Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "slot_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0001",
+          "operation_type": "ehr.get_patient",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0002",
+          "operation_type": "ehr.verify_identity",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0003",
+          "operation_type": "ehr.get_appointments",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0004",
+          "operation_type": "ehr.get_clinical_context",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0006",
+          "operation_type": "ehr.get_availability",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0007",
+          "operation_type": "search",
+          "target_system": "synthetic-mock",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0010",
+          "operation_type": "ehr.create_appointment",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0011",
+          "operation_type": "book",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0013",
+          "operation_type": "ehr.read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": "MOCK_READBACK_UNAVAILABLE"
+        },
+        {
+          "operation_id": "e0014",
+          "operation_type": "read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": "MOCK_READBACK_UNAVAILABLE"
+        },
+        {
+          "operation_id": "e0017",
+          "operation_type": "ehr.read_state",
+          "target_system": "synthetic-mock",
+          "outcome": "ATTEMPTED",
+          "error_code": "MOCK_READBACK_UNAVAILABLE"
+        }
+      ],
+      "error_codes": [
+        "MOCK_READBACK_UNAVAILABLE",
+        "MOCK_READBACK_UNAVAILABLE"
+      ]
+    }
+  ]
+}

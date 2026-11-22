@@ -48,3 +48,15 @@ Final controlled run: `run-20261122T194538-db7d99d3f5` with `deterministic-1.3+c
 Final local suite: **68 passed, one dependency deprecation warning**. Ruff, lock check, JS syntax check, source/wheel build, clean source installation/tests/replay and isolated wheel execution/HTTP checks pass. Browser suite/single controls, trace evidence, human disagreement and findings were observed working. Full logs and screenshots are in `artifacts/verification/`; see `docs/verification.md`.
 
 Implementation freeze: approximately **2:47 p.m. Eastern**. The hard deadline remains 8:00 p.m. Recording and submission belong to the candidate; no recording, deployment, live integration or upstream push was performed.
+
+## EHR continuation from 56b0a8e (November 22)
+
+- Reran base: 68 passing tests. Added a SHA-256 preservation manifest for all 32 original tracked artifacts before edits.
+- Inspected Guava revision c708acb's read-only OpenEMR adapter, EHR contracts and provider boundaries. Its example localhost:9300 URL had no running service here. Reused boundaries and preserved original vendored validators.
+- Introduced EHR contract/mock, guarded provider tool path and authoritative readback before adding FHIR. Run state and journals are separately persisted; provider acknowledgments do not establish effects.
+- Added read-only FHIR R4 discovery/auth/normalization with synthetic trust restrictions, explicit unsupported operations, partial collection evidence and sanitized failures. A local synthetic fixture exercised real HTTP; actual OpenEMR was not installed or verified.
+- Added optional bounded model text/tool execution without a framework migration. Synthetic HTTP protocol tests verify result feedback and guard/error behavior. No actual LLM call was made.
+- Connected adapter/mode/fault selection, connection probe and per-trace EHR inspection to the existing API/UI. Browser-created runs preserve actual outputs. No human labels were added by AI.
+- Controlled experiments exposed private-state/agent-visible evidence confusion and lost partial FHIR evidence. Versioned corrections and all four experiment revisions remain in artifacts. See docs/ehr-experiment.md for exact IDs and observations.
+- Final checks: 125 tests pass (all original 68 retained), lint passes, source builds to sdist/wheel, clean wheel installs without development dependencies and executes the mock API → saved run → rendered UI. Original artifact checksums and four-label legacy calibration are unchanged. One existing Starlette/httpx deprecation warning remains.
+- Updated README/configuration/architecture/evaluation/production/AI-use/walkthrough notes. No live voice, real patient records, production credentials, real EHR writes, deployment or recorded video. Implementation frozen with recording time before the 8 p.m. Eastern deadline; exact final verification time is in artifacts/verification/ehr-final-verification.json.

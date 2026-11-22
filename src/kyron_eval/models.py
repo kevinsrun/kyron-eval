@@ -26,6 +26,7 @@ class CallerTurn(Model):
     text: str = Field(min_length=1)
     facts: dict[str, str] = Field(default_factory=dict)
     confirms_offer: bool = False
+    confirms_cancellation: bool = False
     elapsed_seconds: int = Field(default=0, ge=0)
 
 
@@ -90,7 +91,7 @@ class Event(Model):
     id: str
     seq: int = Field(ge=1)
     at: datetime
-    kind: Literal["caller", "agent", "tool", "policy", "state", "error", "disposition"]
+    kind: Literal["caller", "agent", "tool", "policy", "state", "error", "disposition", "model"]
     text: str | None = None
     name: str | None = None
     data: dict[str, Any] = Field(default_factory=dict)
@@ -103,7 +104,7 @@ class Trace(Model):
     scenario_id: str
     scenario_version: str
     scenario_sha256: str
-    variant: Literal["A", "B"]
+    variant: Literal["A", "B", "LLM"]
     agent_version: str
     policy_id: str
     policy_version: str
@@ -112,6 +113,7 @@ class Trace(Model):
     state_after: SystemState | None = None
     events: list[Event] = Field(default_factory=list)
     final_disposition: Disposition | None = None
+    ehr: dict[str, Any] = Field(default_factory=dict)
 
 
 class Metric(Model):
@@ -139,13 +141,14 @@ class Run(Model):
     runtime: dict[str, str] = Field(default_factory=dict)
     policy_manifest: dict[str, Any] = Field(default_factory=dict)
     evaluator_version: str
-    variants: list[Literal["A", "B"]]
+    variants: list[Literal["A", "B", "LLM"]]
+    configuration: dict[str, Any] = Field(default_factory=dict)
     results: list[Result]
 
 
 class HumanLabel(Model):
     scenario_id: str
-    variant: Literal["A", "B"]
+    variant: Literal["A", "B", "LLM"]
     metric: Literal["resolution_clarity"] = "resolution_clarity"
     label: Literal["PASS", "FAIL", "UNKNOWN"]
     rationale: str = Field(min_length=5, max_length=4000)

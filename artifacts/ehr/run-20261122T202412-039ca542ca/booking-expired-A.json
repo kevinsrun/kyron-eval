@@ -1,0 +1,165 @@
+{
+  "evidence_class": "PRIVILEGED_SYNTHETIC_MOCK_STORAGE",
+  "warning": "Mock persistence only; unavailable readback remains UNKNOWN to evaluators.",
+  "state": {
+    "patient_id": "synthetic-patient-1",
+    "slots": [
+      {
+        "slot_id": "synthetic-slot-1",
+        "provider_id": "synthetic-provider-a",
+        "location_id": "synthetic-clinic",
+        "starts_at": "2026-11-23T14:00:00Z",
+        "ends_at": "2026-11-23T14:30:00Z",
+        "kind": "OPEN"
+      },
+      {
+        "slot_id": "synthetic-slot-2",
+        "provider_id": "synthetic-provider-a",
+        "location_id": "synthetic-clinic",
+        "starts_at": "2026-11-23T15:00:00Z",
+        "ends_at": "2026-11-23T15:30:00Z",
+        "kind": "OPEN"
+      }
+    ],
+    "bookings": [],
+    "reviews": [],
+    "disposition": "ROUTINE"
+  },
+  "journal": [
+    {
+      "operation": "get_patient",
+      "status": "OK",
+      "data": {
+        "patient_id": "synthetic-patient-1",
+        "synthetic": true
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": null,
+      "source": "mock"
+    },
+    {
+      "operation": "verify_identity",
+      "status": "OK",
+      "data": {
+        "patient_id": "synthetic-patient-1",
+        "verified": true,
+        "verified_factor_codes": [
+          "BIRTH_DATE",
+          "PHONE"
+        ],
+        "requires_human_review": false
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": null,
+      "source": "mock"
+    },
+    {
+      "operation": "get_appointments",
+      "status": "OK",
+      "data": {
+        "bookings": []
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": null,
+      "source": "mock"
+    },
+    {
+      "operation": "get_clinical_context",
+      "status": "OK",
+      "data": {
+        "patient_id": "synthetic-patient-1",
+        "condition_codes": [
+          "synthetic-condition"
+        ],
+        "medication_codes": [],
+        "observation_codes": [],
+        "synthetic": true
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": null,
+      "source": "mock"
+    },
+    {
+      "operation": "get_availability",
+      "status": "OK",
+      "data": {
+        "snapshot": {
+          "snapshot_id": "synthetic-snapshot",
+          "observed_at": "2026-11-23T13:00:00Z",
+          "expires_at": "2026-11-23T13:00:20Z",
+          "slots": [
+            {
+              "slot_id": "synthetic-slot-1",
+              "provider_id": "synthetic-provider-a",
+              "location_id": "synthetic-clinic",
+              "starts_at": "2026-11-23T14:00:00Z",
+              "ends_at": "2026-11-23T14:30:00Z",
+              "kind": "OPEN"
+            },
+            {
+              "slot_id": "synthetic-slot-2",
+              "provider_id": "synthetic-provider-a",
+              "location_id": "synthetic-clinic",
+              "starts_at": "2026-11-23T15:00:00Z",
+              "ends_at": "2026-11-23T15:30:00Z",
+              "kind": "OPEN"
+            }
+          ]
+        }
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": "2026-11-23T13:00:00Z",
+      "source": "mock"
+    },
+    {
+      "operation": "get_appointments",
+      "status": "OK",
+      "data": {
+        "bookings": []
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": null,
+      "source": "mock"
+    },
+    {
+      "operation": "read_state",
+      "status": "OK",
+      "data": {
+        "state": {
+          "patient_id": "synthetic-patient-1",
+          "slots": [
+            {
+              "slot_id": "synthetic-slot-1",
+              "provider_id": "synthetic-provider-a",
+              "location_id": "synthetic-clinic",
+              "starts_at": "2026-11-23T14:00:00Z",
+              "ends_at": "2026-11-23T14:30:00Z",
+              "kind": "OPEN"
+            },
+            {
+              "slot_id": "synthetic-slot-2",
+              "provider_id": "synthetic-provider-a",
+              "location_id": "synthetic-clinic",
+              "starts_at": "2026-11-23T15:00:00Z",
+              "ends_at": "2026-11-23T15:30:00Z",
+              "kind": "OPEN"
+            }
+          ],
+          "bookings": [],
+          "reviews": [],
+          "disposition": "ROUTINE"
+        }
+      },
+      "failure_code": null,
+      "authoritative": true,
+      "observed_at": "2026-11-23T13:00:40Z",
+      "source": "mock"
+    }
+  ]
+}

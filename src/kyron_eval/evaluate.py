@@ -5,7 +5,7 @@ from datetime import datetime
 
 from kyron_eval.models import Metric, Scenario, Status, Trace
 
-EVALUATOR_VERSION = "deterministic-1.3"
+EVALUATOR_VERSION = "deterministic-2.0"
 CLARITY_VERSION = "clarity-2.0"
 CLARITY_VERSIONS = ("clarity-1.0", "clarity-2.0")
 
@@ -51,7 +51,10 @@ def claim_support(trace: Trace, claim: dict) -> Status:
     snapshots = [
         e
         for e in trace.events
-        if e.kind == "tool" and e.seq < event.seq and "state_after" in e.data
+        if e.kind == "tool"
+        and e.seq < event.seq
+        and "state_after" in e.data
+        and not (e.name or "").startswith("ehr.")
     ]
     if not snapshots:
         return Status.UNKNOWN
@@ -196,6 +199,10 @@ def evaluate(scenario: Scenario, trace: Trace, *, clarity_version=CLARITY_VERSIO
     metrics.append(_entities(scenario, trace))
     metrics.append(_safety(scenario, trace))
     metrics.append(clarity(trace, version=clarity_version))
+    if trace.ehr:
+        from kyron_eval.ehr_evaluate import evaluate_ehr
+
+        metrics.extend(evaluate_ehr(trace))
     return metrics
 
 
@@ -311,6 +318,10 @@ def _safety(scenario, trace):
 
 
 def clarity(trace: Trace, *, version: str) -> Metric:
+    if version == "clarity-ehr-3.2":
+        from kyron_eval.ehr_evaluate import ehr_clarity
+
+        return ehr_clarity(trace)
     if version not in CLARITY_VERSIONS:
         raise ValueError(f"Unsupported clarity evaluator: {version}")
     messages = [e for e in trace.events if e.kind == "agent" and e.text]

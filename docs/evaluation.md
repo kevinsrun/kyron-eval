@@ -1,5 +1,7 @@
 # Ground truth, metrics and rubric
 
+The EHR upgrade adds provider/readback/identity/claim metrics and versioned clarity extensions described in [architecture](architecture.md) and [the current experiment](ehr-experiment.md). This document retains the original rubric and four-label calibration; those labels have not independently validated the new extensions.
+
 The caller script's structured facts define the synthetic request; the scenario's independently specified expectations define acceptable outcomes. Mock state defines whether a mutation actually occurred. Each variant receives a deep copy of the same initial state and the same injection configuration. Agents observe caller facts and tool responses; neither consults expected outcomes or metric statuses. A/B may call different tools, so identical injection does not imply identical tool exposure.
 
 State is trusted only inside this synthetic mock. Production would need independent transaction/read evidence, consistent identifiers and ingestion completeness checks. A transcript cannot prove a booking, accepted transfer or completed write; neither can a tool invocation or successful acknowledgment alone.
