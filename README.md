@@ -47,7 +47,7 @@ uv run --frozen python scripts/ehr_experiment.py
 
 ## Evidence and limitations
 
-- [Guava Voice AI SDK integration](docs/voice-integration.md): native Guava Agent tasks, checklists, events, mediated tool execution, and OpenEMR cancellation under `VOICE_LIVE_SYNTHETIC`.
+- [Guava Voice AI SDK integration](docs/voice-integration.md): offline Guava SDK callbacks, mediated tool execution and optional real synthetic OpenEMR cancellation under `GUAVA_SDK_CALLBACK_SIMULATION`. No audio, model or telephony executes.
 - [Real OpenEMR experiment](docs/openemr-experiment.md): authenticated local EHR operations, readback, actual agent cancellation and explicit unsupported capabilities.
 - [Earlier mock/FHIR EHR experiment](docs/ehr-experiment.md): actual paired suite, fault matrix, evaluator revisions, regressions and unresolved verification.
 - [Architecture and evidence rules](docs/architecture.md), [original rubric/calibration](docs/evaluation.md), [production priorities](docs/production.md).
@@ -59,4 +59,8 @@ Missing or ambiguous state is `UNKNOWN`. A success acknowledgment is not a persi
 
 The two workflows use eight purposive synthetic scenarios and scripted caller facts/consent annotations. The optional model receives caller text, while existing tool guards use those known simulator annotations; this does not test speech recognition or natural-language extraction. Real synthetic OpenEMR writes and API authentication are verified on this integration branch. No live calls, actual transfers, clinical validation, production prevalence, app-user authentication or deployment is claimed. Synthetic policies are unreviewed examples.
 
-Guava domain/scheduling validators and the emergency rule remain unchanged, attributed at [revision c708acb](https://github.com/saquer916/guava-hackathon/tree/c708acbbb03b8424313b4aeb0eeacb32fed64af4); see [file provenance](docs/upstream-provenance.json). The new FHIR adapter draws on its read-only OpenEMR adapter's boundaries; it is not copied wholesale. No Guava SDK or upstream changes are required.
+Guava domain/scheduling validators and the emergency rule remain unchanged, attributed at [revision c708acb](https://github.com/saquer916/guava-hackathon/tree/c708acbbb03b8424313b4aeb0eeacb32fed64af4); see [file provenance](docs/upstream-provenance.json). The new FHIR adapter draws on its read-only OpenEMR adapter's boundaries; it is not copied wholesale. Guava SDK 0.53.0 is pinned for the optional callback-simulation path; no upstream changes are required.
+
+## PR #1 safety review continuation
+
+The Guava path is an **offline SDK callback simulation**, with optional actual local synthetic OpenEMR I/O. It executes no audio, telephony or model. Proposed consent, identity, completion-readback and evidence-label fixes are isolated on `codex/review-pr1-voice-safety`; they are not merged into PR #1. See [review findings and exact tests](docs/pr1-review.md) and [current SDK boundaries](docs/voice-integration.md). The frozen take-home artifact remains unchanged.

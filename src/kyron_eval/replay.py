@@ -36,7 +36,7 @@ AGENT_VERSIONS = {
     "A": "baseline-1.0",
     "B": "verified-ehr-2.1",
     "LLM": "llm-text-1.0",
-    "VOICE": "guava-voice-1.0",
+    "VOICE": "guava-sdk-simulation-1.1",
 }
 
 

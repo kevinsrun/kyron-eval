@@ -45,19 +45,24 @@ class LabelRequest(Model):
 
 
 def voice_status():
-    api_key = bool(os.environ.get("GUAVA_API_KEY"))
-    number = bool(os.environ.get("GUAVA_AGENT_NUMBER"))
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        sdk_version = version("guava-sdk")
+    except PackageNotFoundError:
+        sdk_version = None
+    credentials = bool(os.environ.get("GUAVA_API_KEY") and os.environ.get("GUAVA_AGENT_NUMBER"))
     return {
-        "sdk_installed": True,
-        "sdk_version": "0.53.0",
-        "live_telephony_configured": api_key and number,
-        "synthetic_voice_ready": True,
-        "mode": "VOICE_LIVE_SYNTHETIC",
-        "live_credentials_status": (
-            "configured"
-            if api_key
-            else "unconfigured (telephony blocked, synthetic simulation active)"
-        ),
+        "sdk_installed": sdk_version is not None,
+        "sdk_version": sdk_version,
+        "live_telephony_configured": False,
+        "credentials_present": credentials,
+        "synthetic_voice_ready": sdk_version == "0.53.0",
+        "mode": "GUAVA_SDK_CALLBACK_SIMULATION",
+        "live_credentials_status": "not implemented; no telephony or model execution",
+        "actual_audio": False,
+        "actual_telephony": False,
+        "actual_model": False,
     }
 
 

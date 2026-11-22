@@ -1,0 +1,155 @@
+...FFFFs                                                                 [100%]
+=================================== FAILURES ===================================
+_______________ test_appointment_retrieval_and_cancellation_mock _______________
+
+scenario = Scenario(id='booking-confirmed', version='1.0', synthetic=True, title='Confirmed booking · ordinary control', workflow...ove=['Actual mock EHR booking record and slot removal.', 'Tool failure injection and availability expiry timestamps.'])
+
+    def test_appointment_retrieval_and_cancellation_mock(scenario):
+        """End-to-end voice session cancels appointment with independent readback."""
+        # In mock scenario, add an initial booking to cancel
+>       res = execute_guava_voice(scenario, confirm_cancellation=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_guava_voice.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scenario = Scenario(id='booking-confirmed', version='1.0', synthetic=True, title='Confirmed booking · ordinary control', workflow...ove=['Actual mock EHR booking record and slot removal.', 'Tool failure injection and availability expiry timestamps.'])
+
+    def execute_guava_voice(
+        scenario: Scenario,
+        *,
+        adapter=None,
+        faults=None,
+        caller_dob: str = "1980-01-02",
+        caller_phone: str = "2025550100",
+        confirm_cancellation: bool = True,
+        target_appointment_id: str | None = None,
+    ) -> Result:
+        """Offline SDK callback simulation; no audio, telephony, ASR or model executes."""
+        explicit_target = target_appointment_id or next(
+            (
+                turn.facts.get("cancel_appointment_id")
+                for turn in scenario.script
+                if turn.facts.get("cancel_appointment_id")
+            ),
+            None,
+        )
+        if scenario.workflow != "scheduling" or not explicit_target:
+>           raise ValueError("SDK simulation requires an explicit cancellation scenario/target")
+E           ValueError: SDK simulation requires an explicit cancellation scenario/target
+
+src/kyron_eval/voice/runner.py:49: ValueError
+_______________ test_unconfirmed_cancellation_prevents_mutation ________________
+
+scenario = Scenario(id='booking-confirmed', version='1.0', synthetic=True, title='Confirmed booking · ordinary control', workflow...ove=['Actual mock EHR booking record and slot removal.', 'Tool failure injection and availability expiry timestamps.'])
+
+    def test_unconfirmed_cancellation_prevents_mutation(scenario):
+        """Caller saying 'no' to cancellation prevents tool invocation and retains state."""
+>       res = execute_guava_voice(scenario, confirm_cancellation=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_guava_voice.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scenario = Scenario(id='booking-confirmed', version='1.0', synthetic=True, title='Confirmed booking · ordinary control', workflow...ove=['Actual mock EHR booking record and slot removal.', 'Tool failure injection and availability expiry timestamps.'])
+
+    def execute_guava_voice(
+        scenario: Scenario,
+        *,
+        adapter=None,
+        faults=None,
+        caller_dob: str = "1980-01-02",
+        caller_phone: str = "2025550100",
+        confirm_cancellation: bool = True,
+        target_appointment_id: str | None = None,
+    ) -> Result:
+        """Offline SDK callback simulation; no audio, telephony, ASR or model executes."""
+        explicit_target = target_appointment_id or next(
+            (
+                turn.facts.get("cancel_appointment_id")
+                for turn in scenario.script
+                if turn.facts.get("cancel_appointment_id")
+            ),
+            None,
+        )
+        if scenario.workflow != "scheduling" or not explicit_target:
+>           raise ValueError("SDK simulation requires an explicit cancellation scenario/target")
+E           ValueError: SDK simulation requires an explicit cancellation scenario/target
+
+src/kyron_eval/voice/runner.py:49: ValueError
+___________ test_unavailable_readback_records_unknown_not_false_pass ___________
+
+scenario = Scenario(id='booking-confirmed', version='1.0', synthetic=True, title='Confirmed booking · ordinary control', workflow...ove=['Actual mock EHR booking record and slot removal.', 'Tool failure injection and availability expiry timestamps.'])
+
+    def test_unavailable_readback_records_unknown_not_false_pass(scenario):
+        """Injected readback failure records UNKNOWN write verification, never silent PASS."""
+>       res = execute_guava_voice(
+            scenario,
+            faults={"read_state": "readback_failure"},
+            confirm_cancellation=True,
+        )
+
+tests/test_guava_voice.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scenario = Scenario(id='booking-confirmed', version='1.0', synthetic=True, title='Confirmed booking · ordinary control', workflow...ove=['Actual mock EHR booking record and slot removal.', 'Tool failure injection and availability expiry timestamps.'])
+
+    def execute_guava_voice(
+        scenario: Scenario,
+        *,
+        adapter=None,
+        faults=None,
+        caller_dob: str = "1980-01-02",
+        caller_phone: str = "2025550100",
+        confirm_cancellation: bool = True,
+        target_appointment_id: str | None = None,
+    ) -> Result:
+        """Offline SDK callback simulation; no audio, telephony, ASR or model executes."""
+        explicit_target = target_appointment_id or next(
+            (
+                turn.facts.get("cancel_appointment_id")
+                for turn in scenario.script
+                if turn.facts.get("cancel_appointment_id")
+            ),
+            None,
+        )
+        if scenario.workflow != "scheduling" or not explicit_target:
+>           raise ValueError("SDK simulation requires an explicit cancellation scenario/target")
+E           ValueError: SDK simulation requires an explicit cancellation scenario/target
+
+src/kyron_eval/voice/runner.py:49: ValueError
+__________ test_escalation_locks_scheduling_and_never_claims_transfer __________
+
+service = <kyron_eval.voice.service.KyronVoiceService object at 0x1087a15d0>
+world = <kyron_eval.replay.MockWorld object at 0x1087a2cd0>
+
+    def test_escalation_locks_scheduling_and_never_claims_transfer(service, world):
+        """Escalation transitions disposition to EMERGENCY and prohibits scheduling."""
+        esc_res = service.escalate(
+            patient_id=service.bound_patient_id,
+            reason="Severe acute symptoms reported",
+            requested_by="agent",
+        )
+        assert esc_res.completed
+        assert world.state.disposition.value == "EMERGENCY"
+    
+        # Scheduling is now prohibited
+        book_res = service.create_appointment(
+            patient_id=service.bound_patient_id,
+            slot_id="synthetic-slot-1",
+            confirmed_by_caller=True,
+        )
+        assert not book_res.completed
+>       assert book_res.failure_code == VoiceErrorCode.DISPOSITION_PROHIBITS_MUTATION
+E       AssertionError: assert 'IDENTITY_NOT_VERIFIED' == 'DISPOSITION_...BITS_MUTATION'
+E         
+E         - DISPOSITION_PROHIBITS_MUTATION
+E         + IDENTITY_NOT_VERIFIED
+
+tests/test_guava_voice.py:215: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_guava_voice.py::test_appointment_retrieval_and_cancellation_mock
+FAILED tests/test_guava_voice.py::test_unconfirmed_cancellation_prevents_mutation
+FAILED tests/test_guava_voice.py::test_unavailable_readback_records_unknown_not_false_pass
+FAILED tests/test_guava_voice.py::test_escalation_locks_scheduling_and_never_claims_transfer
+4 failed, 3 passed, 1 skipped in 0.16s

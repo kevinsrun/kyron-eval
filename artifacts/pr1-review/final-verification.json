@@ -1,0 +1,22 @@
+{
+  "at": "2026-11-22T22:32:37.699524+00:00",
+  "reviewed_head": "0f1714f6a763a384597637c063a7c0f3b31608f6",
+  "reviewed_base": "40b8130b317c4b6d1168cb81869d16c86efc2d8b",
+  "fix_branch": "codex/review-pr1-voice-safety",
+  "implementation_sha256": "34546037c3e73518dfb4dda379e969f15ecf523d8176b4ac1ce7afd2ce85b726",
+  "offline": {
+    "passed": 188,
+    "skipped": 9
+  },
+  "live_enabled": {
+    "passed": 197
+  },
+  "new_regressions": 39,
+  "prior_artifact_count": 333,
+  "historical_artifacts_unchanged": true,
+  "frozen_submission_unchanged": true,
+  "actual_audio": false,
+  "actual_model": false,
+  "actual_telephony": false,
+  "merge_recommendation": "REQUEST_CHANGES; independently review separate fixes before merging"
+}

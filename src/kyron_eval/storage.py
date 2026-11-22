@@ -107,6 +107,15 @@ class Store:
         if scenario_ids and set(scenario_ids) - known:
             raise ValueError("Unknown scenario IDs")
         selected = [s for s in scenarios if not scenario_ids or s.id in scenario_ids]
+        if "VOICE" in variants and (
+            adapter_name not in {"mock", "openemr"}
+            or any(
+                s.workflow != "scheduling"
+                or not any(turn.facts.get("cancel_appointment_id") for turn in s.script)
+                for s in selected
+            )
+        ):
+            raise ValueError("SDK simulation requires an explicit synthetic cancellation scenario")
         results = []
         for scenario in selected:
             for variant in variants:

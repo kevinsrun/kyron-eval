@@ -31,6 +31,16 @@ class GuavaVoiceAdapter:
     def raw_events(self) -> list[dict[str, Any]]:
         return self._raw_events
 
+    def record_sdk_command(self, command_type, payload):
+        self._world.event(
+            "state",
+            name="voice.sdk_command",
+            command_type=command_type,
+            payload=payload,
+            evidence_source="locally_queued_sdk_instruction",
+            delivered_to_caller=False,
+        )
+
     def record_inbound_call(self, event: InboundCallEvent) -> None:
         self._raw_events.append(event.model_dump(mode="json"))
         self._world.event(
@@ -105,7 +115,15 @@ class GuavaVoiceAdapter:
             pickup=event.pickup,
         )
         self._world.trace.ehr["guava_voice"] = {
-            "evidence_class": "VOICE_LIVE_SYNTHETIC",
+            "evidence_class": self._world.trace.evidence_class,
+            "execution": "offline SDK callback simulation",
+            "actual_audio": False,
+            "actual_telephony": False,
+            "actual_model": False,
+            "actual_asr": False,
+            "speech_delivery_verified": False,
+            "ehr_backend": self._world.adapter.name,
+            "synthetic_lifecycle_events": True,
             "termination_reason": event.termination_reason,
             "raw_events_count": len(self._raw_events),
             "pickup": event.pickup,

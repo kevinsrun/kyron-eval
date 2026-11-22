@@ -8,7 +8,7 @@ Adheres strictly to the official Guava SDK mental model:
 """
 
 import guava
-from guava.events import BotSessionEnded, EscalateEvent
+from guava.events import BotSessionEnded, CallerSpeechEvent, EscalateEvent
 
 from kyron_eval.voice.service import KyronVoiceService
 
@@ -22,8 +22,21 @@ def build_guava_agent(service: KyronVoiceService) -> guava.Agent:
         purpose="Verify patient identity and assist with confirmed appointment cancellation.",
     )
 
+    def active(call):
+        if service.bind_call(call.id):
+            return True
+        call.hangup("This session is unavailable. Please call the clinic directly.")
+        return False
+
+    @agent.on_caller_speech
+    def on_caller_speech(call: guava.Call, event: CallerSpeechEvent) -> None:
+        if active(call):
+            service.observe_caller(call.id, event.utterance_id, event.utterance)
+
     @agent.on_call_start
     def on_call_start(call: guava.Call) -> None:
+        if not active(call):
+            return
         call.set_task(
             "identity",
             objective=(
@@ -48,6 +61,8 @@ def build_guava_agent(service: KyronVoiceService) -> guava.Agent:
 
     @agent.on_task_complete("identity")
     def on_identity_complete(call: guava.Call) -> None:
+        if not active(call):
+            return
         raw_dob = call.get_field("patient_birth_date")
         raw_phone = call.get_field("patient_phone")
         phone_digits = "".join(c for c in str(raw_phone or "") if c.isdigit())
@@ -65,6 +80,7 @@ def build_guava_agent(service: KyronVoiceService) -> guava.Agent:
             )
             return
 
+        service.get_appointments(patient_id=service.bound_patient_id)
         call.set_task(
             "cancellation",
             objective=(
@@ -90,18 +106,14 @@ def build_guava_agent(service: KyronVoiceService) -> guava.Agent:
 
     @agent.on_task_complete("cancellation")
     def on_cancellation_complete(call: guava.Call) -> None:
-        appointment_id = str(call.get_field("appointment_id") or "").strip()
-        confirmation = str(call.get_field("caller_confirmation") or "").lower().strip()
-        confirmed = confirmation in {"yes", "true", "confirm", "confirmed"}
-
-        if not confirmed:
-            call.hangup("Cancellation was not confirmed. Your appointment remains scheduled.")
+        if not active(call):
             return
-
+        appointment_id = str(call.get_field("appointment_id") or "").strip()
+        # Checklist fields are model output. Only the caller transcript callback can
+        # grant exact-target, session-bound consent in the service.
         result = service.cancel_appointment(
             patient_id=service.bound_patient_id,
             appointment_id=appointment_id,
-            confirmed_by_caller=True,
         )
 
         if result.completed and result.ehr_status == "OK":
@@ -121,11 +133,12 @@ def build_guava_agent(service: KyronVoiceService) -> guava.Agent:
 
     @agent.on_action("cancel_appointment")
     def on_action_cancel(call: guava.Call) -> None:
+        if not active(call):
+            return
         appointment_id = str(call.get_variable("target_appointment_id") or "").strip()
         result = service.cancel_appointment(
             patient_id=service.bound_patient_id,
             appointment_id=appointment_id,
-            confirmed_by_caller=True,
         )
         if result.completed and result.ehr_status == "OK":
             call.send_instruction(
@@ -141,18 +154,22 @@ def build_guava_agent(service: KyronVoiceService) -> guava.Agent:
 
     @agent.on_escalate
     def on_escalate(call: guava.Call, event: EscalateEvent) -> None:
+        if not active(call):
+            return
         service.escalate(
             patient_id=service.bound_patient_id,
             reason="Caller requested human clinician or safety threshold triggered",
             requested_by=getattr(event, "requested_by", "agent"),
         )
         call.hangup(
-            "I am transferring your request to clinical staff for review. "
-            "Please remain on the line or contact our emergency number if urgent."
+            "I cannot connect a live transfer or confirm a clinical review. "
+            "Please call the clinic directly. If this is an emergency, call 911 now."
         )
 
     @agent.on_session_end
     def on_session_end(call: guava.Call, event: BotSessionEnded) -> None:
-        del call, event
+        del event
+        if service.bind_call(call.id):
+            service.end_session()
 
     return agent

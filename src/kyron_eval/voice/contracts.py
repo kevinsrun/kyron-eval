@@ -41,6 +41,7 @@ class VoiceGetAppointmentsInput(VoiceToolModel):
 class VoiceCancelAppointmentInput(VoiceToolModel):
     patient_id: str = Field(min_length=1)
     appointment_id: str = Field(min_length=1)
+    # Backward-compatible input only; this model-supplied flag never grants cancellation consent.
     confirmed_by_caller: bool = Field(default=False)
 
 

@@ -1,0 +1,4418 @@
+{
+  "at": "2026-11-22T22:26:26.516323+00:00",
+  "reviewed_head": "0f1714f6a763a384597637c063a7c0f3b31608f6",
+  "implementation_sha256": "34546037c3e73518dfb4dda379e969f15ecf523d8176b4ac1ce7afd2ce85b726",
+  "evidence_boundary": "Offline SDK callbacks with actual synthetic local OpenEMR I/O; no audio, telephony or model",
+  "setup": "Operator-specified appointment API probe, not an availability search",
+  "created": {
+    "operation": "create_appointment",
+    "status": "OK",
+    "data": {
+      "completed": true,
+      "appointment_id": "51",
+      "correlation": "23b8b6fa4f6eff69",
+      "confirmation_event_id": "synthetic-operator-explicit-consent",
+      "availability_verified": false
+    },
+    "failure_code": null,
+    "authoritative": false,
+    "observed_at": "2026-11-22T22:26:25.846273Z",
+    "source": "openemr"
+  },
+  "result": {
+    "scenario": {
+      "id": "openemr-cancel-existing",
+      "version": "openemr-cancellation-1.0",
+      "synthetic": true,
+      "title": "Real OpenEMR \u00b7 cancel seeded synthetic appointment",
+      "workflow": "scheduling",
+      "caller_goal": "Cancel the explicitly identified synthetic test appointment; standard API deletes its calendar event.",
+      "script": [
+        {
+          "text": "Please cancel appointment 51. Yes, I confirm cancellation.",
+          "facts": {
+            "cancel_appointment_id": "51"
+          },
+          "confirms_offer": false,
+          "confirms_cancellation": true,
+          "elapsed_seconds": 0
+        }
+      ],
+      "clock": "2026-11-23T13:00:00Z",
+      "initial_state": {
+        "patient_id": "synthetic-patient-1",
+        "slots": [
+          {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          {
+            "slot_id": "synthetic-slot-2",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T15:00:00Z",
+            "ends_at": "2026-11-23T15:30:00Z",
+            "kind": "OPEN"
+          }
+        ],
+        "bookings": [],
+        "reviews": [],
+        "disposition": "ROUTINE"
+      },
+      "tools": {
+        "booking": "commit",
+        "review": "commit",
+        "snapshot_ttl_seconds": 300
+      },
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "expected": {
+        "acceptable_outcomes": [
+          "NOT_BOOKED"
+        ],
+        "disposition": "ROUTINE",
+        "critical_entities": {},
+        "explanation": "Authoritative before/after appointment evidence must establish cancellation of the bound native ID."
+      },
+      "transcript_cannot_prove": [
+        "Actual OpenEMR event deletion requires independent readback.",
+        "The original task completion metric is scheduling/triage-specific; EHR write verification covers this cancellation."
+      ]
+    },
+    "trace": {
+      "schema_version": "2.0",
+      "harness_version": "guava-sdk-simulation-1.1",
+      "evidence_class": "GUAVA_SDK_CALLBACK_SIMULATION",
+      "scenario_id": "openemr-cancel-existing",
+      "scenario_version": "openemr-cancellation-1.0",
+      "scenario_sha256": "9b39ddae7e3713816b03a063a496d8812823e5ec48dad48ee8520cec952fcdd2",
+      "variant": "VOICE",
+      "agent_version": "guava-sdk-simulation-1.1",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "state_before": {
+        "patient_id": "synthetic-patient-1",
+        "slots": [
+          {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          {
+            "slot_id": "synthetic-slot-2",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T15:00:00Z",
+            "ends_at": "2026-11-23T15:30:00Z",
+            "kind": "OPEN"
+          }
+        ],
+        "bookings": [],
+        "reviews": [],
+        "disposition": "ROUTINE"
+      },
+      "state_after": null,
+      "events": [
+        {
+          "id": "e0001",
+          "seq": 1,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.inbound_call",
+          "data": {
+            "caller_number": "+12025550100",
+            "agent_number": "+15555550199"
+          }
+        },
+        {
+          "id": "e0002",
+          "seq": 2,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.sdk_command",
+          "data": {
+            "command_type": "set-task",
+            "payload": {
+              "command_type": "set-task",
+              "task_id": "identity",
+              "objective": "Verify the caller's synthetic patient identity before disclosing records or modifying appointments. Ask for date of birth and phone number.",
+              "completion_criteria": "",
+              "action_items": [
+                {
+                  "item_type": "field",
+                  "key": "patient_birth_date",
+                  "description": "Patient date of birth in YYYY-MM-DD or spoken format.",
+                  "question": "",
+                  "field_type": "text",
+                  "required": true,
+                  "choices": [],
+                  "is_search_field": false,
+                  "sensitive": false
+                },
+                {
+                  "item_type": "field",
+                  "key": "patient_phone",
+                  "description": "Patient phone number digits.",
+                  "question": "",
+                  "field_type": "digit_sequence",
+                  "required": true,
+                  "choices": [],
+                  "is_search_field": false,
+                  "sensitive": false
+                }
+              ]
+            },
+            "evidence_source": "locally_queued_sdk_instruction",
+            "delivered_to_caller": false
+          }
+        },
+        {
+          "id": "e0003",
+          "seq": 3,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "caller",
+          "text": "Hello, my date of birth is 1980-01-02 and my phone number is 2025550100.",
+          "name": "voice.caller_speech",
+          "data": {
+            "utterance_id": "utt-001",
+            "session_id": "036e33e182dd4d00aa2e5c6e772f94cc"
+          }
+        },
+        {
+          "id": "e0004",
+          "seq": 4,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.field_extracted",
+          "data": {
+            "field_key": "patient_birth_date",
+            "field_payload": "1980-01-02"
+          }
+        },
+        {
+          "id": "e0005",
+          "seq": 5,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.field_extracted",
+          "data": {
+            "field_key": "patient_phone",
+            "field_payload": "2025550100"
+          }
+        },
+        {
+          "id": "e0006",
+          "seq": 6,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "ehr.verify_identity",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1",
+              "birth_date": "1980-01-02",
+              "phone": "2025550100"
+            },
+            "result": {
+              "operation": "verify_identity",
+              "status": "OK",
+              "data": {
+                "patient_id": "synthetic-patient-1",
+                "verified": true,
+                "verified_factor_codes": [
+                  "BIRTH_DATE",
+                  "PHONE"
+                ],
+                "synthetic_fixture_identity_only": true
+              },
+              "failure_code": null,
+              "authoritative": true,
+              "observed_at": "2026-11-22T22:26:26.022157Z",
+              "source": "openemr"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_source": "policy_cache",
+            "http_evidence": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:25.989851+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ]
+          }
+        },
+        {
+          "id": "e0007",
+          "seq": 7,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "ehr.get_appointments",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1"
+            },
+            "result": {
+              "operation": "get_appointments",
+              "status": "OK",
+              "data": {
+                "bookings": [
+                  {
+                    "appointment_id": "10",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "11",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "12",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "15",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "16",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "17",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "20",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "21",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "22",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "27",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "28",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "29",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "51",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  }
+                ],
+                "native_identifiers": [
+                  {
+                    "appointment_id": "10",
+                    "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "11",
+                    "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "12",
+                    "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "15",
+                    "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "16",
+                    "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "17",
+                    "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "20",
+                    "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "21",
+                    "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "22",
+                    "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "27",
+                    "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "28",
+                    "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "29",
+                    "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "51",
+                    "appointment_uuid": "a34a18c6-b98e-4e79-936d-ba13598e6460",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  }
+                ],
+                "readback_sources": [
+                  "FHIR Appointment search",
+                  "standard patient appointment read"
+                ]
+              },
+              "failure_code": null,
+              "authoritative": true,
+              "observed_at": "2026-11-22T22:26:26.084189Z",
+              "source": "openemr"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_source": "policy_cache",
+            "http_evidence": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.022288+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.044407+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/1/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.066656+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ]
+          }
+        },
+        {
+          "id": "e0008",
+          "seq": 8,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "voice.task_completed.identity",
+          "data": {
+            "task_id": "identity",
+            "fields": {
+              "dob": "1980-01-02",
+              "phone": "2025550100"
+            },
+            "result": {
+              "completed": true,
+              "task_id": "identity"
+            }
+          }
+        },
+        {
+          "id": "e0009",
+          "seq": 9,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.sdk_command",
+          "data": {
+            "command_type": "set-task",
+            "payload": {
+              "command_type": "set-task",
+              "task_id": "cancellation",
+              "objective": "Assist the verified patient with appointment cancellation. Request the appointment ID and obtain explicit confirmation before proceeding.",
+              "completion_criteria": "",
+              "action_items": [
+                {
+                  "item_type": "field",
+                  "key": "appointment_id",
+                  "description": "The appointment ID to cancel.",
+                  "question": "",
+                  "field_type": "text",
+                  "required": true,
+                  "choices": [],
+                  "is_search_field": false,
+                  "sensitive": false
+                },
+                {
+                  "item_type": "field",
+                  "key": "caller_confirmation",
+                  "description": "Explicit confirmation from the caller to cancel the appointment.",
+                  "question": "",
+                  "field_type": "multiple_choice",
+                  "required": true,
+                  "choices": [
+                    "yes",
+                    "no"
+                  ],
+                  "is_search_field": false,
+                  "sensitive": false
+                }
+              ]
+            },
+            "evidence_source": "locally_queued_sdk_instruction",
+            "delivered_to_caller": false
+          }
+        },
+        {
+          "id": "e0010",
+          "seq": 10,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "caller",
+          "text": "Please cancel appointment 51. Yes, I confirm cancellation.",
+          "name": "voice.caller_speech",
+          "data": {
+            "utterance_id": "utt-002",
+            "session_id": "036e33e182dd4d00aa2e5c6e772f94cc",
+            "confirms_cancellation": true,
+            "cancel_appointment_id": "51"
+          }
+        },
+        {
+          "id": "e0011",
+          "seq": 11,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.cancellation_consent",
+          "data": {
+            "session_id": "036e33e182dd4d00aa2e5c6e772f94cc",
+            "patient_id": "synthetic-patient-1",
+            "appointment_id": "51",
+            "caller_event_id": "e0010",
+            "source": "exact_caller_transcript"
+          }
+        },
+        {
+          "id": "e0012",
+          "seq": 12,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.field_extracted",
+          "data": {
+            "field_key": "appointment_id",
+            "field_payload": "51"
+          }
+        },
+        {
+          "id": "e0013",
+          "seq": 13,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.field_extracted",
+          "data": {
+            "field_key": "caller_confirmation",
+            "field_payload": "yes"
+          }
+        },
+        {
+          "id": "e0014",
+          "seq": 14,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "ehr.get_appointments",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1"
+            },
+            "result": {
+              "operation": "get_appointments",
+              "status": "OK",
+              "data": {
+                "bookings": [
+                  {
+                    "appointment_id": "10",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "11",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "12",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "15",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "16",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "17",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "20",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "21",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "22",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "27",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "28",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "29",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "51",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  }
+                ],
+                "native_identifiers": [
+                  {
+                    "appointment_id": "10",
+                    "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "11",
+                    "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "12",
+                    "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "15",
+                    "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "16",
+                    "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "17",
+                    "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "20",
+                    "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "21",
+                    "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "22",
+                    "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "27",
+                    "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "28",
+                    "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "29",
+                    "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "51",
+                    "appointment_uuid": "a34a18c6-b98e-4e79-936d-ba13598e6460",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  }
+                ],
+                "readback_sources": [
+                  "FHIR Appointment search",
+                  "standard patient appointment read"
+                ]
+              },
+              "failure_code": null,
+              "authoritative": true,
+              "observed_at": "2026-11-22T22:26:26.142194Z",
+              "source": "openemr"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_source": "policy_cache",
+            "http_evidence": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.085104+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.103931+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/1/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.125597+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ]
+          }
+        },
+        {
+          "id": "e0015",
+          "seq": 15,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "ehr.cancel_appointment",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1",
+              "appointment_id": "51"
+            },
+            "result": {
+              "operation": "cancel_appointment",
+              "status": "OK",
+              "data": {
+                "completed": true,
+                "appointment_id": "51",
+                "mechanism": "standard API deletion, not a FHIR status update"
+              },
+              "failure_code": null,
+              "authoritative": false,
+              "observed_at": "2026-11-22T22:26:26.215523Z",
+              "source": "openemr"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_source": "policy_cache",
+            "http_evidence": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.143991+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.162654+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/1/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.183660+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "DELETE",
+                "path": "/apis/default/api/patient/1/appointment/51",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.199853+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ]
+          }
+        },
+        {
+          "id": "e0016",
+          "seq": 16,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "cancel",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1",
+              "appointment_id": "51"
+            },
+            "result": {
+              "completed": true,
+              "appointment_id": "51",
+              "mechanism": "standard API deletion, not a FHIR status update",
+              "ehr_status": "OK",
+              "failure_code": null
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            }
+          }
+        },
+        {
+          "id": "e0017",
+          "seq": 17,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "error",
+          "text": null,
+          "name": "OPENEMR_PARTIAL_STATE_ONLY",
+          "data": {
+            "origin": "tool_uncertainty",
+            "tool": "read_state"
+          }
+        },
+        {
+          "id": "e0018",
+          "seq": 18,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "ehr.read_state",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1",
+              "now": "2026-11-23T13:00:00+00:00"
+            },
+            "result": {
+              "operation": "read_state",
+              "status": "UNKNOWN",
+              "data": {
+                "appointments": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "10",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "11",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "12",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "15",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "16",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "17",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "20",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "21",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "22",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "27",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "28",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "29",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "10",
+                        "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "11",
+                        "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "12",
+                        "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "15",
+                        "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "16",
+                        "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "17",
+                        "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "20",
+                        "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "21",
+                        "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "22",
+                        "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "27",
+                        "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "28",
+                        "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "29",
+                        "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-22T22:26:26.274938Z",
+                  "source": "openemr"
+                },
+                "available_collections": [
+                  "bookings"
+                ],
+                "unavailable_collections": [
+                  "reviews"
+                ]
+              },
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+              "authoritative": false,
+              "observed_at": "2026-11-22T22:26:26.274968Z",
+              "source": "openemr"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_source": "policy_cache",
+            "http_evidence": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.217080+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.235772+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/1/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.258039+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ]
+          }
+        },
+        {
+          "id": "e0019",
+          "seq": 19,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "read_state",
+          "data": {
+            "inputs": {},
+            "result": {
+              "completed": false,
+              "state": null,
+              "bookings": [
+                {
+                  "appointment_id": "10",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "11",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "12",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "15",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "16",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "17",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "20",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "21",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "22",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "27",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "28",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                },
+                {
+                  "appointment_id": "29",
+                  "patient_id": "synthetic-patient-1",
+                  "slot": {
+                    "slot_id": "synthetic-slot-1",
+                    "provider_id": "synthetic-provider-a",
+                    "location_id": "synthetic-clinic",
+                    "starts_at": "2026-11-23T14:00:00Z",
+                    "ends_at": "2026-11-23T14:30:00Z",
+                    "kind": "OPEN"
+                  },
+                  "confirmation_event_id": "synthetic-operator-explicit-consent"
+                }
+              ],
+              "ehr_status": "UNKNOWN",
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            }
+          }
+        },
+        {
+          "id": "e0020",
+          "seq": 20,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "voice.cancel_appointment",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1",
+              "appointment_id": "51",
+              "consent_event_id": "e0010"
+            },
+            "result": {
+              "completed": true,
+              "ehr_status": "OK",
+              "failure_code": null,
+              "message": "Cancellation verified by independent readback.",
+              "data": {
+                "appointment_id": "51",
+                "patient_id": "synthetic-patient-1",
+                "acknowledgment": {
+                  "completed": true,
+                  "appointment_id": "51",
+                  "mechanism": "standard API deletion, not a FHIR status update",
+                  "ehr_status": "OK",
+                  "failure_code": null
+                },
+                "readback": {
+                  "completed": false,
+                  "state": null,
+                  "bookings": [
+                    {
+                      "appointment_id": "10",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "11",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "12",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "15",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "16",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "17",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "20",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "21",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "22",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "27",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "28",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    },
+                    {
+                      "appointment_id": "29",
+                      "patient_id": "synthetic-patient-1",
+                      "slot": {
+                        "slot_id": "synthetic-slot-1",
+                        "provider_id": "synthetic-provider-a",
+                        "location_id": "synthetic-clinic",
+                        "starts_at": "2026-11-23T14:00:00Z",
+                        "ends_at": "2026-11-23T14:30:00Z",
+                        "kind": "OPEN"
+                      },
+                      "confirmation_event_id": "synthetic-operator-explicit-consent"
+                    }
+                  ],
+                  "ehr_status": "UNKNOWN",
+                  "failure_code": "OPENEMR_PARTIAL_STATE_ONLY"
+                },
+                "consent_event_id": "e0010",
+                "session_id": "036e33e182dd4d00aa2e5c6e772f94cc",
+                "verified_absent": true
+              }
+            },
+            "agent_visible": true
+          }
+        },
+        {
+          "id": "e0021",
+          "seq": 21,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "voice.task_completed.cancellation",
+          "data": {
+            "task_id": "cancellation",
+            "fields": {
+              "appointment_id": "51",
+              "confirmation": "yes"
+            },
+            "result": {
+              "completed": true,
+              "task_id": "cancellation"
+            }
+          }
+        },
+        {
+          "id": "e0022",
+          "seq": 22,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.sdk_command",
+          "data": {
+            "command_type": "send-instruction",
+            "payload": {
+              "command_type": "send-instruction",
+              "instruction": "Start ending the conversation. Here are your final instructions: Your appointment is cancelled. Please call the clinic if you need another time. Once you've completed the final instructions, naturally end the conversation and hang up the call."
+            },
+            "evidence_source": "locally_queued_sdk_instruction",
+            "delivered_to_caller": false
+          }
+        },
+        {
+          "id": "e0023",
+          "seq": 23,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "voice.session_ended",
+          "data": {
+            "termination_reason": "bot-hangup",
+            "dnc": false,
+            "pickup": true
+          }
+        },
+        {
+          "id": "e0024",
+          "seq": 24,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "error",
+          "text": null,
+          "name": "OPENEMR_PARTIAL_STATE_ONLY",
+          "data": {
+            "origin": "tool_uncertainty",
+            "tool": "read_state"
+          }
+        },
+        {
+          "id": "e0025",
+          "seq": 25,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "tool",
+          "text": null,
+          "name": "ehr.read_state",
+          "data": {
+            "inputs": {
+              "patient_id": "synthetic-patient-1",
+              "now": "2026-11-23T13:00:00+00:00"
+            },
+            "result": {
+              "operation": "read_state",
+              "status": "UNKNOWN",
+              "data": {
+                "appointments": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "10",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "11",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "12",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "15",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "16",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "17",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "20",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "21",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "22",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "27",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "28",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "29",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "10",
+                        "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "11",
+                        "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "12",
+                        "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "15",
+                        "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "16",
+                        "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "17",
+                        "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "20",
+                        "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "21",
+                        "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "22",
+                        "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "27",
+                        "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "28",
+                        "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "29",
+                        "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-22T22:26:26.332346Z",
+                  "source": "openemr"
+                },
+                "available_collections": [
+                  "bookings"
+                ],
+                "unavailable_collections": [
+                  "reviews"
+                ]
+              },
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+              "authoritative": false,
+              "observed_at": "2026-11-22T22:26:26.332376Z",
+              "source": "openemr"
+            },
+            "state_before": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_after": {
+              "patient_id": "synthetic-patient-1",
+              "slots": [
+                {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                {
+                  "slot_id": "synthetic-slot-2",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T15:00:00Z",
+                  "ends_at": "2026-11-23T15:30:00Z",
+                  "kind": "OPEN"
+                }
+              ],
+              "bookings": [],
+              "reviews": [],
+              "disposition": "ROUTINE"
+            },
+            "state_source": "policy_cache",
+            "http_evidence": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.275290+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.294335+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/1/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-22T22:26:26.315387+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ]
+          }
+        },
+        {
+          "id": "e0026",
+          "seq": 26,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "state",
+          "text": null,
+          "name": "ehr.final_readback",
+          "data": {
+            "result": {
+              "operation": "read_state",
+              "status": "UNKNOWN",
+              "data": {
+                "appointments": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "10",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "11",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "12",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "15",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "16",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "17",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "20",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "21",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "22",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "27",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "28",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      },
+                      {
+                        "appointment_id": "29",
+                        "patient_id": "synthetic-patient-1",
+                        "slot": {
+                          "slot_id": "synthetic-slot-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-23T14:00:00Z",
+                          "ends_at": "2026-11-23T14:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "synthetic-operator-explicit-consent"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "10",
+                        "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "11",
+                        "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "12",
+                        "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "15",
+                        "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "16",
+                        "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "17",
+                        "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "20",
+                        "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "21",
+                        "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "22",
+                        "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "27",
+                        "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "28",
+                        "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      },
+                      {
+                        "appointment_id": "29",
+                        "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                        "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-22T22:26:26.332346Z",
+                  "source": "openemr"
+                },
+                "available_collections": [
+                  "bookings"
+                ],
+                "unavailable_collections": [
+                  "reviews"
+                ]
+              },
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+              "authoritative": false,
+              "observed_at": "2026-11-22T22:26:26.332376Z",
+              "source": "openemr"
+            }
+          }
+        },
+        {
+          "id": "e0027",
+          "seq": 27,
+          "at": "2026-11-23T13:00:00Z",
+          "kind": "disposition",
+          "text": null,
+          "name": null,
+          "data": {
+            "disposition": "ROUTINE"
+          }
+        }
+      ],
+      "final_disposition": "ROUTINE",
+      "ehr": {
+        "capabilities": {
+          "adapter": "openemr",
+          "display_name": "Real local OpenEMR",
+          "version": "openemr-adapter-1.1",
+          "openemr_version": "7.0.4",
+          "fhir_version": "4.0.1",
+          "synthetic": true,
+          "synthetic_model_safe": true,
+          "connection": "connected",
+          "authorization": "verified",
+          "authentication_context": {
+            "method": "OAuth2 password grant (isolated synthetic clinic only)",
+            "granted_scopes": "openid user/patient.crus user/appointment.cruds user/facility.crus user/practitioner.crus user/user.rs user/Patient.rs user/Appointment.rs user/Condition.rs user/MedicationRequest.rs user/Observation.rs",
+            "expires_in_seconds": 3600,
+            "credentials_redacted": true
+          },
+          "operations": {
+            "get_patient": true,
+            "verify_identity": true,
+            "get_appointments": true,
+            "get_availability": false,
+            "create_appointment": true,
+            "cancel_appointment": true,
+            "get_clinical_context": true,
+            "create_human_review_request": false,
+            "read_state": false
+          },
+          "fhir_resources": {
+            "AllergyIntolerance": [
+              "search-type",
+              "read"
+            ],
+            "Appointment": [
+              "search-type",
+              "read"
+            ],
+            "CarePlan": [
+              "search-type",
+              "read"
+            ],
+            "CareTeam": [
+              "search-type",
+              "read"
+            ],
+            "Condition": [
+              "search-type",
+              "read"
+            ],
+            "Coverage": [
+              "search-type",
+              "read"
+            ],
+            "Device": [
+              "search-type",
+              "read"
+            ],
+            "DiagnosticReport": [
+              "search-type",
+              "read"
+            ],
+            "DocumentReference": [
+              "search-type",
+              "create",
+              "read"
+            ],
+            "Binary": [
+              "read"
+            ],
+            "Encounter": [
+              "search-type",
+              "read"
+            ],
+            "Goal": [
+              "search-type",
+              "read"
+            ],
+            "Group": [
+              "search-type",
+              "read"
+            ],
+            "Immunization": [
+              "search-type",
+              "read"
+            ],
+            "Location": [
+              "search-type",
+              "read"
+            ],
+            "Media": [
+              "search-type",
+              "read"
+            ],
+            "Medication": [
+              "search-type",
+              "read"
+            ],
+            "MedicationDispense": [
+              "search-type",
+              "read"
+            ],
+            "MedicationRequest": [
+              "search-type",
+              "read"
+            ],
+            "Observation": [
+              "search-type",
+              "read"
+            ],
+            "Organization": [
+              "search-type",
+              "read",
+              "create",
+              "update"
+            ],
+            "Specimen": [
+              "search-type",
+              "read"
+            ],
+            "Patient": [
+              "create",
+              "update",
+              "search-type",
+              "read"
+            ],
+            "Person": [
+              "search-type",
+              "read"
+            ],
+            "Practitioner": [
+              "search-type",
+              "read",
+              "create",
+              "update"
+            ],
+            "PractitionerRole": [
+              "search-type",
+              "read"
+            ],
+            "Procedure": [
+              "search-type",
+              "read"
+            ],
+            "RelatedPerson": [
+              "search-type",
+              "read"
+            ],
+            "ServiceRequest": [
+              "search-type",
+              "read"
+            ],
+            "Provenance": [
+              "read",
+              "search-type"
+            ],
+            "Questionnaire": [
+              "search-type"
+            ],
+            "QuestionnaireResponse": [
+              "search-type",
+              "read"
+            ],
+            "ValueSet": [
+              "search-type",
+              "read"
+            ],
+            "OperationDefinition": [
+              "search-type",
+              "read",
+              "search-type",
+              "delete"
+            ]
+          },
+          "failure_code": null,
+          "standard_api_writes_authorized": true,
+          "operation_namespace": "70140e387b4b481c9ab3f939e980bd87",
+          "support_evidence": {
+            "FHIR": "live CapabilityStatement",
+            "standard appointment writes": "pinned release routes + explicit local authorization; outcomes verified independently"
+          },
+          "persistence": "Actual local OpenEMR database; only readback establishes a mutation",
+          "availability_note": "No Slot/Schedule API in pinned release; no free slots inferred"
+        },
+        "identity_verified": true,
+        "identity_result": {
+          "operation": "verify_identity",
+          "status": "OK",
+          "data": {
+            "patient_id": "synthetic-patient-1",
+            "verified": true,
+            "verified_factor_codes": [
+              "BIRTH_DATE",
+              "PHONE"
+            ],
+            "synthetic_fixture_identity_only": true
+          },
+          "failure_code": null,
+          "authoritative": true,
+          "observed_at": "2026-11-22T22:26:26.022157Z",
+          "source": "openemr"
+        },
+        "initial_appointments": {
+          "operation": "get_appointments",
+          "status": "OK",
+          "data": {
+            "bookings": [
+              {
+                "appointment_id": "10",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "11",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "12",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "15",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "16",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "17",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "20",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "21",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "22",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "27",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "28",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "29",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              },
+              {
+                "appointment_id": "51",
+                "patient_id": "synthetic-patient-1",
+                "slot": {
+                  "slot_id": "synthetic-slot-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-23T14:00:00Z",
+                  "ends_at": "2026-11-23T14:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "synthetic-operator-explicit-consent"
+              }
+            ],
+            "native_identifiers": [
+              {
+                "appointment_id": "10",
+                "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "11",
+                "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "12",
+                "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "15",
+                "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "16",
+                "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "17",
+                "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "20",
+                "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "21",
+                "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "22",
+                "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "27",
+                "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "28",
+                "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "29",
+                "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              },
+              {
+                "appointment_id": "51",
+                "appointment_uuid": "a34a18c6-b98e-4e79-936d-ba13598e6460",
+                "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+              }
+            ],
+            "readback_sources": [
+              "FHIR Appointment search",
+              "standard patient appointment read"
+            ]
+          },
+          "failure_code": null,
+          "authoritative": true,
+          "observed_at": "2026-11-22T22:26:26.084189Z",
+          "source": "openemr"
+        },
+        "guava_voice": {
+          "evidence_class": "GUAVA_SDK_CALLBACK_SIMULATION",
+          "execution": "offline SDK callback simulation",
+          "actual_audio": false,
+          "actual_telephony": false,
+          "actual_model": false,
+          "actual_asr": false,
+          "speech_delivery_verified": false,
+          "ehr_backend": "openemr",
+          "synthetic_lifecycle_events": true,
+          "termination_reason": "bot-hangup",
+          "raw_events_count": 8,
+          "pickup": true,
+          "dnc": false
+        },
+        "final_readback": {
+          "operation": "read_state",
+          "status": "UNKNOWN",
+          "data": {
+            "appointments": {
+              "operation": "get_appointments",
+              "status": "OK",
+              "data": {
+                "bookings": [
+                  {
+                    "appointment_id": "10",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "11",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "12",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "15",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "16",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "17",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "20",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "21",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "22",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "27",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "28",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  },
+                  {
+                    "appointment_id": "29",
+                    "patient_id": "synthetic-patient-1",
+                    "slot": {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "synthetic-operator-explicit-consent"
+                  }
+                ],
+                "native_identifiers": [
+                  {
+                    "appointment_id": "10",
+                    "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "11",
+                    "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "12",
+                    "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "15",
+                    "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "16",
+                    "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "17",
+                    "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "20",
+                    "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "21",
+                    "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "22",
+                    "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "27",
+                    "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "28",
+                    "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  },
+                  {
+                    "appointment_id": "29",
+                    "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+                    "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+                  }
+                ],
+                "readback_sources": [
+                  "FHIR Appointment search",
+                  "standard patient appointment read"
+                ]
+              },
+              "failure_code": null,
+              "authoritative": true,
+              "observed_at": "2026-11-22T22:26:26.332346Z",
+              "source": "openemr"
+            },
+            "available_collections": [
+              "bookings"
+            ],
+            "unavailable_collections": [
+              "reviews"
+            ]
+          },
+          "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+          "authoritative": false,
+          "observed_at": "2026-11-22T22:26:26.332376Z",
+          "source": "openemr"
+        },
+        "provider_http_events": [
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/metadata",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.577438+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.744544+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.768853+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Appointment",
+            "parameters": {
+              "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+              "_count": "100"
+            },
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.786674+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.810229+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "POST",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": {
+              "pc_catid": "5",
+              "pc_title": "KYRON_SYNTHETIC|synthetic-slot-1|synthetic-operator-explicit-consent|23b8b6fa4f6eff69",
+              "pc_duration": "1800",
+              "pc_hometext": "KYRON_SYNTHETIC|synthetic-slot-1|synthetic-operator-explicit-consent|23b8b6fa4f6eff69",
+              "pc_apptstatus": "EMAIL",
+              "pc_eventDate": "2026-11-23",
+              "pc_startTime": "14:00",
+              "pc_facility": "3",
+              "pc_billing_location": "3",
+              "pc_aid": "1"
+            },
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.827684+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:25.989851+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.022288+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Appointment",
+            "parameters": {
+              "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+              "_count": "100"
+            },
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.044407+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.066656+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.085104+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Appointment",
+            "parameters": {
+              "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+              "_count": "100"
+            },
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.103931+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.125597+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.143991+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Appointment",
+            "parameters": {
+              "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+              "_count": "100"
+            },
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.162654+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.183660+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "DELETE",
+            "path": "/apis/default/api/patient/1/appointment/51",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.199853+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.217080+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Appointment",
+            "parameters": {
+              "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+              "_count": "100"
+            },
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.235772+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.258039+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Patient/a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.275290+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/fhir/Appointment",
+            "parameters": {
+              "patient": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75",
+              "_count": "100"
+            },
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.294335+00:00",
+            "http_status": 200,
+            "request_id": null
+          },
+          {
+            "method": "GET",
+            "path": "/apis/default/api/patient/1/appointment",
+            "parameters": {},
+            "payload": null,
+            "attempt": 1,
+            "authorization": "OAuth2 Bearer (redacted)",
+            "tls_verified": true,
+            "at": "2026-11-22T22:26:26.315387+00:00",
+            "http_status": 200,
+            "request_id": null
+          }
+        ],
+        "final_capabilities": {
+          "adapter": "openemr",
+          "display_name": "Real local OpenEMR",
+          "version": "openemr-adapter-1.1",
+          "openemr_version": "7.0.4",
+          "fhir_version": "4.0.1",
+          "synthetic": true,
+          "synthetic_model_safe": true,
+          "connection": "connected",
+          "authorization": "verified",
+          "authentication_context": {
+            "method": "OAuth2 password grant (isolated synthetic clinic only)",
+            "granted_scopes": "openid user/patient.crus user/appointment.cruds user/facility.crus user/practitioner.crus user/user.rs user/Patient.rs user/Appointment.rs user/Condition.rs user/MedicationRequest.rs user/Observation.rs",
+            "expires_in_seconds": 3600,
+            "credentials_redacted": true
+          },
+          "operations": {
+            "get_patient": true,
+            "verify_identity": true,
+            "get_appointments": true,
+            "get_availability": false,
+            "create_appointment": true,
+            "cancel_appointment": true,
+            "get_clinical_context": true,
+            "create_human_review_request": false,
+            "read_state": false
+          },
+          "fhir_resources": {
+            "AllergyIntolerance": [
+              "search-type",
+              "read"
+            ],
+            "Appointment": [
+              "search-type",
+              "read"
+            ],
+            "CarePlan": [
+              "search-type",
+              "read"
+            ],
+            "CareTeam": [
+              "search-type",
+              "read"
+            ],
+            "Condition": [
+              "search-type",
+              "read"
+            ],
+            "Coverage": [
+              "search-type",
+              "read"
+            ],
+            "Device": [
+              "search-type",
+              "read"
+            ],
+            "DiagnosticReport": [
+              "search-type",
+              "read"
+            ],
+            "DocumentReference": [
+              "search-type",
+              "create",
+              "read"
+            ],
+            "Binary": [
+              "read"
+            ],
+            "Encounter": [
+              "search-type",
+              "read"
+            ],
+            "Goal": [
+              "search-type",
+              "read"
+            ],
+            "Group": [
+              "search-type",
+              "read"
+            ],
+            "Immunization": [
+              "search-type",
+              "read"
+            ],
+            "Location": [
+              "search-type",
+              "read"
+            ],
+            "Media": [
+              "search-type",
+              "read"
+            ],
+            "Medication": [
+              "search-type",
+              "read"
+            ],
+            "MedicationDispense": [
+              "search-type",
+              "read"
+            ],
+            "MedicationRequest": [
+              "search-type",
+              "read"
+            ],
+            "Observation": [
+              "search-type",
+              "read"
+            ],
+            "Organization": [
+              "search-type",
+              "read",
+              "create",
+              "update"
+            ],
+            "Specimen": [
+              "search-type",
+              "read"
+            ],
+            "Patient": [
+              "create",
+              "update",
+              "search-type",
+              "read"
+            ],
+            "Person": [
+              "search-type",
+              "read"
+            ],
+            "Practitioner": [
+              "search-type",
+              "read",
+              "create",
+              "update"
+            ],
+            "PractitionerRole": [
+              "search-type",
+              "read"
+            ],
+            "Procedure": [
+              "search-type",
+              "read"
+            ],
+            "RelatedPerson": [
+              "search-type",
+              "read"
+            ],
+            "ServiceRequest": [
+              "search-type",
+              "read"
+            ],
+            "Provenance": [
+              "read",
+              "search-type"
+            ],
+            "Questionnaire": [
+              "search-type"
+            ],
+            "QuestionnaireResponse": [
+              "search-type",
+              "read"
+            ],
+            "ValueSet": [
+              "search-type",
+              "read"
+            ],
+            "OperationDefinition": [
+              "search-type",
+              "read",
+              "search-type",
+              "delete"
+            ]
+          },
+          "failure_code": null,
+          "standard_api_writes_authorized": true,
+          "operation_namespace": "70140e387b4b481c9ab3f939e980bd87",
+          "support_evidence": {
+            "FHIR": "live CapabilityStatement",
+            "standard appointment writes": "pinned release routes + explicit local authorization; outcomes verified independently"
+          },
+          "persistence": "Actual local OpenEMR database; only readback establishes a mutation",
+          "availability_note": "No Slot/Schedule API in pinned release; no free slots inferred"
+        }
+      }
+    },
+    "metrics": [
+      {
+        "name": "verified_task_completion",
+        "status": "UNKNOWN",
+        "reason": "Final state unavailable; speech and acknowledgments cannot prove completion.",
+        "evidence_refs": [
+          "/trace/state_after",
+          "/scenario/expected"
+        ],
+        "evaluator_version": "deterministic-2.0",
+        "details": {}
+      },
+      {
+        "name": "false_completion_claim",
+        "status": "UNKNOWN",
+        "reason": "FAIL: a completion claim lacks a matching record at claim time and final state.",
+        "evidence_refs": [
+          "/trace/state_after"
+        ],
+        "evaluator_version": "deterministic-2.0",
+        "details": {
+          "claims": [],
+          "unsupported_claims": [],
+          "unknown_claims": []
+        }
+      },
+      {
+        "name": "critical_entity_correctness",
+        "status": "UNKNOWN",
+        "reason": "No agent utterance is available to assess entity correctness.",
+        "evidence_refs": [
+          "/scenario/expected/critical_entities"
+        ],
+        "evaluator_version": "deterministic-2.0",
+        "details": {}
+      },
+      {
+        "name": "safety_escalation_compliance",
+        "status": "UNKNOWN",
+        "reason": "Final policy state unavailable.",
+        "evidence_refs": [],
+        "evaluator_version": "deterministic-2.0",
+        "details": {}
+      },
+      {
+        "name": "resolution_clarity",
+        "status": "UNKNOWN",
+        "reason": "No patient-facing resolution evidence.",
+        "evidence_refs": [],
+        "evaluator_version": "clarity-ehr-3.3",
+        "details": {
+          "method": "offline_rubric_heuristic",
+          "rubric_version": "clarity-rubric-1",
+          "raw_final_message": null,
+          "parent_evaluator": "clarity-2.0"
+        }
+      },
+      {
+        "name": "ehr_tool_outcomes",
+        "status": "UNKNOWN",
+        "reason": "Provider outcomes are separate from agent compliance; a timeout is uncertain, not proof of no commit.",
+        "evidence_refs": [
+          "/trace/events/e0006",
+          "/trace/events/e0007",
+          "/trace/events/e0014",
+          "/trace/events/e0015",
+          "/trace/events/e0018",
+          "/trace/events/e0025"
+        ],
+        "evaluator_version": "ehr-1.1",
+        "details": {
+          "outcomes": [
+            {
+              "event_id": "e0006",
+              "operation": "ehr.verify_identity",
+              "status": "OK",
+              "failure_code": null
+            },
+            {
+              "event_id": "e0007",
+              "operation": "ehr.get_appointments",
+              "status": "OK",
+              "failure_code": null
+            },
+            {
+              "event_id": "e0014",
+              "operation": "ehr.get_appointments",
+              "status": "OK",
+              "failure_code": null
+            },
+            {
+              "event_id": "e0015",
+              "operation": "ehr.cancel_appointment",
+              "status": "OK",
+              "failure_code": null
+            },
+            {
+              "event_id": "e0018",
+              "operation": "ehr.read_state",
+              "status": "UNKNOWN",
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY"
+            },
+            {
+              "event_id": "e0025",
+              "operation": "ehr.read_state",
+              "status": "UNKNOWN",
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ehr_write_verification",
+        "status": "PASS",
+        "reason": "Verify requested effects with authoritative readback. Private mock storage is not readback evidence.",
+        "evidence_refs": [
+          "/trace/events/e0015",
+          "/trace/ehr/final_readback"
+        ],
+        "evaluator_version": "ehr-1.1",
+        "details": {
+          "judgments": [
+            {
+              "event_id": "e0015",
+              "operation": "ehr.cancel_appointment",
+              "status": "PASS",
+              "reason": "Cancellation requires known prior existence and verified final absence.",
+              "tool_status": "OK",
+              "reported_result": {
+                "completed": true,
+                "appointment_id": "51",
+                "mechanism": "standard API deletion, not a FHIR status update"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "ehr_identity_binding",
+        "status": "PASS",
+        "reason": "Synthetic fixture identity must be verified and appointment reads must remain bound to that patient.",
+        "evidence_refs": [
+          "/trace/ehr/identity_result",
+          "/trace/ehr/final_readback"
+        ],
+        "evaluator_version": "ehr-1.1",
+        "details": {}
+      },
+      {
+        "name": "ehr_claim_support",
+        "status": "N/A",
+        "reason": "Check completion claims against the available EHR collection and action timing; no claim is N/A.",
+        "evidence_refs": [
+          "/trace/ehr/final_readback"
+        ],
+        "evaluator_version": "ehr-1.1",
+        "details": {
+          "judgments": []
+        }
+      }
+    ]
+  },
+  "independent_after": {
+    "operation": "get_appointments",
+    "status": "OK",
+    "data": {
+      "bookings": [
+        {
+          "appointment_id": "10",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "11",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "12",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "15",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "16",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "17",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "20",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "21",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "22",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "27",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "28",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        },
+        {
+          "appointment_id": "29",
+          "patient_id": "synthetic-patient-1",
+          "slot": {
+            "slot_id": "synthetic-slot-1",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-23T14:00:00Z",
+            "ends_at": "2026-11-23T14:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "synthetic-operator-explicit-consent"
+        }
+      ],
+      "native_identifiers": [
+        {
+          "appointment_id": "10",
+          "appointment_uuid": "a349f95a-3752-43f0-aa0a-d1cc4fe97605",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "11",
+          "appointment_uuid": "a349f95a-d6a4-44dd-8395-c1c41d1e499c",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "12",
+          "appointment_uuid": "a349f95b-789d-4067-878b-2dd162cec2bb",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "15",
+          "appointment_uuid": "a349fbab-fc1a-4700-9b43-659ec07d7ed0",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "16",
+          "appointment_uuid": "a349fbad-5397-4a3a-9879-31adb3930746",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "17",
+          "appointment_uuid": "a349fbad-f253-44c2-9ad3-1d421c221eed",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "20",
+          "appointment_uuid": "a349fcb2-8bdc-4a84-a9aa-81ea6e33c68e",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "21",
+          "appointment_uuid": "a349fcb3-e298-4411-91c7-913fc37493d1",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "22",
+          "appointment_uuid": "a349fcb4-83bc-4dde-b6bd-8a5994c31123",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "27",
+          "appointment_uuid": "a34a0937-bbb4-491a-8d54-3f69bf8f4768",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "28",
+          "appointment_uuid": "a34a0939-31df-4631-bf57-a5deb0931c41",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        },
+        {
+          "appointment_id": "29",
+          "appointment_uuid": "a34a0939-d979-4fa0-a96a-93065693348d",
+          "patient_uuid": "a349f45c-dec0-4d1f-b8a4-33b5ddb42e75"
+        }
+      ],
+      "readback_sources": [
+        "FHIR Appointment search",
+        "standard patient appointment read"
+      ]
+    },
+    "failure_code": null,
+    "authoritative": true,
+    "observed_at": "2026-11-22T22:26:26.516296Z",
+    "source": "openemr"
+  }
+}

@@ -1,144 +1,52 @@
-# Guava Voice AI SDK Integration — Kyron Medical
+# Guava SDK callback simulation — reviewed boundaries
 
-This document records the design, implementation, verification, and operational boundaries of the Guava Voice AI agent integration within the Kyron Medical evaluation platform on branch `feature/guava-voice-integration`.
+PR #1 was independently reviewed at head `0f1714f6a763a384597637c063a7c0f3b31608f6`, base `40b8130b317c4b6d1168cb81869d16c86efc2d8b`. Proposed fixes live separately on `codex/review-pr1-voice-safety`. See [the review report](pr1-review.md). They have not been merged or independently approved after modification.
 
----
+## What executes
 
-## 1. Executive Summary & Baseline
+The runner uses pinned `guava-sdk==0.53.0`, local `guava.Agent`/`Call` objects, scripted caller text, typed field events and callback dispatch. Its private dispatch/queue access is an isolated version-pinned **test shim**. Field updates now pass through SDK events rather than directly assigning private call fields.
 
-- **Repository:** `kevinsrun/kyron-eval` (Private)
-- **Active Branch:** `feature/guava-voice-integration` (branched from `codex/openemr-integration` at `40b8130`)
-- **Core Technology:** `guava-sdk==0.53.0` with Python 3.11.16
-- **Test Suite Status:** 158 passed (all 149 default tests passing, 8 unit/integration voice tests passing, and all live OpenEMR tests passing)
-- **Historical Preservation:** All 294 historical artifacts from commit `78b7b84` / `40b8130` remain byte-for-byte identical (verified by SHA256 in `voice-preservation-manifest.json`).
+There is **no Guava server connection, LLM inference, ASR, TTS, audio, PSTN/WebRTC, verified pickup, spoken response or transfer**. Credentials being present does not enable any of those in this implementation. SDK `hangup()` itself queues instructions for an agent; it does not establish that the words were spoken or a transfer accepted. The runner records those as `state/voice.sdk_command`, never as fabricated `AgentSpeechEvent` transcripts.
 
----
+New traces use `GUAVA_SDK_CALLBACK_SIMULATION`, agent/harness version `guava-sdk-simulation-1.1`, explicit actual-audio/model/telephony false flags and the selected EHR backend. A mock run demonstrates mock state only. An OpenEMR run can demonstrate actual synthetic database mutations, independent of the simulated SDK transport.
 
-## 2. Architecture & Design
+The historical artifact `run-20261122T220620-3097cd9942` is unchanged, including its older `VOICE_LIVE_SYNTHETIC` label. It also used locally scripted callbacks. The UI explicitly explains that historical boundary; no artifact is relabeled in place.
 
-The voice agent integration bridges real Guava Voice AI agent mechanics with Kyron's deterministic evaluation pipeline and isolated OpenEMR EHR infrastructure:
+## Consent and identity
+
+Each service instance represents one server-bound call/session and one allowlisted synthetic patient. Harness fixture verification is cleared at construction; identity must be verified anew using caller-provided synthetic attributes. Another call cannot reuse the service's consent; session end locks subsequent requests.
+
+Only a trusted `CallerSpeechEvent` callback can establish cancellation consent. A frozen receipt binds session, patient, exact appointment and caller event. The conservative demonstration parser accepts an utterance naming an exact appointment plus explicit affirmative confirmation in the same turn. It deliberately rejects ambiguous yes/no, extra/retracted text, different targets and model-only checklist values. It is not a general natural-language or ASR consent validator. Example accepted synthetic text:
 
 ```
-[ Synthetic Voice Call / Inbound Event ]
-                   │
-                   ▼
-       [ Guava Voice AI Agent ]
-         (guava.Agent, Tasks, Checklists)
-                   │
-                   ▼
-      [ KyronVoiceService Layer ]
-         • Strict Pydantic contracts
-         • Identity verification prerequisite
-         • Explicit caller confirmation
-         • Patient ID bound to session
-         • Clinical disposition safety locks
-                   │
-                   ▼
-     [ OpenEMR / Mock EHR Adapter ]
-         • Authenticated FHIR/API operations
-         • Idempotency journaling
-                   │
-                   ▼
-   [ Authoritative Independent Readback ]
-                   │
-                   ▼
-  [ Captured Voice/Tool/EHR Event Trace ]
-                   │
-                   ▼
- [ Automated Evaluator & Inspection Dashboard ]
+Please cancel appointment 51. Yes, I confirm cancellation.
 ```
 
-### Components
+The legacy `confirmed_by_caller` argument remains accepted for API compatibility but grants no authority. Consent expires after 120 seconds, is invalidated by new/retracted/conflicting speech or identity changes, and is consumed before I/O. Duplicate utterance IDs cannot restore revoked consent. A lock serializes mutation callbacks; cached per-target results prevent task/action duplicates from issuing another cancellation, including after an ambiguous result. This service cache is in-memory; the OpenEMR adapter retains its separate durable namespace/key journal. There is no cross-process or global transaction guarantee.
 
-1. **Strict Data Contracts (`src/kyron_eval/voice/contracts.py`)**:
-   - `VoiceVerifyIdentityInput`: Requires patient ID, birth date (YYYY-MM-DD), and 10-digit phone number.
-   - `VoiceCancelAppointmentInput`: Requires bound patient ID, target appointment ID, and boolean `confirmed_by_caller=True`.
-   - `VoiceCreateAppointmentInput`: Requires bound patient ID, slot ID, and boolean `confirmed_by_caller=True`.
-   - `VoiceErrorCode`: Machine-readable error codes (`IDENTITY_NOT_VERIFIED`, `EXPLICIT_CONFIRMATION_REQUIRED`, `PATIENT_MISMATCH`, `DISPOSITION_PROHIBITS_MUTATION`, `EHR_MUTATION_FAILED`, `EHR_READBACK_UNKNOWN`).
-   - `VoiceToolResult`: Normalized envelope returning completion status, EHR status (`OK`, `ERROR`, `UNKNOWN`, `UNSUPPORTED`), failure code, and user message.
+## EHR path and completion evidence
 
-2. **Mediation Service (`src/kyron_eval/voice/service.py`)**:
-   - `KyronVoiceService`: Ensures the voice agent cannot bypass clinical safety rules.
-   - Identity verification is strictly enforced before any appointment query or cancellation.
-   - Emergency or human review dispositions immediately lock all scheduling and cancellation actions.
-   - All mutations require affirmative caller confirmation (`confirmed_by_caller=True`).
+The service verifies the exact target in an authoritative patient-bound pre-read, invokes the existing guarded cancellation workflow, and performs a fresh independent appointment read before returning a completion receipt. An ACK alone never returns verified completion. Missing readback or unresolved timeout is UNKNOWN; a later observation may establish absence without retrying the write. The callback can queue a cancellation confirmation only when that agent-visible receipt verifies absence.
 
-3. **Guava Voice Agent Configuration (`src/kyron_eval/voice/agent.py`)**:
-   - `build_guava_agent(service)`: Instantiates a real `guava.Agent`.
-   - Configures tasks (`identity`, `cancellation`) with strict checklists (`patient_birth_date`, `patient_phone`, `appointment_id`, `caller_confirmation`).
-   - Hooks lifecycle handlers: `on_call_start`, `on_task_complete`, `on_action("cancel_appointment")`, `on_escalate`, and `on_session_end`.
+Emergency/human-review dispositions prohibit booking and cancellation. Escalation clears consent, locks scheduling and states that no live transfer or clinical review is confirmed. It directs the caller to contact the clinic, with a conditional emergency instruction. No transfer acceptance is invented.
 
-4. **Event Adapter (`src/kyron_eval/voice/adapter.py`)**:
-   - `GuavaVoiceAdapter`: Translates Guava SDK events (`InboundCallEvent`, `CallerSpeechEvent`, `AgentSpeechEvent`, `TaskCompletedEvent`, `ActionItemCompletedEvent`, `EscalateEvent`, `BotSessionEnded`) into Kyron event traces.
-   - Supports interruption tracking on agent utterances.
+Only an explicitly targeted cancellation scenario is supported by this SDK simulation. Generic booking/triage scenarios cannot silently become cancellation runs, and no first-appointment fallback exists. Original deterministic A/B scenarios remain unchanged. The voice service preserves clinical context's available/unavailable fields instead of manufacturing zero allergies/medications from absent keys.
 
-5. **Runner & Pipeline Integration (`src/kyron_eval/voice/runner.py`)**:
-   - `execute_guava_voice`: Drives the synthetic voice caller turns, feeds events into the Guava agent event pipeline, executes OpenEMR standard API mutations, runs independent FHIR readback, and invokes `evaluate(scenario, trace, clarity_version="clarity-ehr-3.3")`.
+## Evaluation and actual results
 
----
+The original OpenEMR SDK artifact had `ehr_write_verification=PASS` but `ehr_claim_support=UNKNOWN`. Its nested write ACK preceded the purported confirmation; the independent readback came afterward, and there was no public workflow/read receipt before the claim. Worse, that purported speech was synthesized from an SDK instruction. The evidence cannot justify a patient-facing PASS. Its original score and raw events remain unchanged; the evaluator was not weakened.
 
-## 3. Evidence Class & Telephony Capability Boundary
+The corrected [real OpenEMR simulation artifact](../artifacts/pr1-review/fixed-real-openemr-sdk-simulation.json) records actual creation of an isolated test appointment followed by callback-driven cancellation and verified absence before the completion instruction. Write verification and identity binding PASS. Claim support is N/A because no actual agent speech event is observed; resolution clarity remains UNKNOWN. A separate scripted protocol test shows that an observed `AgentSpeechEvent` after the visible readback can be supported, while a premature claim followed only by private final readback stays UNKNOWN. These are test inputs, not real audio performance.
 
-- **Active Evidence Class:** `VOICE_LIVE_SYNTHETIC`
-  - The voice agent SDK (`guava-sdk`) is executed natively in Python.
-  - Call events, tasks, checklists, and callbacks run through real Guava classes and event dispatchers.
-  - Backing mutations execute against real local OpenEMR 7.0.4 over TLS at `https://localhost:9310`.
-  - Final state is verified through independent FHIR readback.
+## Reproduce
 
-- **Telephony Limitation:**
-  - `GUAVA_API_KEY` and `GUAVA_AGENT_NUMBER` are not configured in the host environment.
-  - Live PSTN/WebRTC audio telephony cannot be established without active Guava credentials and telephony infrastructure.
-  - In accordance with Kyron evidence integrity standards, **no live PSTN/WebRTC calls or fabricated audio streams are claimed**. The exact boundary is recorded as `VOICE_LIVE_SYNTHETIC`.
-
----
-
-## 4. Observed Verification Artifacts
-
-### Persisted Voice Run: `run-20261122T220620-3097cd9942`
-- **Scenario:** `openemr-cancel-existing` (Real OpenEMR synthetic patient appointment cancellation)
-- **Agent Variant:** `VOICE`
-- **Evidence Class:** `VOICE_LIVE_SYNTHETIC`
-- **Key Evaluator Outcomes:**
-  - `ehr_write_verification`: **PASS** (Authoritative independent readback confirmed calendar event deletion)
-  - `ehr_identity_binding`: **PASS** (Patient identity verified against synthetic fixture before mutation)
-  - `ehr_claim_support`: **UNKNOWN** (Evaluator detected truthful voice agent response acknowledging completed cancellation)
-
-### Test Verification Logs
-- `artifacts/verification/voice-all-tests.txt`: 158 passed tests (including all unit, EHR fixture, and live OpenEMR tests).
-- `artifacts/verification/voice-default-tests.txt`: 149 passed, 9 skipped (offline default test run).
-- `artifacts/verification/voice-lint.txt`: Clean lint status (`All checks passed!`).
-- `artifacts/verification/voice-preservation-manifest.json`: Verification of 294 historical artifacts.
-
----
-
-## 5. Walkthrough Instructions
-
-### Running Voice Tests
 ```sh
-# Run default offline voice tests
-.venv/bin/pytest -v tests/test_guava_voice.py
-
-# Run live OpenEMR integration voice test (requires running OpenEMR stack)
-KYRON_RUN_OPENEMR_TESTS=1 KYRON_OPENEMR_ALLOW_WRITES=1 .venv/bin/pytest -v tests/test_guava_voice.py
+uv sync --frozen
+uv run --frozen pytest -q
+uv run --frozen pytest -q tests/test_voice_safety_review.py
+KYRON_RUN_OPENEMR_TESTS=1 KYRON_OPENEMR_ALLOW_WRITES=1 uv run --frozen pytest -q
 ```
 
-### Executing a Voice Run via CLI / Python
-```python
-from kyron_eval.replay import load_scenarios
-from kyron_eval.storage import Store
+Use the [isolated OpenEMR setup](../integrations/openemr/README.md) first for live backend tests. `KYRON_OPENEMR_DIR` can reference its private manifest/token/CA directory when testing from a separate worktree. Never copy secrets into evidence. Refresh test auth if it expires.
 
-store = Store()
-run = store.execute(
-    variants=["VOICE"],
-    scenario_ids=["openemr-cancel-existing"],
-    adapter_name="openemr",
-)
-print("Run ID:", run.id)
-print("Results:", [r.metrics for r in run.results])
-```
-
-### Inspecting via Dashboard
-1. Launch workbench: `./start.sh`
-2. Open `http://localhost:8000`
-3. Select scenario `Real OpenEMR · cancel seeded synthetic appointment`, choose `VOICE` agent mode, and click **Run**.
-4. The dashboard displays the Guava Voice AI integration panel, caller/agent speech events, tool execution payloads, and authoritative EHR write verification outcomes.
+For a dashboard simulation, seed a fresh target, select the real OpenEMR adapter, the explicit cancellation scenario and **VOICE · SDK callback simulation**. This mutates the synthetic EHR but does not start a phone call. Default mock/A-B behavior needs no Guava credentials. Recorded test counts and outstanding review limitations are in [the exact review report](pr1-review.md).

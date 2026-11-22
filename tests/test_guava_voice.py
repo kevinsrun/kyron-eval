@@ -14,7 +14,7 @@ from guava.events import (
     TaskCompletedEvent,
 )
 
-from kyron_eval.models import Status
+from kyron_eval.models import Booking, CallerTurn, Status
 from kyron_eval.replay import MockWorld, load_scenarios
 from kyron_eval.voice.adapter import GuavaVoiceAdapter
 from kyron_eval.voice.contracts import VoiceErrorCode
@@ -24,7 +24,23 @@ from kyron_eval.voice.service import KyronVoiceService
 
 @pytest.fixture
 def scenario():
-    return load_scenarios()[0]
+    scenario = load_scenarios()[0].model_copy(deep=True)
+    scenario.initial_state.bookings = [
+        Booking(
+            appointment_id="synthetic-appt-1",
+            patient_id="synthetic-patient-1",
+            slot=scenario.initial_state.slots[0],
+            confirmation_event_id="synthetic-seed-consent",
+        )
+    ]
+    scenario.script = [
+        CallerTurn(
+            text="Please cancel appointment synthetic-appt-1. Yes, I confirm cancellation.",
+            facts={"cancel_appointment_id": "synthetic-appt-1"},
+            confirms_cancellation=True,
+        )
+    ]
+    return scenario
 
 
 @pytest.fixture
@@ -159,7 +175,8 @@ def test_appointment_retrieval_and_cancellation_mock(scenario):
     # In mock scenario, add an initial booking to cancel
     res = execute_guava_voice(scenario, confirm_cancellation=True)
     assert res.trace.variant == "VOICE"
-    assert res.trace.evidence_class == "VOICE_LIVE_SYNTHETIC"
+    assert res.trace.evidence_class == "GUAVA_SDK_CALLBACK_SIMULATION"
+    assert res.trace.state_after.bookings == []
 
     metric_map = {m.name: m for m in res.metrics}
     assert metric_map["ehr_identity_binding"].status == Status.PASS
@@ -176,10 +193,10 @@ def test_unconfirmed_cancellation_prevents_mutation(scenario):
     assert len(cancel_events) == 0
 
     # Verify agent told caller the appointment remains scheduled
-    agent_texts = [e.text for e in res.trace.events if e.kind == "agent" and e.text]
-    assert any(
-        "remains scheduled" in t.lower() or "not confirmed" in t.lower() for t in agent_texts
-    )
+    agent_texts = [
+        str(e.data.get("payload")) for e in res.trace.events if e.name == "voice.sdk_command"
+    ]
+    assert any("consent" in t.lower() and "required" in t.lower() for t in agent_texts)
 
 
 def test_unavailable_readback_records_unknown_not_false_pass(scenario):
@@ -197,6 +214,9 @@ def test_unavailable_readback_records_unknown_not_false_pass(scenario):
 
 def test_escalation_locks_scheduling_and_never_claims_transfer(service, world):
     """Escalation transitions disposition to EMERGENCY and prohibits scheduling."""
+    service.verify_identity(
+        patient_id=service.bound_patient_id, birth_date="1980-01-02", phone="2025550100"
+    )
     esc_res = service.escalate(
         patient_id=service.bound_patient_id,
         reason="Severe acute symptoms reported",
@@ -283,4 +303,15 @@ def test_live_openemr_voice_cancellation():
     metric_map = {m.name: m for m in res.metrics}
     assert metric_map["ehr_write_verification"].status == Status.PASS
     assert metric_map["ehr_identity_binding"].status == Status.PASS
+    assert metric_map["ehr_claim_support"].status == Status.NA
+    assert res.trace.evidence_class == "GUAVA_SDK_CALLBACK_SIMULATION"
+    receipt = next(e for e in res.trace.events if e.name == "voice.cancel_appointment")
+    assert receipt.data["result"]["data"]["verified_absent"] is True
+    completion = next(
+        e
+        for e in res.trace.events
+        if e.name == "voice.sdk_command" and "Your appointment is cancelled" in str(e.data)
+    )
+    assert receipt.seq < completion.seq
+    assert len([e for e in res.trace.ehr["provider_http_events"] if e["method"] == "DELETE"]) == 1
     assert res.trace.ehr.get("final_readback", {}).get("data", {}).get("appointments") is not None

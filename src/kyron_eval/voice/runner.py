@@ -1,8 +1,9 @@
 """Execution harness for Guava Voice AI synthetic agent sessions.
 
-Executes real Guava Agent callback flows and Call objects with synthetic caller
-turns and real OpenEMR backend mutations. Captures all SDK events, tool calls,
-and independent readback into an evaluatable Kyron Trace.
+Executes scripted Guava callbacks with synthetic caller text. Private SDK dispatch
+and command queues are isolated here as a version-pinned test shim. No Guava
+server, model, audio, ASR, PSTN, pickup or spoken response is observed. The selected
+EHR may be mock or a real isolated synthetic OpenEMR database.
 """
 
 from typing import Any
@@ -10,7 +11,6 @@ from typing import Any
 import guava
 from guava.events import (
     ActionItemCompletedEvent,
-    AgentSpeechEvent,
     BotSessionEnded,
     CallerSpeechEvent,
     InboundCallEvent,
@@ -36,12 +36,26 @@ def execute_guava_voice(
     confirm_cancellation: bool = True,
     target_appointment_id: str | None = None,
 ) -> Result:
-    """Executes an end-to-end Guava voice call against KyronVoiceService and EHR adapter."""
+    """Offline SDK callback simulation; no audio, telephony, ASR or model executes."""
+    explicit_target = target_appointment_id or next(
+        (
+            turn.facts.get("cancel_appointment_id")
+            for turn in scenario.script
+            if turn.facts.get("cancel_appointment_id")
+        ),
+        None,
+    )
+    if scenario.workflow != "scheduling" or not explicit_target:
+        raise ValueError("SDK simulation requires an explicit cancellation scenario/target")
+    if adapter is not None and not (
+        getattr(adapter, "name", "") == "mock" or getattr(adapter, "synthetic_model_safe", False)
+    ):
+        raise ValueError("SDK simulation accepts only mock or isolated synthetic OpenEMR")
 
-    # 1. Initialize world model with VOICE variant and live synthetic evidence class
+    # 1. Initialize an explicitly labeled offline SDK simulation.
     world = MockWorld(scenario, "VOICE", adapter=adapter, faults=faults)
-    world.trace.evidence_class = "VOICE_LIVE_SYNTHETIC"
-    world.prepare()
+    world.trace.evidence_class = "GUAVA_SDK_CALLBACK_SIMULATION"
+    world.trace.harness_version = "guava-sdk-simulation-1.1"
 
     # 2. Build service layer and real Guava agent
     service = KyronVoiceService(world)
@@ -53,7 +67,7 @@ def execute_guava_voice(
         from_number=f"+1{caller_phone}",
         to_number="+15555550199",
     )
-    call = guava.Call("call-synthetic-guava-001", call_info)
+    call = guava.Call("call-synthetic-" + service.session_id, call_info)
 
     # 4. Inbound call event
     inbound_event = InboundCallEvent(
@@ -74,13 +88,13 @@ def execute_guava_voice(
         utterance=f"Hello, my date of birth is {caller_dob} and my phone number is {caller_phone}.",
         utterance_id="utt-001",
     )
-    voice_adapter.record_caller_speech(caller_speech_1)
+    agent._dispatch_event(call, caller_speech_1)
 
     # Set field values collected by the task
     field_dob = ActionItemCompletedEvent(key="patient_birth_date", payload=caller_dob)
     field_phone = ActionItemCompletedEvent(key="patient_phone", payload=caller_phone)
-    call._field_values["patient_birth_date"] = caller_dob
-    call._field_values["patient_phone"] = caller_phone
+    agent._dispatch_event(call, field_dob)
+    agent._dispatch_event(call, field_phone)
     voice_adapter.record_field_extracted(field_dob)
     voice_adapter.record_field_extracted(field_phone)
 
@@ -105,14 +119,7 @@ def execute_guava_voice(
 
     # 7. Turn 2: Synthetic caller requests cancellation
     # Determine target appointment ID
-    appt_id = target_appointment_id
-    if not appt_id:
-        if scenario.script and scenario.script[0].facts.get("cancel_appointment_id"):
-            appt_id = scenario.script[0].facts["cancel_appointment_id"]
-        else:
-            initial = world.trace.ehr.get("initial_appointments", {}) or {}
-            bookings = initial.get("data", {}).get("bookings", [])
-            appt_id = bookings[0]["appointment_id"] if bookings else "synthetic-appt-1"
+    appt_id = explicit_target
 
     confirm_str = "yes" if confirm_cancellation else "no"
     confirm_phrase = (
@@ -122,12 +129,12 @@ def execute_guava_voice(
         utterance=f"Please cancel appointment {appt_id}. {confirm_phrase}",
         utterance_id="utt-002",
     )
-    voice_adapter.record_caller_speech(caller_speech_2)
+    agent._dispatch_event(call, caller_speech_2)
 
     field_appt = ActionItemCompletedEvent(key="appointment_id", payload=appt_id)
     field_confirm = ActionItemCompletedEvent(key="caller_confirmation", payload=confirm_str)
-    call._field_values["appointment_id"] = appt_id
-    call._field_values["caller_confirmation"] = confirm_str
+    agent._dispatch_event(call, field_appt)
+    agent._dispatch_event(call, field_confirm)
     voice_adapter.record_field_extracted(field_appt)
     voice_adapter.record_field_extracted(field_confirm)
 
@@ -156,12 +163,5 @@ def _drain_commands(call: guava.Call, adapter: GuavaVoiceAdapter) -> list[Any]:
         cmd = call._command_queue.get_nowait()
         commands.append(cmd)
         cmd_type = getattr(cmd, "command_type", "")
-        if cmd_type == "hangup-call" and getattr(cmd, "final_script", None):
-            adapter.record_agent_speech(
-                AgentSpeechEvent(utterance=cmd.final_script, interrupted=False)
-            )
-        elif cmd_type == "send-instruction" and getattr(cmd, "instruction", None):
-            adapter.record_agent_speech(
-                AgentSpeechEvent(utterance=cmd.instruction, interrupted=False)
-            )
+        adapter.record_sdk_command(cmd_type, cmd.model_dump(mode="json"))
     return commands
