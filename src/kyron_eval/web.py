@@ -1,6 +1,7 @@
 """Loopback-only workbench. All displayed outcomes come from persisted run artifacts."""
 
 import json
+import os
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
@@ -26,19 +27,38 @@ ROOT = Path(__file__).parent
 
 
 class RunRequest(Model):
-    variants: list[Literal["A", "B", "LLM"]] = Field(default=["A", "B"], min_length=1, max_length=3)
-    scenario_ids: list[str] | None = Field(default=None, min_length=1, max_length=8)
+    variants: list[Literal["A", "B", "LLM", "VOICE"]] = Field(
+        default=["A", "B"], min_length=1, max_length=4
+    )
+    scenario_ids: list[str] | None = Field(default=None, min_length=1, max_length=9)
     adapter: Literal["mock", "fhir", "openemr"] = "mock"
     ehr_faults: dict[str, Fault] = Field(default_factory=dict, max_length=9)
 
 
 class LabelRequest(Model):
     scenario_id: str
-    variant: Literal["A", "B", "LLM"]
+    variant: Literal["A", "B", "LLM", "VOICE"]
     label: Literal["PASS", "FAIL", "UNKNOWN"]
     rationale: str = Field(min_length=5, max_length=4000)
     reviewer: str = Field(min_length=1, max_length=100)
     trace_sha256: str
+
+
+def voice_status():
+    api_key = bool(os.environ.get("GUAVA_API_KEY"))
+    number = bool(os.environ.get("GUAVA_AGENT_NUMBER"))
+    return {
+        "sdk_installed": True,
+        "sdk_version": "0.53.0",
+        "live_telephony_configured": api_key and number,
+        "synthetic_voice_ready": True,
+        "mode": "VOICE_LIVE_SYNTHETIC",
+        "live_credentials_status": (
+            "configured"
+            if api_key
+            else "unconfigured (telephony blocked, synthetic simulation active)"
+        ),
+    }
 
 
 def counts(results, variant):
@@ -98,8 +118,13 @@ def create_app(artifact_root=None):
                 "scenarios": catalog,
                 "integration": integration,
                 "model": model_status(),
+                "voice": voice_status(),
             },
         )
+
+    @app.get("/api/voice/status")
+    def api_voice_status():
+        return voice_status()
 
     @app.get("/scenarios", response_class=HTMLResponse)
     def scenarios_page(request: Request):

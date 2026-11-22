@@ -21,6 +21,7 @@ Select a scenario, **Mock · read + write**, A/B comparison, and an optional fau
 | MockEHRAdapter | All eight required operations, state readback, booking idempotency, cancellation, review queue, deterministic fault injection | Run-scoped synthetic state persisted under `artifacts/ehr/`; **not real EHR persistence** |
 | FHIRAdapter | Authenticated GETs, FHIR R4 capability discovery, patient/identity, appointments, availability, clinical codes | Read only. Explicit unsupported errors for booking, cancellation and review mutations. Local synthetic fixture tested; dedicated real OpenEMR support uses the separate adapter below. |
 | OpenEMRAdapter | Real local OpenEMR 7.0.4, authenticated FHIR reads, separate standard API creation/deletion, independent readback | Verified against an isolated Docker database with fabricated records. No Slot/Schedule or review queue. See [setup](integrations/openemr/README.md) and [observed experiment](docs/openemr-experiment.md). |
+| Guava Voice AI Agent | Real `guava-sdk==0.53.0` agent integration with task/checklist lifecycle, guarded tool mediation, and caller confirmation | Native SDK integration driven via `VOICE_LIVE_SYNTHETIC`. Real OpenEMR appointment cancellation and readback verified. Live PSTN/WebRTC calls require telephony credentials. See [voice integration doc](docs/voice-integration.md). |
 | Deterministic A/B | Existing baseline and verified agent replay through EHR tools | Fully functional without a key. Original 68 tests retained. |
 | Optional LLM text agent | Environment-configured OpenAI-compatible tool loop; actual results fed back before the next response; bounded calls and raw events | Restricted to curated synthetic mock data or marker-checked isolated OpenEMR data. Protocol tested with scripted responses; no actual model performance experiment has been run. |
 
@@ -35,16 +36,18 @@ uv run --frozen kyron-eval run
 uv run --frozen kyron-eval run --variant B --scenario booking-confirmed --fault read_state=readback_failure
 uv run --frozen kyron-eval run --variant B --adapter fhir --scenario booking-confirmed
 uv run --frozen kyron-eval run --variant LLM --scenario booking-confirmed
+uv run --frozen kyron-eval run --variant VOICE --scenario openemr-cancel-existing --adapter openemr
 uv run --frozen kyron-eval calibrate
 uv run --frozen pytest -q
 uv run --frozen ruff check src/kyron_eval tests scripts
 uv run --frozen python scripts/ehr_experiment.py
 ```
 
-`KYRON_ARTIFACT_DIR` selects a separate artifact store. Default `./artifacts` is relative to the working directory. The optional commands require their explicit configuration; the first/default command does not. API: `POST /api/runs`, `GET /api/runs/{id}`, `GET /api/ehr/status`, `POST /api/ehr/probe` (read-only configured endpoint).
+`KYRON_ARTIFACT_DIR` selects a separate artifact store. Default `./artifacts` is relative to the working directory. The optional commands require their explicit configuration; the first/default command does not. API: `POST /api/runs`, `GET /api/runs/{id}`, `GET /api/ehr/status`, `POST /api/ehr/probe` (read-only configured endpoint), `GET /api/voice/status`.
 
 ## Evidence and limitations
 
+- [Guava Voice AI SDK integration](docs/voice-integration.md): native Guava Agent tasks, checklists, events, mediated tool execution, and OpenEMR cancellation under `VOICE_LIVE_SYNTHETIC`.
 - [Real OpenEMR experiment](docs/openemr-experiment.md): authenticated local EHR operations, readback, actual agent cancellation and explicit unsupported capabilities.
 - [Earlier mock/FHIR EHR experiment](docs/ehr-experiment.md): actual paired suite, fault matrix, evaluator revisions, regressions and unresolved verification.
 - [Architecture and evidence rules](docs/architecture.md), [original rubric/calibration](docs/evaluation.md), [production priorities](docs/production.md).
