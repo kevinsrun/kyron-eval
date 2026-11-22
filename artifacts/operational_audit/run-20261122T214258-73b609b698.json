@@ -1,0 +1,93 @@
+{
+  "evidence_class": "SANITIZED_OPERATIONAL_AUDIT",
+  "synthetic": true,
+  "records": [
+    {
+      "call_id": "synthetic-openemr-cancel-existing-B",
+      "synthetic_patient_id": "synthetic-patient-1",
+      "started_at": "2026-11-23T13:00:00Z",
+      "ended_at": "2026-11-23T13:00:00Z",
+      "policy_id": "synthetic-scheduling",
+      "policy_version": "1.0-example",
+      "policy_checksum_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+      "question_ids_asked": [],
+      "fact_ids_recorded": [
+        "cancel_appointment_id"
+      ],
+      "rule_evaluations": [],
+      "disposition": "ROUTINE",
+      "appointment_option_ids_considered": [],
+      "human_decision_codes": [],
+      "operations": [
+        {
+          "operation_id": "e0001",
+          "operation_type": "ehr.get_patient",
+          "target_system": "synthetic-openemr",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0002",
+          "operation_type": "ehr.verify_identity",
+          "target_system": "synthetic-openemr",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0003",
+          "operation_type": "ehr.get_appointments",
+          "target_system": "synthetic-openemr",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0004",
+          "operation_type": "ehr.get_clinical_context",
+          "target_system": "synthetic-openemr",
+          "outcome": "COMPLETED",
+          "error_code": null
+        },
+        {
+          "operation_id": "e0007",
+          "operation_type": "ehr.cancel_appointment",
+          "target_system": "synthetic-openemr",
+          "outcome": "ATTEMPTED",
+          "error_code": "OPENEMR_APPOINTMENT_NOT_BOUND"
+        },
+        {
+          "operation_id": "e0008",
+          "operation_type": "cancel",
+          "target_system": "synthetic-openemr",
+          "outcome": "ATTEMPTED",
+          "error_code": "OPENEMR_APPOINTMENT_NOT_BOUND"
+        },
+        {
+          "operation_id": "e0010",
+          "operation_type": "ehr.read_state",
+          "target_system": "synthetic-openemr",
+          "outcome": "ATTEMPTED",
+          "error_code": "OPENEMR_PARTIAL_STATE_ONLY"
+        },
+        {
+          "operation_id": "e0011",
+          "operation_type": "read_state",
+          "target_system": "synthetic-openemr",
+          "outcome": "ATTEMPTED",
+          "error_code": "OPENEMR_PARTIAL_STATE_ONLY"
+        },
+        {
+          "operation_id": "e0014",
+          "operation_type": "ehr.read_state",
+          "target_system": "synthetic-openemr",
+          "outcome": "ATTEMPTED",
+          "error_code": "OPENEMR_PARTIAL_STATE_ONLY"
+        }
+      ],
+      "error_codes": [
+        "OPENEMR_APPOINTMENT_NOT_BOUND",
+        "OPENEMR_PARTIAL_STATE_ONLY",
+        "OPENEMR_PARTIAL_STATE_ONLY"
+      ]
+    }
+  ]
+}

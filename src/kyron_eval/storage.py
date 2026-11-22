@@ -90,10 +90,18 @@ class Store:
     ):
         if not variants or len(set(variants)) != len(variants) or set(variants) - {"A", "B", "LLM"}:
             raise ValueError("Choose A, B, LLM, or a distinct pair")
-        if "LLM" in variants and adapter_name != "mock":
+        if "LLM" in variants and adapter_name not in {"mock", "openemr"}:
             raise ValueError("LLM mode is restricted to synthetic mock EHR data")
-        resolved_clarity = clarity_version or "clarity-ehr-3.2"
+        resolved_clarity = clarity_version or "clarity-ehr-3.3"
         scenarios = load_scenarios()
+        if adapter_name == "openemr":
+            from kyron_eval.openemr_scenarios import cancellation_scenario
+
+            scenarios.append(cancellation_scenario())
+            if scenario_ids is None:
+                scenario_ids = [s.id for s in scenarios if s.id != "openemr-cancel-existing"]
+            if "openemr-cancel-existing" in scenario_ids and len(variants) > 1:
+                raise ValueError("Run a single variant per fresh synthetic cancellation target")
         known = {s.id for s in scenarios}
         if scenario_ids and set(scenario_ids) - known:
             raise ValueError("Unknown scenario IDs")
@@ -126,7 +134,9 @@ class Store:
             schema_version="2.0",
             id=f"run-{datetime.now(UTC):%Y%m%dT%H%M%S}-{uuid4().hex[:10]}",
             created_at=datetime.now(UTC),
-            dataset_sha256=digest(json.loads((DATA / "scenarios.json").read_text())),
+            dataset_sha256=digest([s.model_dump(mode="json") for s in scenarios])
+            if adapter_name == "openemr"
+            else digest(json.loads((DATA / "scenarios.json").read_text())),
             implementation_sha256=implementation_digest(),
             runtime={
                 "python": platform.python_version(),

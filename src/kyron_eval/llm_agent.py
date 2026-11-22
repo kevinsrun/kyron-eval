@@ -1,7 +1,7 @@
 """Optional bounded OpenAI-compatible text tool loop; deterministic mode needs no key.
 
 No provider SDK, live voice, general framework, or implicit model invocation. This mode
-only accepts the curated synthetic mock EHR, never external FHIR patient evidence.
+accepts curated mock or isolated marker-checked OpenEMR data; generic FHIR stays blocked.
 """
 
 import hashlib
@@ -114,7 +114,8 @@ class ChatModelClient:
             "endpoint_host": urlsplit(self.base_url).hostname,
             "engine": "openai-compatible-http",
             "prompt_version": PROMPT_VERSION,
-            "synthetic_mock_only": True,
+            "synthetic_mock_only": False,
+            "data_boundary": "mock or isolated manifest-verified OpenEMR; generic FHIR blocked",
         }
 
     def complete(self, messages, tools):
@@ -175,7 +176,12 @@ def model_status():
         model.close()
         return {"configured": True, **config}
     except ValueError as exc:
-        return {"configured": False, "reason": str(exc), "synthetic_mock_only": True}
+        return {
+            "configured": False,
+            "reason": str(exc),
+            "synthetic_mock_only": False,
+            "data_boundary": "mock or isolated manifest-verified OpenEMR; generic FHIR blocked",
+        }
 
 
 def validate_message(message):
@@ -231,9 +237,14 @@ def dispatch(world, name, raw_arguments):
 
 
 def execute_llm(scenario, *, adapter=None, faults=None, model_client=None, max_calls=12):
-    if adapter is not None and adapter.name != "mock":
+    if (
+        adapter is not None
+        and adapter.name != "mock"
+        and not (adapter.name == "openemr" and getattr(adapter, "synthetic_model_safe", False))
+    ):
         raise ValueError(
-            "LLM mode accepts only synthetic mock EHR data; FHIR evidence is never sent"
+            "LLM mode accepts synthetic mock or isolated marker-checked "
+            "OpenEMR data; generic FHIR is blocked"
         )
     model = model_client or ChatModelClient()
     owned = model_client is None

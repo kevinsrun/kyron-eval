@@ -318,10 +318,10 @@ def _safety(scenario, trace):
 
 
 def clarity(trace: Trace, *, version: str) -> Metric:
-    if version == "clarity-ehr-3.2":
+    if version in {"clarity-ehr-3.2", "clarity-ehr-3.3"}:
         from kyron_eval.ehr_evaluate import ehr_clarity
 
-        return ehr_clarity(trace)
+        return ehr_clarity(trace, version=version)
     if version not in CLARITY_VERSIONS:
         raise ValueError(f"Unsupported clarity evaluator: {version}")
     messages = [e for e in trace.events if e.kind == "agent" and e.text]

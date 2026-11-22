@@ -10,10 +10,12 @@ def main():
     parser = argparse.ArgumentParser(description="Offline synthetic evaluation workbench")
     parser.add_argument("command", choices=["run", "calibrate"])
     parser.add_argument("--variant", choices=["A", "B", "LLM", "both"], default="both")
-    parser.add_argument("--adapter", choices=["mock", "fhir"], default="mock")
+    parser.add_argument("--adapter", choices=["mock", "fhir", "openemr"], default="mock")
     parser.add_argument("--fault", action="append", default=[], metavar="OPERATION=MODE")
     parser.add_argument("--scenario", action="append")
-    parser.add_argument("--clarity-version", choices=(*CLARITY_VERSIONS, EHR_CLARITY_VERSION))
+    parser.add_argument(
+        "--clarity-version", choices=(*CLARITY_VERSIONS, "clarity-ehr-3.2", EHR_CLARITY_VERSION)
+    )
     args = parser.parse_args()
     if args.command == "calibrate":
         from kyron_eval.calibration import save_comparison

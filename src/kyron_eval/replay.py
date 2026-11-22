@@ -131,6 +131,7 @@ class MockWorld:
 
     def ehr_call(self, operation: str, **inputs):
         before = self.state.model_dump(mode="json")
+        http_start = len(getattr(self.adapter, "http_events", []))
         result = getattr(self.adapter, operation)(**inputs)
         safe_inputs = {
             k: v.model_dump(mode="json")
@@ -159,6 +160,11 @@ class MockWorld:
             state_before=before,
             state_after=self.state.model_dump(mode="json"),
             state_source="mock_internal" if self.adapter.name == "mock" else "policy_cache",
+            **(
+                {"http_evidence": self.adapter.http_events[http_start:]}
+                if hasattr(self.adapter, "http_events")
+                else {}
+            ),
         )
         return result
 
@@ -184,6 +190,9 @@ class MockWorld:
     def finish(self):
         final = self.ehr_call("read_state", patient_id=self.state.patient_id, now=self.now)
         self.trace.ehr["final_readback"] = final.model_dump(mode="json")
+        if hasattr(self.adapter, "http_events"):
+            self.trace.ehr["provider_http_events"] = self.adapter.http_events
+            self.trace.ehr["final_capabilities"] = self.adapter.capabilities()
         self.trace.state_after = None
         if final.ok and final.authoritative and final.data.get("state"):
             payload = {**final.data["state"], "disposition": self.state.disposition.value}
@@ -438,10 +447,18 @@ def replay(scenario: Scenario, variant: str, *, adapter=None, faults=None) -> Tr
     for index, turn in enumerate(scenario.script):
         world.now += timedelta(seconds=turn.elapsed_seconds)
         world.last_caller = world.event(
-            "caller", text=turn.text, facts=turn.facts, confirms_offer=turn.confirms_offer
+            "caller",
+            text=turn.text,
+            facts=turn.facts,
+            confirms_offer=turn.confirms_offer,
+            **({"confirms_cancellation": True} if turn.confirms_cancellation else {}),
         )
         world.facts.update(turn.facts)
-        if index == 0 and scenario.workflow == "scheduling":
+        if (
+            index == 0
+            and scenario.workflow == "scheduling"
+            and not world.facts.get("cancel_appointment_id")
+        ):
             search = world.tool("search")
             if search.get("offer"):
                 slot = world.offer.slot
@@ -449,11 +466,37 @@ def replay(scenario: Scenario, variant: str, *, adapter=None, faults=None) -> Tr
                     f"I can offer {slot.slot_id} at {slot.starts_at.isoformat()} with "
                     f"{slot.provider_id}, {slot.location_id}. Do you confirm this appointment?"
                 )
-    if scenario.workflow == "triage":
+    if world.facts.get("cancel_appointment_id"):
+        _cancellation_agent(world, variant)
+    elif scenario.workflow == "triage":
         _triage_agent(world, variant)
     else:
         _scheduling_agent(world, variant)
     return world.finish()
+
+
+def _cancellation_agent(world, variant):
+    appointment_id = world.facts["cancel_appointment_id"]
+    world.tool("cancel", patient_id=world.state.patient_id, appointment_id=appointment_id)
+    if variant == "A":
+        world.say("Your appointment is cancelled. Please call the clinic if you need another time.")
+        return
+    readback = world.tool("read_state")
+    records = readback["bookings"]
+    prior = world.trace.ehr.get("initial_appointments", {})
+    existed = prior.get("authoritative") and any(
+        b["appointment_id"] == appointment_id for b in prior.get("data", {}).get("bookings", [])
+    )
+    if records is None or not existed:
+        world.say(
+            "The cancellation status is unknown. Please call the clinic to check before retrying."
+        )
+    elif any(b["appointment_id"] == appointment_id for b in records):
+        world.say(
+            "I could not cancel the appointment; it remains in the EHR. Please call the clinic."
+        )
+    else:
+        world.say("Your appointment is cancelled. Please call the clinic if you need another time.")
 
 
 def _scheduling_agent(world: MockWorld, variant: str):

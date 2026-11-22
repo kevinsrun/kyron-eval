@@ -1,0 +1,58 @@
+name: kyron-openemr-synthetic
+services:
+  db:
+    image: mariadb:11.4.5@sha256:49117dcc565cf51aa57ac5fca59ab31213402ff0eae6ffc13c46a37b938f7e4b
+    restart: "no"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${KYRON_DB_ROOT_PASSWORD:?Run setup.py init first}
+    volumes:
+      - database:/var/lib/mysql
+    networks: [synthetic]
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  openemr:
+    image: openemr/openemr:7.0.4@sha256:265eae8463c8d23294bed200f2ddd6aae851fc2f7da5ad47ad981a87f3cd1067
+    restart: "no"
+    ports:
+      - "127.0.0.1:9310:443"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_ROOT_PASS: ${KYRON_DB_ROOT_PASSWORD:?}
+      MYSQL_USER: kyron_synthetic
+      MYSQL_PASS: ${KYRON_DB_PASSWORD:?}
+      MYSQL_DATABASE: kyron_synthetic
+      OE_USER: synthetic_admin
+      OE_PASS: ${KYRON_ADMIN_PASSWORD:?}
+      OPENEMR_SETTING_site_addr_oath: https://localhost:9310
+      OPENEMR_SETTING_rest_api: "1"
+      OPENEMR_SETTING_rest_fhir_api: "1"
+      OPENEMR_SETTING_oauth_password_grant: "3"
+      OPENEMR_SETTING_gbl_time_zone: UTC
+      OPENEMR_SETTING_gbl_def_date_format: "1"
+      TZ: UTC
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - sites:/var/www/localhost/htdocs/openemr/sites
+      - logs:/var/log
+      - ./.local/tls/server.pem:/etc/ssl/certs/selfsigned.cert.pem:ro
+      - ./.local/tls/server.key:/etc/ssl/private/selfsigned.key.pem:ro
+      - ./:/kyron-provision:ro
+    networks: [synthetic]
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --cacert, /etc/ssl/certs/selfsigned.cert.pem, https://localhost/interface/login/login.php]
+      start_period: 180s
+      interval: 10s
+      timeout: 5s
+      retries: 30
+volumes:
+  database: {}
+  sites: {}
+  logs: {}
+networks:
+  synthetic:
+    driver: bridge

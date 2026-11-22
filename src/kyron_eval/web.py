@@ -4,8 +4,10 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
+from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -18,7 +20,7 @@ from kyron_eval.ehr.contracts import OPERATIONS, Fault
 from kyron_eval.llm_agent import model_status
 from kyron_eval.models import HumanLabel, Model
 from kyron_eval.replay import digest, load_scenarios, trace_hash
-from kyron_eval.storage import Store
+from kyron_eval.storage import Store, atomic_json
 
 ROOT = Path(__file__).parent
 
@@ -26,7 +28,7 @@ ROOT = Path(__file__).parent
 class RunRequest(Model):
     variants: list[Literal["A", "B", "LLM"]] = Field(default=["A", "B"], min_length=1, max_length=3)
     scenario_ids: list[str] | None = Field(default=None, min_length=1, max_length=8)
-    adapter: Literal["mock", "fhir"] = "mock"
+    adapter: Literal["mock", "fhir", "openemr"] = "mock"
     ehr_faults: dict[str, Fault] = Field(default_factory=dict, max_length=9)
 
 
@@ -82,13 +84,19 @@ def create_app(artifact_root=None):
 
     @app.get("/", response_class=HTMLResponse)
     def home(request: Request):
+        catalog = load_scenarios()
+        integration = configuration_status()
+        if integration["openemr_configured"]:
+            from kyron_eval.openemr_scenarios import cancellation_scenario
+
+            catalog.append(cancellation_scenario())
         return templates.TemplateResponse(
             request=request,
             name="index.html",
             context={
                 **store.list(),
-                "scenarios": load_scenarios(),
-                "integration": configuration_status(),
+                "scenarios": catalog,
+                "integration": integration,
                 "model": model_status(),
             },
         )
@@ -127,6 +135,27 @@ def create_app(artifact_root=None):
     def api_scenarios():
         return load_scenarios()
 
+    @app.get("/openemr", response_class=HTMLResponse)
+    def openemr_evidence_page(request: Request):
+        paths = sorted((store.root / "openemr").glob("experiment-*.json"), reverse=True)
+        artifact = json.loads(paths[0].read_text()) if paths else None
+        return templates.TemplateResponse(
+            request=request,
+            name="openemr.html",
+            context={"experiment": artifact, "artifact_name": paths[0].stem if paths else None},
+        )
+
+    @app.get("/api/openemr/experiments/{name}")
+    def openemr_experiment(name: str):
+        import re
+
+        if not re.fullmatch(r"experiment-[A-Za-z0-9-]+", name):
+            raise HTTPException(404, "Experiment not found")
+        path = store.root / "openemr" / f"{name}.json"
+        if not path.exists():
+            raise HTTPException(404, "Experiment not found")
+        return json.loads(path.read_text())
+
     @app.get("/api/ehr/status")
     def ehr_status():
         scenario = load_scenarios()[0]
@@ -141,23 +170,49 @@ def create_app(artifact_root=None):
             provider.close()
 
     @app.post("/api/ehr/probe")
-    def ehr_probe():
+    def ehr_probe(adapter: Literal["fhir", "openemr"] = "fhir"):
         scenario = load_scenarios()[0]
         try:
-            provider = create_adapter("fhir", scenario)
+            provider = create_adapter(adapter, scenario)
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
         try:
             patient_id = scenario.initial_state.patient_id
-            return {
+            results = {
                 "capabilities": provider.capabilities(),
                 "patient": provider.get_patient(patient_id),
                 "appointments": provider.get_appointments(patient_id),
                 "availability": provider.get_availability(scenario.clock),
                 "clinical_context": provider.get_clinical_context(patient_id),
             }
+            if adapter == "openemr":
+                results["patient_search"] = provider.search_patients(patient_id)
+                results["synthetic_patients"] = [
+                    provider.get_patient(alias) for alias in provider.patient_map
+                ]
+                results["authorization"] = provider.authorization
+                results["http_evidence"] = provider.http_events
+            probe_id = (
+                "probe-" + datetime.now(UTC).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:10]
+            )
+            results["probe_id"] = probe_id
+            results["adapter"] = adapter
+            atomic_json(store.root / "ehr_probes" / f"{probe_id}.json", jsonable_encoder(results))
+            results["artifact_url"] = f"/api/ehr/probes/{probe_id}"
+            return results
         finally:
             provider.close()
+
+    @app.get("/api/ehr/probes/{probe_id}")
+    def saved_probe(probe_id: str):
+        import re
+
+        if not re.fullmatch(r"probe-[A-Za-z0-9-]+", probe_id):
+            raise HTTPException(404, "Probe not found")
+        path = store.root / "ehr_probes" / f"{probe_id}.json"
+        if not path.exists():
+            raise HTTPException(404, "Probe not found")
+        return json.loads(path.read_text())
 
     @app.get("/calibration", response_class=HTMLResponse)
     def calibration_page(request: Request):

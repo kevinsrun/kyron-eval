@@ -19,11 +19,14 @@ Select a scenario, **Mock · read + write**, A/B comparison, and an optional fau
 | Mode | Implemented | Verification boundary |
 |---|---|---|
 | MockEHRAdapter | All eight required operations, state readback, booking idempotency, cancellation, review queue, deterministic fault injection | Run-scoped synthetic state persisted under `artifacts/ehr/`; **not real EHR persistence** |
-| FHIRAdapter | Authenticated GETs, FHIR R4 capability discovery, patient/identity, appointments, availability, clinical codes | Read only. Explicit unsupported errors for booking, cancellation and review mutations. Local synthetic fixture tested; actual OpenEMR remains unverified. |
+| FHIRAdapter | Authenticated GETs, FHIR R4 capability discovery, patient/identity, appointments, availability, clinical codes | Read only. Explicit unsupported errors for booking, cancellation and review mutations. Local synthetic fixture tested; dedicated real OpenEMR support uses the separate adapter below. |
+| OpenEMRAdapter | Real local OpenEMR 7.0.4, authenticated FHIR reads, separate standard API creation/deletion, independent readback | Verified against an isolated Docker database with fabricated records. No Slot/Schedule or review queue. See [setup](integrations/openemr/README.md) and [observed experiment](docs/openemr-experiment.md). |
 | Deterministic A/B | Existing baseline and verified agent replay through EHR tools | Fully functional without a key. Original 68 tests retained. |
-| Optional LLM text agent | Environment-configured OpenAI-compatible tool loop; actual results fed back before the next response; bounded calls and raw events | Restricted to curated synthetic mock data. Protocol tested with scripted responses; no actual model performance experiment has been run. |
+| Optional LLM text agent | Environment-configured OpenAI-compatible tool loop; actual results fed back before the next response; bounded calls and raw events | Restricted to curated synthetic mock data or marker-checked isolated OpenEMR data. Protocol tested with scripted responses; no actual model performance experiment has been run. |
 
 See [configuration](docs/configuration.md) for the local FHIR fixture, synthetic OpenEMR setup requirements, authentication and optional model variables. No real patients, production endpoints, real provider information or production credentials are allowed. External FHIR data cannot enter an LLM prompt.
+
+Optional real EHR setup: follow [the reproducible local OpenEMR guide](integrations/openemr/README.md). The default remains mock. This separate `codex/openemr-integration` branch continues `78b7b84`; the frozen earlier submission ZIP is unchanged.
 
 ## Commands
 
@@ -42,7 +45,8 @@ uv run --frozen python scripts/ehr_experiment.py
 
 ## Evidence and limitations
 
-- [Current EHR experiment](docs/ehr-experiment.md): actual paired suite, fault matrix, evaluator revisions, regressions and unresolved verification.
+- [Real OpenEMR experiment](docs/openemr-experiment.md): authenticated local EHR operations, readback, actual agent cancellation and explicit unsupported capabilities.
+- [Earlier mock/FHIR EHR experiment](docs/ehr-experiment.md): actual paired suite, fault matrix, evaluator revisions, regressions and unresolved verification.
 - [Architecture and evidence rules](docs/architecture.md), [original rubric/calibration](docs/evaluation.md), [production priorities](docs/production.md).
 - [Original experiment](docs/experiment.md) and `artifacts/experiment.json` remain historical evidence, unchanged.
 - [AI-use disclosure and time allocation](docs/submission-notes.md), [five-minute walkthrough](docs/walkthrough.md).
@@ -50,6 +54,6 @@ uv run --frozen python scripts/ehr_experiment.py
 
 Missing or ambiguous state is `UNKNOWN`. A success acknowledgment is not a persisted write. Tool failure, agent policy violations, unresolved task completion and truthful patient-facing recovery are separate judgments. Recognizable English heuristics implement clarity; they are not a general language judge. Four original human labels do not establish holdout accuracy, and the new EHR clarity extensions have no independent human validation.
 
-The two workflows use eight purposive synthetic scenarios and scripted caller facts/consent annotations. The optional model receives caller text, while existing tool guards use those known simulator annotations; this does not test speech recognition or natural-language extraction. No live calls, actual transfers, clinical validation, production prevalence, authentication, deployment or real EHR write is claimed. Synthetic policies are unreviewed examples.
+The two workflows use eight purposive synthetic scenarios and scripted caller facts/consent annotations. The optional model receives caller text, while existing tool guards use those known simulator annotations; this does not test speech recognition or natural-language extraction. Real synthetic OpenEMR writes and API authentication are verified on this integration branch. No live calls, actual transfers, clinical validation, production prevalence, app-user authentication or deployment is claimed. Synthetic policies are unreviewed examples.
 
 Guava domain/scheduling validators and the emergency rule remain unchanged, attributed at [revision c708acb](https://github.com/saquer916/guava-hackathon/tree/c708acbbb03b8424313b4aeb0eeacb32fed64af4); see [file provenance](docs/upstream-provenance.json). The new FHIR adapter draws on its read-only OpenEMR adapter's boundaries; it is not copied wholesale. No Guava SDK or upstream changes are required.

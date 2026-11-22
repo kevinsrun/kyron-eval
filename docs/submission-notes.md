@@ -1,6 +1,16 @@
 # Submission notes and AI-use disclosure
 
-## EHR upgrade after commit 56b0a8e
+## Real OpenEMR continuation from 78b7b84
+
+The user explicitly requested a separate integration branch with a real local OpenEMR instance, authenticated supported operations and independent state verification, while preserving prior evidence. Codex implemented and executed this work on `codex/openemr-integration`, starting about **3:38 p.m. Eastern, November 22, 2026**, while the original authorized window was still open. The hard **8:00 p.m. Eastern** cutoff was not extended. The frozen earlier ZIP was not replaced; submission status was not assumed. See [actual new results](openemr-experiment.md).
+
+Codex provisioned pinned official OpenEMR/MariaDB containers in a dedicated loopback project, seeded fabricated records through authenticated APIs, wrote the adapter, tests, dashboard and report, and ran actual operations. A real browser-created deterministic B cancellation completed at 4:11 p.m. Eastern. Actual model calls, live voice, real patient data and clinical validation remain absent. Original four human labels and all 294 preexisting artifact files are preserved. The new cancellation clarity extension has no independent human labels.
+
+Evidence corrected AI assumptions: this release returns collection Bundles, a legacy empty appointment list returns 404, and an invalid appointment POST can return HTTP 200 with field-level errors. The decoder was corrected to distinguish rejection from acknowledgment; earlier experiment output remains saved. Initial Docker diagnostics inadvertently displayed newly generated disposable setup credentials in process arguments. Codex disclosed this and recreated only the new dedicated test stack with fresh credentials; those old values are invalid. Current secrets remain ignored/private and excluded from the package.
+
+The candidate must inspect and defend this AI-assisted implementation, record one single-take walkthrough and submit. No recording, external publication, upstream push or submission was performed by the assistant. The historical notes below describe earlier frozen phases and are superseded by this section for the current branch.
+
+## Historical EHR upgrade after commit 56b0a8e
 
 The user subsequently requested an EHR abstraction, optional LLM text execution, read-only FHIR integration and new EHR-aware evidence checks while preserving the existing platform. **The current consequential user choice is to prioritize a working mock EHR tool path and state verification before external connectivity and live voice infrastructure.** This was an explicit user instruction, not an inferred personal action. The historical offline-only scope below describes the earlier phase and is superseded where noted here.
 

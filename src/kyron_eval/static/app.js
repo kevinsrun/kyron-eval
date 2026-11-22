@@ -38,3 +38,11 @@ document.querySelector('#ehr-probe')?.addEventListener('click', async event => {
   catch (failure) { output.textContent = failure.message; }
   finally { event.target.disabled = false; }
 });
+
+document.querySelector('#openemr-probe')?.addEventListener('click', async event => {
+  const output = document.querySelector('#ehr-probe-result');
+  event.target.disabled = true; output.textContent = 'Reading real local OpenEMR capabilities and synthetic records…';
+  try { output.textContent = JSON.stringify(await postJSON('/api/ehr/probe?adapter=openemr', {}), null, 2); }
+  catch (failure) { output.textContent = failure.message; }
+  finally { event.target.disabled = false; }
+});

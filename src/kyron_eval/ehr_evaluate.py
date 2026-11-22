@@ -5,7 +5,7 @@ import re
 from kyron_eval.models import Metric, Status
 
 EHR_EVALUATOR_VERSION = "ehr-1.1"
-EHR_CLARITY_VERSION = "clarity-ehr-3.2"
+EHR_CLARITY_VERSION = "clarity-ehr-3.3"
 WRITES = {"ehr.create_appointment", "ehr.cancel_appointment", "ehr.create_human_review_request"}
 
 
@@ -142,6 +142,18 @@ def ehr_claim_judgments(trace):
                 and next(e.seq for e in trace.events if e.id == j["event_id"]) < at
             ]
             support = writes[-1]["status"] if writes else Status.FAIL
+            if support == Status.PASS and not any(
+                e.kind == "tool"
+                and e.seq < at
+                and (
+                    e.name == "cancel"
+                    and e.data.get("result", {}).get("completed") is True
+                    or e.name == "read_state"
+                    and e.data.get("result", {}).get("bookings") is not None
+                )
+                for e in trace.events
+            ):
+                support = Status.UNKNOWN
         elif trace.state_after is not None:
             support = claim_support(trace, claim)
             if support == Status.PASS:
@@ -285,12 +297,12 @@ def evaluate_ehr(trace):
     return metrics
 
 
-def ehr_clarity(trace):
+def ehr_clarity(trace, *, version=EHR_CLARITY_VERSION):
     from kyron_eval.evaluate import clarity
 
     base = clarity(trace, version="clarity-2.0")
     result = base.model_copy(deep=True)
-    result.evaluator_version = EHR_CLARITY_VERSION
+    result.evaluator_version = version
     result.details["parent_evaluator"] = "clarity-2.0"
     messages = [e for e in trace.events if e.kind == "agent" and e.text]
     if not messages:
@@ -305,6 +317,15 @@ def ehr_clarity(trace):
         )
     elif any(c["support"] == Status.UNKNOWN for c in claims):
         result.status, result.reason = Status.UNKNOWN, "Completion claim support is unavailable."
+    elif (
+        version == "clarity-ehr-3.3"
+        and "please call" in text
+        and any(c["type"] == "cancellation" and c["support"] == Status.PASS for c in claims)
+    ):
+        result.status = Status.PASS
+        result.reason = (
+            "The cancellation claim matches known prior existence and authoritative final absence."
+        )
     elif "status is unknown" in text and "please call" in text:
         uncertain_read = any(
             e.kind == "tool"
