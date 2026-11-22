@@ -1,0 +1,14 @@
+{
+  "protocol_version": "triage-protocol-1.0",
+  "frozen_at": "2026-11-22T23:03:56.246886+00:00",
+  "purpose": "Local reference comparison; no clinical validation",
+  "data_execution": "Local only; no public benchmark context sent to Guava/LLM",
+  "baseline": "Always select 0A information-needed, label-blind constant baseline; no fitting",
+  "evaluated_split": "development",
+  "test_policy": "Validation and public_test_1 loaded but NOT RUN; no held-out performance claim",
+  "mapping": "Exact CARE codes; ordinal diagnostics follow upstream 0A<0B<1A<1B, no cost matrix",
+  "confidence": "No probability output; calibration NOT AVAILABLE",
+  "interval": "Seeded case-group bootstrap 95% accuracy interval; descriptive development estimate only",
+  "seed": 916,
+  "thresholds": "No fitted release threshold. All real demo writes disabled pending independent review."
+}

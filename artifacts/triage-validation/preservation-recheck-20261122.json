@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-11-22T23:21:54.612844+00:00",
+  "historical_artifacts_checked": 347,
+  "changed_historical_artifacts": [],
+  "frozen_zip_sha256": "31e585866ea046c71d61473a56d29f4ba1aaebcd930b771878a0d41799f355ea",
+  "frozen_zip_matches": true,
+  "original_pr_head": "0f1714f6a763a384597637c063a7c0f3b31608f6",
+  "original_worktree_status": "M uv.lock",
+  "original_worktree_note": "uv.lock has an existing uncommitted change; left untouched. Preservation check does not assert a clean original checkout.",
+  "merge_performed": false
+}

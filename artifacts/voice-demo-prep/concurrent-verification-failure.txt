@@ -1,0 +1,88 @@
+........................................................................ [ 34%]
+................................................F....................... [ 69%]
+...............................................................          [100%]
+=================================== FAILURES ===================================
+_____________________ test_live_openemr_voice_cancellation _____________________
+
+    @pytest.mark.openemr_integration
+    def test_live_openemr_voice_cancellation():
+        """Opt-in live OpenEMR test: voice agent deletes seeded calendar event."""
+        if os.environ.get("KYRON_RUN_OPENEMR_TESTS") != "1":
+            pytest.skip("Explicit opt-in required for real OpenEMR integration")
+        if os.environ.get("KYRON_OPENEMR_ALLOW_WRITES") != "1":
+            pytest.skip("Explicit write authorization required")
+    
+        from datetime import datetime, timedelta
+        from uuid import uuid4
+    
+        from clinical_triage.domain.scheduling import (
+            AppointmentConfirmation,
+            AppointmentOffer,
+            AppointmentSlot,
+            AvailabilityKind,
+            AvailabilitySnapshot,
+        )
+        from kyron_eval.ehr.config import openemr_adapter
+        from kyron_eval.openemr_scenarios import cancellation_scenario
+    
+        clock = datetime(2026, 11, 23, 14, 0, tzinfo=UTC)
+        slot = AppointmentSlot(
+            slot_id="synthetic-slot-1",
+            provider_id="synthetic-provider-a",
+            location_id="synthetic-clinic",
+            starts_at=clock,
+            ends_at=clock + timedelta(minutes=30),
+            kind=AvailabilityKind.NEXT_AVAILABLE,
+        )
+        snapshot = AvailabilitySnapshot(
+            snapshot_id="synthetic-snapshot-voice",
+            observed_at=clock - timedelta(minutes=5),
+            expires_at=clock + timedelta(minutes=10),
+            slots=(slot,),
+        )
+        offer = AppointmentOffer(
+            offer_id="synthetic-offer-voice",
+            snapshot=snapshot,
+            slot=slot,
+            offered_at=clock - timedelta(minutes=4),
+            expires_at=snapshot.expires_at,
+        )
+        voice_confirmation = AppointmentConfirmation(
+            confirmation_id="synthetic-confirmation-voice",
+            confirmation_event_id="e-confirmed-voice",
+            confirmed_at=clock - timedelta(minutes=2),
+            offer=offer,
+        )
+    
+        adapter = openemr_adapter()
+        args = {
+            "patient_id": "synthetic-patient-1",
+            "confirmation": voice_confirmation,
+            "idempotency_key": f"live-voice-cancellation-{uuid4().hex[:8]}",
+        }
+        created = adapter.create_appointment(**args)
+        assert created.ok
+        target_appt = created.data["appointment_id"]
+    
+        scenario = cancellation_scenario()
+        scenario.script[0].facts["cancel_appointment_id"] = target_appt
+    
+        res = execute_guava_voice(scenario, adapter=adapter, target_appointment_id=target_appt)
+    
+        metric_map = {m.name: m for m in res.metrics}
+>       assert metric_map["ehr_write_verification"].status == Status.PASS
+E       AssertionError: assert <Status.FAIL: 'FAIL'> == <Status.PASS: 'PASS'>
+E         
+E         - PASS
+E         + FAIL
+
+tests/test_guava_voice.py:304: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.11/site-packages/fastapi/testclient.py:1
+  /Users/sadius/Documents/ChatGPT/Kyron Medical/kyron-eval-live-demo/.venv/lib/python3.11/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_guava_voice.py::test_live_openemr_voice_cancellation - Asse...
+1 failed, 206 passed, 1 warning in 3.78s

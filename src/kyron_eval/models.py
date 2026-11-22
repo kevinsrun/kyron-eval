@@ -101,7 +101,12 @@ class Trace(Model):
     schema_version: str = "1.0"
     harness_version: str = "replay-1.0"
     evidence_class: Literal[
-        "SYNTHETIC_EVALUATION_TRACE", "VOICE_LIVE_SYNTHETIC", "GUAVA_SDK_CALLBACK_SIMULATION"
+        "SYNTHETIC_EVALUATION_TRACE",
+        "VOICE_LIVE_SYNTHETIC",
+        "GUAVA_SDK_CALLBACK_SIMULATION",
+        "GUAVA_NETWORK_SESSION_UNVERIFIED",
+        "GUAVA_WEBRTC_AUDIO",
+        "SYNTHETIC_TRIAGE_REPLAY",
     ] = "SYNTHETIC_EVALUATION_TRACE"
     scenario_id: str
     scenario_version: str

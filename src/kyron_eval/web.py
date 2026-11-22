@@ -93,6 +93,7 @@ def create_app(artifact_root=None):
     )
     app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
     templates = Jinja2Templates(directory=ROOT / "templates")
+    app.state.templates = templates
     templates.env.globals.update(digest=digest, trace_hash=trace_hash, counts=counts)
     store = Store(artifact_root)
     app.state.store = store
@@ -322,6 +323,9 @@ def create_app(artifact_root=None):
             raise HTTPException(422, str(exc)) from exc
         return label
 
+    from kyron_eval.triage.web import register_benchmarks
+
+    register_benchmarks(app, templates, store.root)
     return app
 
 

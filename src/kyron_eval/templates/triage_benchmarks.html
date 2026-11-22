@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Triage Benchmarks · Kyron{% endblock %}
+{% block content %}
+<p class="eyebrow">LOCAL REFERENCE COMPARISON · NO CLINICAL CERTIFICATION</p>
+<h1>Triage Benchmarks</h1>
+<div class="notice">Predictions, reference annotations, and scheduling policy are separate. Agreement does not establish clinical safety. Public benchmark context is never sent to Guava. Only fictional demo scripts enter the voice service.</div>
+<section class="panel"><h2>Dataset provenance</h2>
+<label>Dataset <select id="dataset"><option>CARE-Bench</option><option>Sen2Med</option></select></label>
+<label>Partition <select id="split"><option>development</option><option>validation</option><option>public_test_1</option><option>unspecified</option></select></label>
+<p>CARE-Bench v1.1: human-reviewed, AI-assisted references. Sen2Med: separate binary manage/visit/resource tasks and individual clinician ratings; missing ratings retain missingness.</p>
+{% if manifest %}<p>{{ manifest.records }} prefixes · {{ manifest.cases }} CARE case groups loaded locally. Development {{ manifest.splits.development }} · validation {{ manifest.splits.validation }} · public test {{ manifest.splits.public_test_1 }}.</p>
+<p>CARE license: {{ manifest.license }}. Sen2Med context withheld; README CC BY-SA / LICENSE MIT conflict remains unresolved. Sen2Med model comparison: <strong>NOT RUN</strong>. MIMIC: unavailable without credentialed access and applicable agreement.</p>
+{% else %}<p>Local source data not installed. Saved score artifacts remain inspectable. See setup documentation.</p>{% endif %}
+</section>
+{% for run in runs %}
+<section class="panel"><h2>{{ run.dataset }} · {{ run.evaluated_prefixes }} evaluated prefixes / {{ run.case_groups }} cases</h2>
+<p>Agent: constant information-needed baseline, executed locally. No model fitting. Evaluator {{ run.evaluator_version }}. Held-out evaluation: <strong>{{ run.held_out_evaluation }}</strong>.</p>
+<div class="stats"><div>Correct <strong>{{ run.correct }}</strong></div><div>Incorrect <strong>{{ run.incorrect }}</strong></div><div>Unknown <strong>{{ run.unknown }}</strong></div></div>
+<p>Urgent sensitivity: {{ run.urgent_sensitivity }} · Undertriage: {{ run.undertriage_count }} · Overtriage: {{ run.overtriage_count }}. These ordinal diagnostics follow the source ordering; no clinical cost matrix was invented.</p>
+<p>Accuracy 95% case-group bootstrap interval: {{ run.accuracy_95pct_case_bootstrap }}. Development-only descriptive result. Class imbalance and all-prefix denominators remain visible.</p>
+<div style="overflow:auto"><table><thead><tr><th>Reference ↓ / Prediction →</th>{% for label in run.confusion_matrix.values()|first %}<th>{{ label }}</th>{% endfor %}</tr></thead><tbody>{% for label, cols in run.confusion_matrix.items() %}<tr><th>{{ label }}</th>{% for n in cols.values() %}<td>{{ n }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+<details><summary>Per-class precision / recall / support and unavailable metrics</summary><pre>{{ run.per_class|tojson(indent=2) }}</pre><pre>{{ run.critical_question_coverage|tojson(indent=2) }}</pre><pre>{{ run.unsupported_reassurance|tojson(indent=2) }}</pre><pre>{{ run.calibration|tojson(indent=2) }}</pre></details>
+<p><a href="/api/triage/benchmarks/{{ run.id }}">Raw predictions, labels, scoring output and frozen protocol</a></p>
+</section>{% else %}<section class="panel"><strong>NOT RUN</strong> — No benchmark execution artifact exists.</section>{% endfor %}
+<section class="panel"><h2>Case inspection · local data</h2><p>Click a case to inspect its raw prediction, reference, annotations and input. Perturbations and prefixes retain case groups. This does not load a case into the voice agent.</p><button id="load">Load local cases</button><div id="cases"></div><pre id="case"></pre></section>
+<script>
+document.querySelector('#load').onclick=async()=>{
+ const dataset=document.querySelector('#dataset').value,split=document.querySelector('#split').value;
+ const response=await fetch('/api/triage/cases?'+new URLSearchParams({dataset,split}));
+ const data=await response.json(),target=document.querySelector('#cases');target.replaceChildren();
+ const summary=document.createElement('p');summary.textContent=data.total+' records; first 25 shown.';target.append(summary);
+ for(const row of data.records||[]){const b=document.createElement('button');b.textContent=row.source_prefix_id+' · '+(row.raw_label||'UNKNOWN');
+ b.onclick=async()=>{let scoring=[];for(const run of {{ runs|map(attribute='id')|list|tojson }}){const r=await(await fetch('/api/triage/benchmarks/'+run)).json();scoring.push(...r.rows.filter(x=>x.prefix_id===row.source_prefix_id));}
+ document.querySelector('#case').textContent=JSON.stringify({record:row,scoring},null,2);};target.append(b,document.createElement('br'));}
+};
+</script>
+{% endblock %}

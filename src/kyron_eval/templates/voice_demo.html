@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kyron · Voice + triage evaluation</title>
+<link rel="stylesheet" href="/static/style.css">
+<script type="importmap">{"integrity":{"https://cdn.jsdelivr.net/npm/@guava-ai/guava-sdk@0.44.0/dist/guava-webrtc.esm.min.js":"sha384-Lf/SBkHjXX4aPSR9S2XcqQXaI21CnugMUu7ROfHLJGnvtPMS0lFNuYTnUal6eAZ8"}}</script>
+<style>
+.demo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.demo-grid pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:25rem;overflow:auto;font-size:.8rem}.demo-grid h2{font-size:1.15rem}.transcript{max-height:20rem;overflow:auto}.transcript p{padding:.5rem;border-bottom:1px solid #e5e7eb}.route{font-size:1.1rem;font-weight:700;color:#8b3a0b}.live-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}select{max-width:100%;padding:.5rem}.demo-grid .panel{min-width:0}.muted{color:#627080}@media(max-width:1000px){.demo-grid{grid-template-columns:1fr}}
+</style></head><body><main style="max-width:1450px;margin:2rem auto;padding:1rem">
+<p><a href="/">Evaluation runs</a> · <a href="/triage-benchmarks">Triage Benchmarks</a> · FICTIONAL LIVE CALLER ONLY</p>
+<h1>Voice → triage → appointment evidence</h1>
+<div class="notice">Unvalidated demonstration policy. No appointment writes, cancellation or transfer are enabled. Benchmark context stays local. Only actual SDK speech callbacks appear as transcripts; replay is explicitly separate.</div>
+<section class="panel"><div class="live-controls"><label>Mode <select id="mode"><option value="lookup">Read-only appointment lookup</option><option value="triage">Triage + appointment routing</option></select></label>
+<label>Fictional demo <select id="demo"><option value="nonurgent">Nonurgent request</option><option value="urgent">Urgent escalation</option><option value="insufficient">Insufficient information</option></select></label>
+<button id="start">Start microphone session</button><button id="stop" disabled>End session</button></div>
+<p id="script"></p><p>Fictional identity when asked: <strong>January 2, 1980</strong> · <strong>202-555-0100</strong>. No real personal or medical details.</p>
+<p id="state" role="status">Not started. No live audio observed.</p><p id="audio">Remote audio: not observed.</p><p id="result"></p></section>
+<section class="panel"><h2>Saved demonstration fallback</h2><p>Scripted fictional dialogue + actual read-only OpenEMR. No audio or model inference. Loading a replay disables microphone controls until page reload.</p><select id="replay"><option value="">Choose saved replay</option></select> <button id="loadReplay">Inspect scripted replay</button></section>
+<p id="encounter" class="muted">No encounter started. All three panels will use the same authoritative encounter ID.</p>
+<div class="demo-grid">
+<section class="panel"><h2>A · Live voice</h2><p id="task">Awaiting microphone session</p><p id="duration">Duration: —</p><div id="transcripts" class="transcript"><p>No actual caller or agent transcript received.</p></div><h3>Extracted facts</h3><pre id="facts">Not observed</pre></section>
+<section class="panel"><h2>B · Triage evaluation</h2><p id="route" class="route">TRIAGE INCOMPLETE</p><p id="routeReason">No structured prediction received.</p><pre id="triage">Reference: no benchmark case loaded.
+Agent prediction: NOT RUN.</pre><h3>Sequential transitions</h3><pre id="transitions">No transitions observed</pre><p>No green clinical safety badge: reference agreement does not authorize scheduling.</p></section>
+<section class="panel"><h2>C · Appointment / OpenEMR</h2><p id="patient">Fictional patient: synthetic-patient-1</p><p id="identity">Identity: NOT VERIFIED</p><p id="schedule" class="route">WRITES DISABLED</p><pre id="appointment">No protected appointment lookup yet</pre><details><summary>Actual OpenEMR HTTP metadata</summary><pre id="http">No encounter HTTP requests yet</pre></details><details><summary>Independent final readback</summary><pre id="readback">Pending session completion</pre></details></section>
+</div>
+<section class="panel"><h2>Evidence boundary</h2><p>Browser connection, remote track, decoded non-silent audio, SDK speech callbacks, structured SDK task outputs, Kyron tool calls, HTTP metadata and independent readback remain separate. WebRTC is not PSTN. No model identity, token usage, speaker-delivery guarantee or clinical validation is claimed.</p><p>Cancellation stays disabled pending independent review. Unsupported free-slot discovery is never replaced with invented availability.</p><a href="/api/triage/demos">Fictional scripts and source attribution</a></section>
+<details><summary>Full session status</summary><pre id="details"></pre></details>
+<audio id="decoded" muted></audio>
+</main>
+<script type="module">
+import {Call} from 'https://cdn.jsdelivr.net/npm/@guava-ai/guava-sdk@0.44.0/dist/guava-webrtc.esm.min.js';
+const nonce='__DEMO_NONCE__';
+const scripts={lookup:'Say: “Please look up my synthetic demo appointment.”',nonurgent:'Say: “I have a mild itchy patch on my arm for two weeks. It is not worsening. I would like a routine appointment to have it checked.”',urgent:'Say only the fictional scenario: “I have severe chest pain and trouble breathing that started ten minutes ago.”',insufficient:'First say: “I do not feel well.” Wait for clarification, then describe a mild itchy patch on your arm for two weeks and request a routine appointment.'};
+function setScript(){document.querySelector('#script').textContent=scripts[document.querySelector('#mode').value==='lookup'?'lookup':document.querySelector('#demo').value];}
+document.querySelector('#mode').onchange=setScript;document.querySelector('#demo').onchange=setScript;setScript();
+const headers={'Content-Type':'application/json','X-Kyron-Demo':nonce};
+const state=document.querySelector('#state'), audio=document.querySelector('#audio');
+let call, audioContext, analyser, timer, sampleTimer, replayView=false;
+let observed={connected:false,remote_track:false,non_silent_frames:0,audio_playing:false,ended:false};
+async function report(){
+  const r=await fetch('/api/live-demo/evidence',{method:'POST',headers,body:JSON.stringify(observed)});
+  const s=await r.json(); update(s);
+}
+function update(s){
+  document.querySelector('#details').textContent=JSON.stringify(s,null,2);
+  if(s.encounter){
+    const e=s.encounter,t=e.triage;
+    document.querySelector('#encounter').textContent='Encounter '+e.encounter_id+' · '+e.mode+' · '+(e.latest_run||'active; trace not yet finalized');
+    document.querySelector('#task').textContent=(s.execution==='SCRIPTED_TRIAGE_REPLAY'?'SCRIPTED REPLAY — no actual voice. ':'')+'Active task: '+e.active_task;
+    document.querySelector('#duration').textContent='Call duration: '+e.duration_seconds+'s';
+    const target=document.querySelector('#transcripts');target.replaceChildren();
+    for(const turn of e.transcripts){const p=document.createElement('p');p.textContent=turn.kind.toUpperCase()+' ['+turn.source+']: '+turn.text;target.append(p);}
+    document.querySelector('#facts').textContent=JSON.stringify(t.facts,null,2);
+    document.querySelector('#route').textContent=e.mode==='lookup'?'LOOKUP ONLY':t.state.replaceAll('_',' ');
+    document.querySelector('#routeReason').textContent=t.reason;
+    document.querySelector('#triage').textContent=JSON.stringify({agent_prediction:t.prediction,reference:t.reference,agreement:e.reference_evaluation||'UNKNOWN — scripted reference not matched to the current prefix',missing_facts:t.missing_facts,evaluator_version:'triage-reference-1.0',policy_version:t.policy_version,evidence_quality:s.audio_observed?'Observed WebRTC + SDK speech':'Audio unverified'},null,2);
+    document.querySelector('#transitions').textContent=JSON.stringify(t.transitions,null,2);
+    document.querySelector('#identity').textContent='Identity: '+(e.identity_verified?'VERIFIED':e.identity_was_verified?'WAS VERIFIED; session now closed':'NOT VERIFIED');
+    document.querySelector('#schedule').textContent=t.state==='URGENT_ESCALATION'?'SCHEDULING BLOCKED':'WRITES DISABLED · availability unsupported';
+    document.querySelector('#appointment').textContent=JSON.stringify({availability:e.availability,patient_id:e.patient_id,target_appointment_id:e.appointment_id,requested_operation:e.requested_operation,consent:e.consent,lookup:e.lookup,acknowledgment:e.ehr_acknowledgment},null,2);
+    document.querySelector('#http').textContent=JSON.stringify(e.http_events,null,2);
+    document.querySelector('#readback').textContent=JSON.stringify(e.readback,null,2);
+  }
+  if(s.latest_run){
+    const link=document.createElement('a');link.href='/runs/'+s.latest_run;link.textContent='Inspect saved trace and evaluator judgments';
+    document.querySelector('#result').replaceChildren(link);
+  }
+  audio.textContent='Remote track: '+observed.remote_track+' · decoded non-silent frames: '+observed.non_silent_frames+' · overall audio evidence: '+Boolean(s.audio_observed);
+}
+async function status(){if(replayView)return;try{const r=await fetch('/api/live-demo/status');update(await r.json());}catch{state.textContent='Local server unavailable; no result inferred.';}}
+document.querySelector('#start').addEventListener('click',async()=>{
+  document.querySelector('#start').disabled=true;
+  try{
+    const config=await fetch('/api/live-demo/configure',{method:'POST',headers,body:JSON.stringify({mode:document.querySelector('#mode').value,demo_id:document.querySelector('#mode').value==='triage'?document.querySelector('#demo').value:null})});
+    if(!config.ok)throw new Error('Configuration unavailable; restart the single-use demo.');
+    document.querySelector('#mode').disabled=true;document.querySelector('#demo').disabled=true;
+    audioContext=new AudioContext();await audioContext.resume();
+    const r=await fetch('/api/live-demo/start',{method:'POST',headers,body:'{}'});
+    if(!r.ok)throw new Error('Preflight/registration failed; inspect local server status.');
+    const configuration=await r.json();
+    // No file injection, connecting tones or fabricated speech/audio tracks.
+    call=new Call({...configuration,connectingTone:'disabled',leavingTone:'disabled'});
+    call.onStateChange(s=>{
+      state.textContent='WebRTC state: '+s;
+      if(s==='connected')observed.connected=true;
+      if(s==='ended'){
+        observed.ended=true;clearInterval(timer);clearInterval(sampleTimer);
+        document.querySelector('#stop').disabled=true;
+        state.textContent+=' · '+(call.error?.code||'normal session end');
+      }
+      report().catch(()=>{});
+    });
+    call.onRemoteStream(stream=>{
+      observed.remote_track=stream.getAudioTracks().length>0;
+      const decoded=document.querySelector('#decoded');decoded.srcObject=stream;
+      decoded.onplaying=()=>{observed.audio_playing=true;report().catch(()=>{});};
+      decoded.play().catch(()=>{audio.textContent='Remote track received; decoded playback not yet observed.';});
+      analyser=audioContext.createAnalyser();analyser.fftSize=1024;
+      audioContext.createMediaStreamSource(stream).connect(analyser);
+      const samples=new Float32Array(analyser.fftSize);
+      sampleTimer=setInterval(()=>{
+        analyser.getFloatTimeDomainData(samples);
+        const rms=Math.sqrt(samples.reduce((sum,x)=>sum+x*x,0)/samples.length);
+        if(rms>0.005)observed.non_silent_frames++;
+      },100);
+    });
+    document.querySelector('#stop').disabled=false;
+    await call.start();
+    timer=setInterval(()=>report().catch(()=>{}),2000);
+  }catch(e){state.textContent=e.message;document.querySelector('#start').disabled=false;}
+});
+document.querySelector('#stop').addEventListener('click',async()=>{if(call)await call.hangup();});
+let replays=[];
+fetch('/api/triage/replays').then(r=>r.json()).then(rows=>{replays=rows;for(const row of rows){const option=document.createElement('option');option.value=row.replay_id;option.textContent=row.encounter.demo_id+' · '+row.encounter.triage.state;document.querySelector('#replay').append(option);}}).catch(()=>{});
+document.querySelector('#loadReplay').onclick=()=>{
+ if(call){state.textContent='End the active session before inspecting a replay.';return;}
+ const row=replays.find(r=>r.replay_id===document.querySelector('#replay').value);if(!row)return;
+ replayView=true;document.querySelector('#start').disabled=true;document.querySelector('#mode').disabled=true;document.querySelector('#demo').disabled=true;
+ state.textContent='SCRIPTED TRIAGE REPLAY — no live microphone, audio, or model execution. Actual OpenEMR GET requests only.';update(row);
+};
+setInterval(status,2000);status();
+</script></body></html>

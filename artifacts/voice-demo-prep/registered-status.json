@@ -1,0 +1,17 @@
+{
+  "at": "2026-11-22T22:56:37.164758+00:00",
+  "source": "actual running demo API",
+  "status": {
+    "mode": "READ_ONLY_WEBRTC_CANDIDATE",
+    "guava_registration_verified": true,
+    "writes_enabled": false,
+    "listener_started": true,
+    "listener_ready": true,
+    "listener_error": null,
+    "call_started": false,
+    "audio_observed": false,
+    "browser": null,
+    "latest_run": null,
+    "independent_fix_approval": "pending; cancellation disabled"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-11-22T23:19:22.294633+00:00",
+  "baseline": "1b2f0d53543295d026b7a0a4489a133054e6f928",
+  "historical_artifacts_checked": 347,
+  "changed_historical_artifacts": [],
+  "frozen_zip_sha256": "31e585866ea046c71d61473a56d29f4ba1aaebcd930b771878a0d41799f355ea",
+  "frozen_zip_matches": true,
+  "original_pr_head": "0f1714f6a763a384597637c063a7c0f3b31608f6",
+  "original_checkout_clean": false,
+  "no_merge_performed": true
+}

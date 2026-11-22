@@ -1,0 +1,16 @@
+{
+  "api_key_present": false,
+  "agent_number_present": false,
+  "cli_auth_present": true,
+  "authenticated": false,
+  "webrtc_does_not_require_phone_number": true,
+  "actual_audio_observed": false,
+  "error_type": "HTTPStatusError",
+  "http_status": 400,
+  "oauth_error": "invalid_grant",
+  "blocker": "Guava authentication/API access not verified; refresh login or test key",
+  "openemr_patient_read": "OK",
+  "openemr_appointment_read": "OK",
+  "demo_target_present": true,
+  "writes_enabled": false
+}
