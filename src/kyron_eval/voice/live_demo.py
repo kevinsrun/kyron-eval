@@ -22,13 +22,18 @@ SECRET_FILE = Path(".env.guava.local")
 
 
 def load_private_key_file(path=SECRET_FILE):
-    if not path.exists() or os.environ.get("GUAVA_API_KEY"):
+    if not path.exists():
         return
     if path.stat().st_mode & 0o077:
         raise ValueError("The ignored Guava environment file must have mode 600")
     for line in path.read_text().splitlines():
         key, separator, value = line.partition("=")
-        if separator and key.strip() == "GUAVA_API_KEY" and value.strip():
+        if (
+            separator
+            and key.strip() in {"GUAVA_API_KEY", "GUAVA_AGENT_NUMBER"}
+            and value.strip()
+            and not os.environ.get(key.strip())
+        ):
             os.environ[key.strip()] = value.strip().strip('"').strip("'")
 
 
@@ -93,17 +98,60 @@ class DemoController:
         self.listener_started = False
         self.listener_error = None
         self.provider_factory = provider_factory or openemr_adapter
+        self.phone_number = os.environ.get("GUAVA_AGENT_NUMBER")
         self.mode = "receptionist"
         self.demo_id = None
 
-    def start_session(self, call_id):
+    def start_session(self, call_id, transport="webrtc"):
         with self.lock:
             if self.session is not None:
                 return None
             if self.mode == "receptionist":
                 from kyron_eval.voice.receptionist import ReceptionistSession
 
-                self.session = ReceptionistSession(self.provider_factory(), self.root)
+                self.session = ReceptionistSession(
+                    self.provider_factory(),
+                    self.root,
+                    booking_enabled=os.environ.get("KYRON_BOOKING_ENABLED") == "1",
+                )
+                if os.environ.get("KYRON_BOOKING_ENABLED") == "1":
+                    from kyron_eval.voice.booking import BookingTransaction, ClinicInventory
+                    from kyron_eval.voice.booking_email import ConfirmationEmail, ConnectorEmail
+
+                    local = openemr_directory()
+                    inventory = ClinicInventory(
+                        local / "booking-inventory.json", local / "booking-reservations.sqlite"
+                    )
+                    config = inventory.config
+                    outbound = os.environ.get("KYRON_EMAIL_OUTBOUND") == "1"
+                    email = ConfirmationEmail(
+                        local / "notifications.sqlite",
+                        recipient=config["authorized_recipient"],
+                        host=os.environ.get("KYRON_SMTP_HOST", "127.0.0.1"),
+                        port=os.environ.get("KYRON_SMTP_PORT", "9326"),
+                        sender=os.environ.get(
+                            "KYRON_SMTP_FROM", "appointments@willow.example.test"
+                        ),
+                        username=os.environ.get("KYRON_SMTP_USER"),
+                        password=os.environ.get("KYRON_SMTP_PASSWORD"),
+                        outbound=outbound,
+                        authorized_recipients=[config["authorized_recipient"]],
+                    )
+                    if os.environ.get("KYRON_EMAIL_CONNECTOR") == "1":
+                        email = ConnectorEmail(
+                            local / "notifications.sqlite",
+                            local / "connector-outbox",
+                            recipient=config["authorized_recipient"],
+                            authorized_recipients=[config["authorized_recipient"]],
+                        )
+                    self.session.booking = BookingTransaction(
+                        self.session,
+                        self.session.world.adapter.provider,
+                        inventory,
+                        email,
+                        Path(self.root) / "booking-confirmations",
+                        writes_enabled=True,
+                    )
             else:
                 self.session = LiveLookupSession(
                     self.provider_factory(),
@@ -112,12 +160,18 @@ class DemoController:
                     mode=self.mode,
                     demo_id=self.demo_id,
                 )
+            self.session.transport = transport
+            self.session.world.trace.ehr["call_channel"] = {
+                "transport": transport,
+                "caller_id_used_as_identity": False,
+                "raw_audio_captured": False,
+            }
             self.session.world.trace.ehr["guava_registration"] = {
                 "authenticated_registration": bool(self.client and self.code),
                 "sdk_version": "0.53.0",
                 "routing_code": "redacted",
                 "client_token": "redacted",
-                "transport": "WebRTC",
+                "transport": transport,
             }
             self.session.start(call_id)
             return self.session
@@ -125,9 +179,12 @@ class DemoController:
     def public_status(self):
         with self.lock:
             return {
-                "mode": "READ_ONLY_WEBRTC_CANDIDATE",
+                "mode": "GUAVA_BOOKING_CANDIDATE"
+                if os.environ.get("KYRON_BOOKING_ENABLED") == "1"
+                else "READ_ONLY_WEBRTC_CANDIDATE",
                 "guava_registration_verified": bool(self.client and self.code),
-                "writes_enabled": False,
+                "writes_enabled": bool(self.session and getattr(self.session, "booking", None)),
+                "phone_number": self.phone_number,
                 "listener_started": self.listener_started,
                 "listener_ready": self.listener_ready(),
                 "listener_error": self.listener_error,
@@ -261,6 +318,7 @@ def main():
     status, client = auth_probe()
     provider = openemr_adapter()
     provider.allow_writes = False
+    booking_ready = True
     try:
         patient = provider.get_patient("synthetic-patient-1")
         appointments = provider.get_appointments("synthetic-patient-1")
@@ -287,6 +345,31 @@ def main():
             if receptionist_match
             else "NOT_CONFIGURED",
         )
+        if os.environ.get("KYRON_BOOKING_ENABLED") == "1":
+            import smtplib
+            from datetime import UTC, datetime
+
+            from kyron_eval.voice.booking import ClinicInventory
+
+            try:
+                local = openemr_directory()
+                inventory = ClinicInventory(
+                    local / "booking-inventory.json", local / "booking-reservations.sqlite"
+                )
+                options = inventory.available(provider, datetime.now(UTC))
+                with smtplib.SMTP("127.0.0.1", 9326, timeout=3) as smtp:
+                    code, _ = smtp.noop()
+                booking_ready = bool(options) and code == 250
+                status.update(
+                    guarded_booking_configured=True,
+                    conflict_checked_option_count=len(options),
+                    local_smtp_ready=code == 250,
+                    email_transport="LOCAL_MAILPIT_CAPTURE",
+                    inbox_delivery_verified=False,
+                )
+            except Exception as exc:
+                booking_ready = False
+                status.update(guarded_booking_configured=False, booking_blocker=type(exc).__name__)
     finally:
         provider.close()
     print(json.dumps(status, indent=2))
@@ -302,7 +385,7 @@ def main():
         print(f"Blocked UI preview only: http://127.0.0.1:{args.port}/voice-demo")
         uvicorn.run(create_demo_app(controller), host="127.0.0.1", port=args.port)
         return
-    if not client or not receptionist_match or not receptionist_match.ok:
+    if not client or not receptionist_match or not receptionist_match.ok or not booking_ready:
         raise SystemExit("Blocked. Resolve preflight; no voice call was created.")
     try:
         code = client.create_webrtc_agent(ttl=timedelta(minutes=30), require_token=True)
@@ -319,6 +402,11 @@ def main():
     import guava
 
     runner = guava.Runner().listen_webrtc(agent, code)
+    if controller.phone_number:
+        assigned = {n.phone_number for n in client.list_numbers()}
+        if controller.phone_number not in assigned:
+            raise SystemExit("Configured phone number is not assigned to this Guava account")
+        runner.listen_phone(agent, controller.phone_number)
     # Read-only readiness observation of this pinned SDK's own health context.
     controller.listener_ready = runner._health_ctx.is_ready
 

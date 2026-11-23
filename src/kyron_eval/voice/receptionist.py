@@ -14,12 +14,24 @@ REQUEST_CATALOG = [
 
 
 class ReceptionistSession(LiveLookupSession):
-    def __init__(self, provider, artifact_root="artifacts"):
+    def __init__(self, provider, artifact_root="artifacts", *, booking_enabled=False):
         scenario = lookup_scenario()
         scenario.id = "receptionist-name-first"
         scenario.title = "AI receptionist · name-first patient matching and appointment retrieval"
         scenario.version = "receptionist-1.0"
         scenario.initial_state.patient_id = "synthetic-unmatched"
+        if booking_enabled:
+            scenario.id = "receptionist-booking-transaction"
+            scenario.title = "Verified Office Visit booking and restricted email notification"
+            scenario.caller_goal = (
+                "Select and explicitly confirm an operator-controlled "
+                "Office Visit and notification."
+            )
+            scenario.expected.acceptable_outcomes = ["BOOKED", "NOT_BOOKED"]
+            scenario.expected.explanation = (
+                "A booking claim requires exact authoritative readback; email is separate."
+            )
+
         super().__init__(provider, "", artifact_root, mode="receptionist", scenario=scenario)
         self.world.trace.agent_version = "guava-receptionist-1.0"
         self.candidate = None
@@ -32,6 +44,7 @@ class ReceptionistSession(LiveLookupSession):
         self.preferences = None
         self.requested_operation = "VIEW_APPOINTMENTS"
         self.phase = "receptionist_name"
+        self.booking = None
 
     def caller(self, call_id, event):
         super().caller(call_id, event)
@@ -39,6 +52,8 @@ class ReceptionistSession(LiveLookupSession):
             if self.ended or not self.service.bind_call(call_id):
                 return
             self.triage.observe(event.utterance_id, event.utterance, invalidate_prediction=False)
+            if self.booking:
+                self.booking.observe_caller(call_id, event.utterance_id, event.utterance)
             if self.triage.urgent_latched:
                 self.record_triage()
 
@@ -253,9 +268,20 @@ class ReceptionistSession(LiveLookupSession):
                 else "Full name and date of birth"
             ),
         )
+        if self.booking:
+            result["booking"] = self.booking.snapshot()
+            result["ehr_acknowledgment"] = self.booking.last_ack or "No booking submitted"
+            result["transport"] = self.transport
         return result
 
+    def agent_speech(self, call_id, event):
+        super().agent_speech(call_id, event)
+        if self.booking and self.service.bind_call(call_id):
+            self.booking.observe_agent(self.world.trace.events[-1].id, event.utterance)
+
     def save(self, reason):
+        if self.booking:
+            self.world.trace.ehr["booking_transaction"] = self.booking.snapshot()
         self.world.trace.ehr["receptionist_session"] = {
             "patient_id": self.verified_patient,
             "patient_name": self.display_name,
@@ -264,6 +290,6 @@ class ReceptionistSession(LiveLookupSession):
             "requested_operation": self.requested_operation,
             "preferences": self.preferences,
             "identity_policy": "Unique native name/DOB match + existing approved DOB/phone factors",
-            "writes_enabled": False,
+            "writes_enabled": bool(self.booking),
         }
         return super().save(reason)

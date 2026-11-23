@@ -5,26 +5,27 @@
 <style>
 [hidden]{display:none!important}
 .demo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.demo-grid pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:25rem;overflow:auto;font-size:.8rem}.demo-grid h2{font-size:1.15rem}.transcript{max-height:20rem;overflow:auto}.transcript p{padding:.5rem;border-bottom:1px solid #e5e7eb}.route{font-size:1.1rem;font-weight:700;color:#8b3a0b}.live-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}select{max-width:100%;padding:.5rem}.demo-grid .panel{min-width:0}.muted{color:#627080}.appointment-card{border:1px solid #d5dce5;border-radius:8px;padding:.8rem;margin:.8rem 0}.appointment-card p{margin:.25rem 0}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;font-size:.7rem}.calendar-day{border:1px solid #d5dce5;min-height:65px;padding:3px;overflow-wrap:anywhere}.calendar-day p{background:#e5edf4}@media(max-width:1000px){.demo-grid{grid-template-columns:1fr}}
-</style></head><body><main style="max-width:1450px;margin:2rem auto;padding:1rem">
+</style><link rel="stylesheet" href="/static/product.css"></head><body class="voice-workspace"><aside class="app-sidebar"><a class="app-brand" href="/">kyron<span>Medical intelligence</span></a><div class="nav-group-label">WORKSPACE</div><nav aria-label="Main navigation"><a href="/">Overview</a><a href="/voice-demo">Voice Agent</a><a href="/appointments">Appointments</a><a href="/triage-benchmarks">Triage Evaluation</a><a href="/findings">Experiments</a><a href="/#run-history">Run History</a></nav><div class="sidebar-bottom"><a href="/scenarios">Scenario library</a><a href="/calibration">Human review</a><a href="/openemr">EHR integration</a><span class="environment-label">Isolated test workspace</span></div></aside><main style="max-width:1450px;margin:2rem auto;padding:1rem">
 <nav><a href="/voice-demo">AI Receptionist</a> · <a href="/appointments">Appointments</a> · <a href="/triage-benchmarks">Triage Benchmarks</a> · <a href="/">Evaluation runs</a></nav>
 <h1>Appointments</h1><p>This tab follows the verified receptionist encounter. Start the call in <a href="/voice-demo">AI Receptionist</a>.</p>
 <div class="notice">Fictional clinic in an isolated local environment — not a real healthcare service. This assistant is AI. Use only the fictional identity in the operator guide.</div>
 <section class="panel"><div class="live-controls"><label>Session <select id="mode"><option value="receptionist">AI receptionist</option><option value="lookup">Earlier appointment lookup</option><option value="triage">Triage evaluation</option></select></label>
 <label>Scenario <select id="demo"><option value="nonurgent">Nonurgent request</option><option value="urgent">Urgent escalation</option><option value="insufficient">Insufficient information</option></select></label>
 <button id="start" disabled>Start the call in AI Receptionist</button><button id="stop" disabled>End session</button></div>
-<p id="state" role="status">Ready to start a call.</p><p id="audio">Audio: not received.</p><p id="result"></p>
+<p id="phoneChannel"></p><p id="state" role="status">Ready to start a call.</p><p id="audio">Audio: not received.</p><div class="audio-activity"><meter id="audioLevel" min="0" max="1" value="0" aria-label="Actual received browser audio level"></meter><span id="activityLabel">Audio idle</span></div><p id="result"></p>
 <details><summary>Operator call guide · fictional identity</summary><p id="script"></p><p>For the AI receptionist: <strong>Jordan Morgan</strong>, date of birth <strong>April 12, 1990</strong>. Additional phone verification: <strong>202-555-0122</strong>. Say: “Please check my appointments.” Then request an annual wellness visit next Tuesday morning to demonstrate truthful scheduling limitations.</p><p>Earlier lookup/triage fixtures use January 2, 1980 and 202-555-0100.</p></details></section>
 <p id="encounter" class="muted">No encounter started.</p>
 <div class="demo-grid">
-<section class="panel"><h2>AI Receptionist</h2><p id="task">Waiting for your call</p><p id="duration">Call duration: —</p><div id="transcripts" class="transcript"><p>No speech received.</p></div><details><summary>Extracted clinical facts</summary><pre id="facts">Not observed</pre></details></section>
-<section class="panel"><h2>Appointments</h2><p id="patientDetails">Verify your identity to see appointments.</p><p id="syncState" role="status">Not synchronized</p><div class="live-controls"><button id="listView">Chronological list</button><button id="calendarView">Calendar</button></div>
+<section class="panel"><h2>Conversation</h2><p id="task">Waiting for your call</p><p id="duration">Call duration: —</p><div id="transcripts" class="transcript"><p>No speech received.</p></div><details><summary>Extracted clinical facts</summary><pre id="facts">Not observed</pre></details></section>
+<section class="panel"><h2>Appointments</h2>
+<div id="bookingPanel" hidden><h3>Booking workflow</h3><p id="bookingState"></p><ol id="bookingOptions"></ol><details><summary>Transaction evidence</summary><pre id="bookingProgress"></pre></details></div><p id="patientDetails">Verify your identity to see appointments.</p><p id="syncState" role="status">Not synchronized</p><div class="live-controls"><button id="listView">Chronological list</button><button id="calendarView">Calendar</button></div>
 <div id="appointmentList">No patient records displayed before verification.</div>
-<div id="calendarPane" hidden><div class="live-controls"><button id="previousMonth">Previous month</button><strong id="calendarTitle"></strong><button id="nextMonth">Next month</button></div><div id="calendarGrid" class="calendar-grid"></div><p class="muted">Existing appointments only. A blank date does not establish availability.</p></div>
-<p id="selectedRecord">No appointment selected</p><h3>Appointment requests</h3><p id="availabilityState">The clinic must confirm available appointment times.</p><pre id="preferences">No request preferences recorded</pre><p><a href="/appointments">Open Appointments tab</a> · <a href="https://localhost:9310/interface/main/calendar/index.php" target="_blank" rel="noopener">Open local OpenEMR calendar</a></p></section>
-<section class="panel"><h2>Verification</h2><p id="identity">Identity: not verified</p><p id="schedule" class="route">Appointment changes restricted</p><p id="routeReason">The clinic must confirm scheduling availability.</p><pre id="appointment">No verified appointment tool result</pre><details><summary>EHR requests</summary><pre id="http">No patient request yet</pre></details><details><summary>Independent final readback</summary><pre id="readback">Pending</pre></details>
-<details><summary>Evaluation results</summary><pre id="evaluationResults">Not finalized</pre></details><details><summary>Triage and reference evaluation</summary><p id="route" class="route">TRIAGE INCOMPLETE</p><pre id="triage">No prediction received</pre><pre id="transitions">No transitions observed</pre></details></section>
+<div id="calendarPane" hidden><div class="live-controls"><button id="previousMonth">Previous month</button><strong id="calendarTitle"></strong><button id="nextMonth">Next month</button></div><div id="calendarGrid" class="calendar-grid"></div><p class="muted">Eastern time. Existing appointments only; blank dates do not establish availability.</p></div>
+<p id="selectedRecord">No appointment selected</p><p class="muted">Dashboard: Eastern time. The local OpenEMR calendar displays UTC.</p><h3>Appointment requests</h3><p id="availabilityState">The clinic must confirm available appointment times.</p><pre id="preferences">No preferences requested yet</pre><p><a href="/appointments">Open Appointments tab</a> · <a href="https://localhost:9310/interface/main/calendar/index.php" target="_blank" rel="noopener">Open local OpenEMR calendar (UTC)</a></p></section>
+<section class="panel"><h2>Evaluation</h2><p id="clinicalDisposition" class="status-line">Routing pending</p><p id="ehrVerificationStatus" class="status-line">EHR verification pending</p><p id="identity">Identity: not verified</p><p id="schedule" class="route">Appointment changes restricted</p><p id="routeReason">The clinic must confirm scheduling availability.</p><details><summary>Tool result evidence</summary><pre id="appointment">No verified appointment tool result</pre></details><details><summary>EHR requests</summary><pre id="http">No patient request yet</pre></details><details><summary>Independent final readback</summary><pre id="readback">Pending</pre></details>
+<details><summary>Email Preview</summary><pre id="emailPreview">No verified booking email generated</pre><p id="emailStatus">No email attempted</p><a href="http://127.0.0.1:9325" target="_blank" rel="noopener">Open local Mailpit capture inbox</a></details><details><summary>Evaluation results</summary><pre id="evaluationResults">Not finalized</pre></details><details><summary>Triage and reference evaluation</summary><p id="route" class="route">TRIAGE INCOMPLETE</p><pre id="triage">No prediction received</pre><pre id="transitions">No transitions observed</pre></details></section>
 </div>
-<details class="panel"><summary>Developer / audit evidence and saved fallback</summary><p>Live speech, SDK actions, service calls, HTTP metadata and readback remain separate. No booking/cancellation/reschedule is enabled without authoritative availability and independent safety review. Request categories are a demonstration planning catalog, not confirmed EHR bookable types. No PSTN, clinical validation or accepted human transfer is claimed.</p><p>Saved entries below are SCRIPTED_TRIAGE_REPLAY, not received audio or model inference. Loading one disables microphone controls until reload.</p><select id="replay"><option value="">Choose saved replay</option></select> <button id="loadReplay">Inspect scripted replay</button><pre id="details"></pre><a href="/api/triage/demos">Scenario provenance</a></details>
+<details class="panel"><summary>Developer / audit evidence and saved fallback</summary><p>Live speech, SDK actions, service calls, HTTP metadata and readback remain separate. Booking requires configured operator-controlled inventory, actual exact caller consent and readback. Self-review was explicitly authorized for this separate demo; no independent approval is claimed. Cancellation and rescheduling remain disabled. Request categories are a demonstration planning catalog, not confirmed EHR bookable types. No PSTN, clinical validation or accepted human transfer is claimed.</p><p>Saved entries below are SCRIPTED_TRIAGE_REPLAY, not received audio or model inference. Loading one disables microphone controls until reload.</p><select id="replay"><option value="">Choose saved replay</option></select> <button id="loadReplay">Inspect scripted replay</button><pre id="details"></pre><a href="/api/triage/demos">Scenario provenance</a></details>
 <audio id="decoded" muted></audio>
 </main>
 <script type="module">
@@ -44,21 +45,31 @@ async function report(){
 }
 function update(s){
   document.querySelector('#details').textContent=JSON.stringify(s,null,2);
+  document.querySelector('#phoneChannel').textContent=s.phone_number?'Incoming telephone: '+s.phone_number+' · '+(s.listener_ready?'listener ready':'connecting')+' · caller ID never verifies identity':'';
   if(s.encounter){
     const e=s.encounter,t=e.triage; renderAppointments(e);
+    if(e.booking){const b=e.booking;document.querySelector('#bookingPanel').hidden=false;
+      document.querySelector('#bookingState').textContent='Transaction '+b.transaction_id+' · '+b.state;
+      const options=document.querySelector('#bookingOptions');options.hidden=b.state==='COMPLETE';options.replaceChildren();
+      for(const o of b.options){const li=document.createElement('li');li.textContent=o.local_time+' · '+o.appointment_type+' · '+o.clinician+' · '+o.location;options.append(li);}
+      document.querySelector('#bookingProgress').textContent=JSON.stringify({transitions:b.history,selected:b.selected,caller_confirmation_recorded:b.confirmation_recorded,EHR_reference:b.receipt?.appointment?.appointment_id||null,email_status:b.email?.status||'NOT_ATTEMPTED',email_transport:b.email?.transport||'LOCAL_CAPTURE_ONLY'},null,2);
+      document.querySelector('#emailPreview').textContent=b.email_preview?JSON.stringify(b.email_preview,null,2):'No verified booking email generated';
+      document.querySelector('#emailStatus').textContent=(b.email?.status||'NOT_ATTEMPTED')+' · inbox delivery UNKNOWN';
+    }
     document.querySelector('#encounter').textContent='Encounter '+e.encounter_id+' · '+e.mode+' · '+(e.latest_run||'active; trace not yet finalized');
     document.querySelector('#task').textContent=(s.execution==='SCRIPTED_TRIAGE_REPLAY'?'SCRIPTED REPLAY — no actual voice. ':'')+'Active task: '+e.active_task;
     document.querySelector('#duration').textContent='Call duration: '+e.duration_seconds+'s';
-    const target=document.querySelector('#transcripts');target.replaceChildren();
-    for(const turn of e.transcripts){const p=document.createElement('p');p.textContent=turn.kind.toUpperCase()+' ['+turn.source+']: '+turn.text;target.append(p);}
+    const target=document.querySelector('#transcripts');const nearBottom=target.scrollHeight-target.scrollTop-target.clientHeight<40;target.replaceChildren();
+    for(const turn of e.transcripts){const p=document.createElement('p');p.className='speech speech-'+turn.kind;p.title=turn.source;const label=document.createElement('small');label.textContent=turn.kind==='agent'?'AI assistant':'Caller';p.append(label,document.createTextNode(turn.text));target.append(p);}if(nearBottom)target.scrollTop=target.scrollHeight;
     document.querySelector('#facts').textContent=JSON.stringify(t.facts,null,2);
     document.querySelector('#route').textContent=e.mode==='lookup'?'LOOKUP ONLY':t.state.replaceAll('_',' ');
     document.querySelector('#routeReason').textContent=e.mode==='receptionist'?(t.state==='URGENT_ESCALATION'?'Routine scheduling is suspended; no transfer is confirmed.':'Appointment viewing requires verified identity. The clinic must confirm changes.'):t.reason;
     document.querySelector('#evaluationResults').textContent=JSON.stringify(e.evaluation_summary||[],null,2);
     document.querySelector('#triage').textContent=JSON.stringify({agent_prediction:t.prediction,reference:t.reference,agreement:e.reference_evaluation||'UNKNOWN — scripted reference not matched to the current prefix',missing_facts:t.missing_facts,evaluator_version:'triage-reference-1.0',policy_version:t.policy_version,evidence_quality:s.audio_observed?'Observed WebRTC + SDK speech':'Audio unverified'},null,2);
     document.querySelector('#transitions').textContent=JSON.stringify(t.transitions,null,2);
+    document.querySelector('#clinicalDisposition').textContent=e.booking?'Administrative visit · safety guards active':t.state.replaceAll('_',' ');document.querySelector('#ehrVerificationStatus').textContent=e.booking?.receipt?'EHR booking independently verified':e.synchronization==='SYNCED'?'Appointment records synchronized':'EHR verification pending';
     document.querySelector('#identity').textContent='Identity: '+(e.identity_verified?'VERIFIED':e.identity_was_verified?'WAS VERIFIED; session now closed':'NOT VERIFIED');
-    document.querySelector('#schedule').textContent=t.state==='URGENT_ESCALATION'?'SCHEDULING BLOCKED':'WRITES DISABLED · availability unsupported';
+    document.querySelector('#schedule').textContent=t.state==='URGENT_ESCALATION'?'SCHEDULING BLOCKED':(e.booking?'BOOKING GUARDED · operator-controlled inventory':'WRITES DISABLED · availability unsupported');
     document.querySelector('#appointment').textContent=JSON.stringify({availability:e.availability,patient_id:e.patient_id,target_appointment_id:e.appointment_id,requested_operation:e.requested_operation,consent:e.consent,lookup:e.lookup,acknowledgment:e.ehr_acknowledgment},null,2);
     document.querySelector('#http').textContent=JSON.stringify(e.http_events,null,2);
     document.querySelector('#readback').textContent=JSON.stringify(e.readback,null,2);
@@ -68,8 +79,8 @@ function update(s){
     document.querySelector('#result').replaceChildren(link);
   }
   const transport=call?observed:(s.browser||observed);
-  if(!call&&s.call_started){state.textContent=transport.ended?'Encounter ended; showing saved call evidence.':'Observing the active encounter from another tab.';document.querySelector('#start').disabled=true;}
-  audio.textContent='Encounter remote track: '+transport.remote_track+' · decoded non-silent frames: '+transport.non_silent_frames+' · overall audio evidence: '+Boolean(s.audio_observed);
+  if(!call&&s.call_started){state.textContent=(transport.ended||s.encounter?.active_task==='ended')?'Encounter ended; showing saved call evidence.':s.encounter?.transport==='pstn'?'Incoming PSTN call · active network session':'Observing the active encounter from another tab.';document.querySelector('#start').disabled=true;}
+  if(s.encounter?.transport==='pstn'){audio.textContent='PSTN '+(s.encounter?.active_task==='ended'?'completed':'connected')+' · speech events captured';document.querySelector('#audioLevel').hidden=true;document.querySelector('#activityLabel').textContent='Phone audio level unavailable in browser';}else audio.textContent='Encounter remote track: '+transport.remote_track+' · decoded non-silent frames: '+transport.non_silent_frames+' · overall audio evidence: '+Boolean(s.audio_observed);
 }
 async function status(){if(replayView)return;try{const r=await fetch('/api/live-demo/status');update(await r.json());}catch{state.textContent='Local server unavailable; no result inferred.';}}
 document.querySelector('#start').addEventListener('click',async()=>{
@@ -105,7 +116,7 @@ document.querySelector('#start').addEventListener('click',async()=>{
       sampleTimer=setInterval(()=>{
         analyser.getFloatTimeDomainData(samples);
         const rms=Math.sqrt(samples.reduce((sum,x)=>sum+x*x,0)/samples.length);
-        if(rms>0.005)observed.non_silent_frames++;
+        document.querySelector('#audioLevel').value=Math.min(1,rms*10);document.querySelector('#activityLabel').textContent=rms>0.005?'Receiving audio':'Listening';if(rms>0.005)observed.non_silent_frames++;
       },100);
     });
     document.querySelector('#stop').disabled=false;
@@ -117,17 +128,17 @@ document.querySelector('#stop').addEventListener('click',async()=>{if(call)await
 function renderAppointments(e){
  const verified=e.identity_verified||e.identity_was_verified;
  document.querySelector('#patientDetails').textContent=e.patient_name?e.patient_name:verified?'Identity verified':'Verify your identity to see appointments.';
- document.querySelector('#syncState').textContent='EHR synchronization: '+(e.synchronization||'Not requested');
+ document.querySelector('#syncState').textContent='EHR synchronization: '+(e.synchronization||'Not requested')+' · Eastern time';
  document.querySelector('#selectedRecord').textContent=e.selected_appointment?'Selected appointment: '+e.selected_appointment:'No appointment selected';
  document.querySelector('#preferences').textContent=JSON.stringify(e.preferences||{},null,2);
- document.querySelector('#availabilityState').textContent='The clinic must confirm an available time. No appointment openings have been verified here.';
+ document.querySelector('#availabilityState').textContent=e.booking?'Options come only from operator-reserved test inventory with fresh clinic-wide EHR conflict checks.':'The clinic must confirm an available time. No appointment openings have been verified here.';
  currentAppointments=verified?(e.appointments||e.lookup?.appointments||[]):[];
  const list=document.querySelector('#appointmentList');list.replaceChildren();
  if(!verified){list.textContent='Verify your identity to display appointments.';renderCalendar();return;}
  if(['UNKNOWN','ERROR','UNSUPPORTED','PATIENT_BINDING_REJECTED'].includes(e.synchronization)){list.textContent='Appointments unavailable. Please contact the clinic.';renderCalendar();return;}
  if(!currentAppointments.length){list.textContent=e.synchronization==='LOADING'?'Loading appointments…':e.synchronization==='EMPTY'?'No appointments found.':'No appointment records received.';renderCalendar();return;}
  for(const row of currentAppointments){const card=document.createElement('article');card.className='appointment-card';
- const title=document.createElement('h3');title.textContent=new Date(row.starts_at).toLocaleString('en-US',{timeZone:'UTC'})+' UTC';card.append(title);
+ const title=document.createElement('h3');title.textContent=new Date(row.starts_at).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});card.append(title);
  for(const text of ['Clinician: '+(row.clinician||'Not provided'),'Location: '+(row.location||'Not provided'),'Type: '+(row.appointment_type||'Not provided'),'Status: '+(row.status||'Not provided'),'OpenEMR ID: '+row.appointment_id]){const p=document.createElement('p');p.textContent=text;card.append(p);}
  const button=document.createElement('button');button.textContent=row.appointment_id===e.selected_appointment?'Selected':'Select appointment';button.onclick=async()=>{const response=await fetch('/api/receptionist/select',{method:'POST',headers,body:JSON.stringify({appointment_id:row.appointment_id})});const result=await response.json();if(!result.completed)document.querySelector('#selectedRecord').textContent='Selection not verified.';else status();};card.append(button);list.append(card);}
  renderCalendar();
@@ -137,7 +148,7 @@ function renderCalendar(){
  const year=calendarMonth.getUTCFullYear(),month=calendarMonth.getUTCMonth();document.querySelector('#calendarTitle').textContent=calendarMonth.toLocaleString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});
  for(const day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']){const cell=document.createElement('strong');cell.textContent=day;grid.append(cell);}
  for(let n=0;n<new Date(Date.UTC(year,month,1)).getUTCDay();n++)grid.append(document.createElement('div'));
- for(let d=1;d<=new Date(Date.UTC(year,month+1,0)).getUTCDate();d++){const cell=document.createElement('div');cell.className='calendar-day';cell.textContent=d;const date=new Date(Date.UTC(year,month,d)).toISOString().slice(0,10);for(const row of currentAppointments.filter(a=>a.starts_at.slice(0,10)===date)){const entry=document.createElement('p');entry.textContent=row.starts_at.slice(11,16)+' UTC · #'+row.appointment_id;cell.append(entry);}grid.append(cell);}
+ for(let d=1;d<=new Date(Date.UTC(year,month+1,0)).getUTCDate();d++){const cell=document.createElement('div');cell.className='calendar-day';cell.textContent=d;const date=new Date(Date.UTC(year,month,d)).toISOString().slice(0,10);for(const row of currentAppointments.filter(a=>new Date(a.starts_at).toLocaleDateString('en-CA',{timeZone:'America/New_York'})===date)){const entry=document.createElement('p');entry.textContent=new Date(row.starts_at).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit',timeZoneName:'short'})+' · #'+row.appointment_id;cell.append(entry);}grid.append(cell);}
 }
 document.querySelector('#listView').onclick=()=>{document.querySelector('#appointmentList').hidden=false;document.querySelector('#calendarPane').hidden=true;};
 document.querySelector('#calendarView').onclick=()=>{document.querySelector('#appointmentList').hidden=true;document.querySelector('#calendarPane').hidden=false;renderCalendar();};

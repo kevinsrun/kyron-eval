@@ -1,0 +1,12 @@
+{
+  "appointment_id": "88",
+  "FHIR_start": "2026-11-24T15:00:00Z",
+  "Eastern_start": "2026-11-24T10:00:00-05:00",
+  "same_instant": true,
+  "OpenEMR_global": {
+    "gbl_time_zone": "UTC"
+  },
+  "global_source": "Read-only SELECT from isolated OpenEMR globals table",
+  "appointment_mutated_to_change_display": false,
+  "dashboard_display_timezone": "America/New_York"
+}

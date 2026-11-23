@@ -89,4 +89,11 @@ def evaluate_receptionist(trace):
             "does_not_prove_no_external_transient_change": True,
         },
     )
+    if trace.ehr.get("booking_transaction"):
+        consistency.status = Status.NA
+        consistency.reason = (
+            "Unchanged-state lookup criterion does not apply to authorized "
+            "booking; inspect booking_ehr_receipt."
+        )
+        consistency.evaluator_version = "receptionist-readback-1.1"
     return [binding, consistency]

@@ -1,0 +1,10 @@
+{
+  "baseline": "79e4d2b",
+  "preserved_artifact_count": 412,
+  "changed_historical_artifacts": [],
+  "frozen_zip_sha256": "31e585866ea046c71d61473a56d29f4ba1aaebcd930b771878a0d41799f355ea",
+  "credential_matches": 0,
+  "personal_recipient_in_public_files": 0,
+  "raw_phone_transcripts_preserved_privately": true,
+  "original_pr_head": "0f1714f6a763a384597637c063a7c0f3b31608f6"
+}

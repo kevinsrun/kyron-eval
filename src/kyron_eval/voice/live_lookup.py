@@ -102,6 +102,7 @@ class LiveLookupSession:
         demo_id=None,
         scenario=None,
     ):
+        self.transport = "webrtc"
         self.scenario = scenario or lookup_scenario()
         self.world = MockWorld(self.scenario, "VOICE", adapter=ReadOnlyDemoEHR(provider))
         self.world.trace.evidence_class = "GUAVA_NETWORK_SESSION_UNVERIFIED"
@@ -147,7 +148,7 @@ class LiveLookupSession:
             self.event(
                 "state",
                 name="voice.network_call_started",
-                transport="Guava WebRTC",
+                transport=self.transport,
                 source="SDK on_call_start from live listener",
                 call_id=call_id,
                 writes_enabled=False,
@@ -280,7 +281,11 @@ class LiveLookupSession:
                 name="voice.network_agent_speech",
                 interrupted=event.interrupted,
                 source="SDK AgentSpeechEvent",
-                delivery_proof="correlate separate browser remote audio evidence",
+                delivery_proof=(
+                    "PSTN network speech event; correlate caller audibility report"
+                    if self.transport == "pstn"
+                    else "correlate separate browser remote audio evidence"
+                ),
             )
 
     def verify_and_lookup(self, call_id, birth_date, phone):
@@ -379,17 +384,27 @@ class LiveLookupSession:
         trace = self.world.trace.model_copy(deep=True)
         observed = self.audio_observed()
         trace.evidence_class = (
-            "GUAVA_WEBRTC_AUDIO" if observed else "GUAVA_NETWORK_SESSION_UNVERIFIED"
+            "GUAVA_PSTN_NETWORK_SPEECH"
+            if self.transport == "pstn"
+            and self.network_call_started
+            and any(e.kind == "caller" for e in trace.events)
+            and any(e.name == "voice.network_agent_speech" for e in trace.events)
+            else "GUAVA_WEBRTC_AUDIO"
+            if observed
+            else "GUAVA_NETWORK_SESSION_UNVERIFIED"
         )
         trace.ehr["guava_voice"] = {
             "evidence_class": trace.evidence_class,
-            "transport": "WebRTC, not PSTN",
+            "transport": self.transport,
             "audio_observed": observed,
             "browser_evidence": dict(self.browser),
             "source": "live SDK listener callbacks + browser remote-stream observations",
-            "writes_enabled": False,
+            "writes_enabled": bool(getattr(self, "booking", None)),
             "snapshot_reason": reason,
-            "limitation": "Client-reported browser evidence; no signed server audio receipt.",
+            "limitation": (
+                "Browser audio is client-reported. PSTN class proves network "
+                "session/speech callbacks; no raw audio or signed audio receipt."
+            ),
         }
         trace.ehr["triage_encounter"] = self.triage.snapshot()
         trace.ehr["triage_encounter"]["mode"] = self.mode
@@ -420,6 +435,34 @@ class LiveLookupSession:
             from kyron_eval.voice.receptionist_evaluate import evaluate_receptionist
 
             metrics.extend(evaluate_receptionist(trace))
+        booking = getattr(self, "booking", None)
+        if booking:
+            metrics.append(
+                Metric(
+                    name="booking_ehr_receipt",
+                    status=Status.PASS if booking.receipt else Status.UNKNOWN,
+                    reason=(
+                        "Exact persisted patient, slot, native appointment ID, actors and "
+                        "display fields checked independently; no receipt remains UNKNOWN."
+                    ),
+                    evidence_refs=["/trace/ehr/booking_transaction"],
+                    evaluator_version="booking-receipt-1.0",
+                    details={"receipt": booking.receipt, "independent_human_review": False},
+                )
+            )
+            metrics.append(
+                Metric(
+                    name="email_inbox_delivery",
+                    status=Status.UNKNOWN,
+                    reason=(
+                        "SMTP acceptance or local capture does not establish recipient "
+                        "inbox delivery."
+                    ),
+                    evidence_refs=["/trace/ehr/booking_transaction/email"],
+                    evaluator_version="email-delivery-1.0",
+                    details={},
+                )
+            )
         self.last_metrics = [m.model_dump(mode="json") for m in metrics]
         run = Run(
             schema_version="2.0",
@@ -434,7 +477,7 @@ class LiveLookupSession:
             variants=["VOICE"],
             configuration={
                 "adapter": "openemr",
-                "writes_enabled": False,
+                "writes_enabled": bool(getattr(self, "booking", None)),
                 "implementation_digest_scope": "Python source files at session start",
             },
             results=[Result(scenario=self.scenario, trace=trace, metrics=metrics)],
@@ -446,7 +489,7 @@ class LiveLookupSession:
 
 def build_lookup_agent(controller):
     import guava
-    from guava.types.call_info import WebRTCCallInfo
+    from guava.types.call_info import PSTNCallInfo, WebRTCCallInfo
 
     agent = guava.Agent(
         name="AI Scheduling Assistant",
@@ -457,7 +500,8 @@ def build_lookup_agent(controller):
         "Assist with symptom clarification and appointment lookup. "
         "Follow the current task. Ask focused questions; do not guess clinical facts. "
         "Verify identity through the expert before reading records. Use only returned "
-        "appointment facts. Never book, cancel, diagnose, claim emergency care is unnecessary "
+        "appointment facts. Only report booking when the backend returns a verified EHR receipt. "
+        "Never cancel, reschedule, diagnose, claim emergency care is unnecessary "
         "or claim a transfer. Do not describe internal testing or evaluation terminology "
         "in patient-facing speech. Availability and appointment changes "
         "require actual tool evidence.",
@@ -465,6 +509,12 @@ def build_lookup_agent(controller):
 
     @agent.on_call_received
     def received(info):
+        if isinstance(info, PSTNCallInfo):
+            return (
+                guava.AcceptCall()
+                if controller.phone_number and info.to_number == controller.phone_number
+                else guava.DeclineCall()
+            )
         if (
             not isinstance(info, WebRTCCallInfo)
             or info.custom_payload.get("demo_nonce") != controller.nonce
@@ -545,6 +595,10 @@ def build_lookup_agent(controller):
                     "message", "I could not verify your identity. Please contact the clinic."
                 )
             )
+            return
+        if session.booking:
+            session.phase = "booking_preferences"
+            booking_preferences(call)
             return
         session.phase = "receptionist_operation"
         session.event(
@@ -662,6 +716,159 @@ def build_lookup_agent(controller):
         result = session.request(call.id, session.requested_operation, preferences)
         call.hangup(result["message"])
 
+    @agent.on_task_complete("booking_intent")
+    def booking_intent(call):
+        session = controller.session
+        if (
+            not session
+            or not session.booking
+            or session.phase != "booking_intent"
+            or not session.service.bind_call(call.id)
+        ):
+            return
+        session.booking_reason = str(call.get_field("booking_reason") or "")
+        session.phase = "receptionist_name"
+        receptionist_name_task(call)
+
+    @agent.on_task_complete("booking_preferences")
+    def booking_preferences(call):
+        session = controller.session
+        if (
+            not session
+            or not session.booking
+            or session.phase != "booking_preferences"
+            or not session.service.bind_call(call.id)
+        ):
+            return
+        session.phase = "booking_options"
+        result = session.booking.present(
+            getattr(session, "booking_reason", str(call.get_field("booking_reason") or "")),
+            {
+                "preferred_day": call.get_field("booking_day"),
+                "time_of_day": call.get_field("booking_time"),
+            },
+        )
+        session.event("tool", name="booking.available_options", result=result, agent_visible=True)
+        if not result["completed"]:
+            call.hangup(result["message"])
+            return
+        call.send_instruction(
+            (
+                "Read these authoritative operator-reserved clinic options "
+                "exactly, including Eastern timezone, "
+            )
+            + "Office Visit type, clinician and location. Ask the caller to choose one. "
+            + json.dumps(result)
+        )
+        call.set_task(
+            "booking_option",
+            objective="Which of the returned available options would you like? "
+            "Select only the caller-selected option number. Do not invent a time.",
+            checklist=[
+                guava.Field(
+                    key="booking_option",
+                    field_type="multiple_choice",
+                    choices=[str(i + 1) for i in range(len(result["options"]))],
+                )
+            ],
+        )
+
+    @agent.on_task_complete("booking_option")
+    def booking_selected(call):
+        session = controller.session
+        if (
+            not session
+            or not session.booking
+            or session.phase != "booking_options"
+            or not session.service.bind_call(call.id)
+        ):
+            return
+        result = session.booking.select(str(call.get_field("booking_option") or ""))
+        if not result["completed"]:
+            call.hangup(
+                "I could not verify that selection. Please contact the clinic. No "
+                "booking was submitted."
+            )
+            return
+        session.phase = "booking_confirmation"
+        call.set_task(
+            "booking_confirmation",
+            objective=(
+                "Read back the exact selected date/time, Office Visit type, clinician "
+                "and location. Read the recipient email address. "
+                + (
+                    "The authorized email service will send the confirmation. "
+                    if session.booking.email.outbound
+                    else "Email is local capture only and will not reach Gmail. "
+                )
+                + "Ask: May I book this appointment and email the confirmation to that address? "
+                "Accept a natural yes or no. Do not ask for a code or passphrase. "
+                "Use only these returned details: " + json.dumps(result)
+            ),
+            checklist=[
+                guava.Field(
+                    key="booking_confirmation_spoken",
+                    description="Caller answered the exact booking and email confirmation question",
+                )
+            ],
+        )
+
+    @agent.on_task_complete("booking_confirmation_retry")
+    @agent.on_task_complete("booking_confirmation")
+    def booking_confirmed(call):
+        session = controller.session
+        if not session or not session.booking or session.phase != "booking_confirmation":
+            return
+        result = session.service.complete_booking_transaction(session.booking, call.id)
+        if (
+            not result["completed"]
+            and session.booking.state == "AWAITING_CONFIRMATION"
+            and not session.booking.consent
+        ):
+            last_caller = next(reversed(session.caller_revisions.values()), "")
+            from kyron_eval.voice.booking import normalized
+
+            if normalized(last_caller) in {"no", "no thanks", "do not book", "no do not book"}:
+                session.booking.transition("COMPLETE")
+                session.phase = "complete"
+                call.hangup(
+                    "No appointment was booked and no email was sent. Thank you for calling."
+                )
+                return
+            retries = getattr(session, "booking_confirmation_retries", 0)
+            if retries:
+                session.phase = "complete"
+                call.hangup(
+                    "I could not establish confirmation. No booking was submitted. "
+                    "Please contact the clinic."
+                )
+                return
+            session.booking_confirmation_retries = retries + 1
+            call.set_task(
+                "booking_confirmation_retry",
+                objective="Repeat the exact selected appointment and recipient from this result. "
+                "Ask: Do you confirm booking this appointment and sending the confirmation "
+                "to the confirmed address? A natural yes is sufficient after the full readback. "
+                "Do not ask for a code or secret phrase. "
+                + json.dumps(session.booking.describe(session.booking.selected, ""))
+                + " Recipient: "
+                + session.booking.email.recipient,
+                checklist=[
+                    guava.Field(
+                        key="booking_confirmation_retry_response",
+                        description="Caller confirmation response",
+                    )
+                ],
+            )
+            return
+        session.phase = "complete"
+        call.hangup(
+            "State this actual backend outcome and then thank the caller and say goodbye. "
+            "Do not ask another question. Claim email sending only if status is SENT, "
+            "and inbox receipt only if inbox_delivery_proven is true. Backend result: "
+            + json.dumps(result)
+        )
+
     def triage_task(call):
         call.set_task(
             "triage",
@@ -689,12 +896,28 @@ def build_lookup_agent(controller):
 
     @agent.on_call_start
     def start(call):
-        session = controller.start_session(call.id)
+        session = controller.start_session(call.id, transport=call.call_info.call_type)
         if session is None:
             call.hangup("This demo is busy. Please try again later.")
             return
         if session.mode == "receptionist":
-            receptionist_name_task(call)
+            if session.booking:
+                session.phase = "booking_intent"
+                call.set_task(
+                    "booking_intent",
+                    objective="Greet warmly and identify yourself as the clinic AI assistant. "
+                    "Ask only how you can help today. "
+                    "Do not immediately ask preferences or identity. "
+                    "Collect the exact appointment reason from the caller.",
+                    checklist=[
+                        guava.Field(
+                            key="booking_reason",
+                            description="Exact caller quote for appointment reason",
+                        )
+                    ],
+                )
+            else:
+                receptionist_name_task(call)
         elif session.mode == "triage":
             triage_task(call)
         else:

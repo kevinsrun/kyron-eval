@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block content %}
+{% block content %}<span id="run-history"></span>
 <div class="page-heading"><div><p class="eyebrow">AGENT QUALITY WORKBENCH</p><h1>Evaluation runs</h1><p class="subtle">Follow every outcome back to the conversation, tool result and final state.</p></div><span class="tag">Synthetic EHR evaluation</span></div>
 <section class="panel ehr-panel"><div class="section-heading"><h2>EHR integration</h2><span class="badge status-pass">Mock · connected locally</span></div>
 <p class="subtle">Default: MockEHRAdapter · run-scoped synthetic persistence. FHIR: {{'configured, probe to connect' if integration.fhir_configured else 'not configured'}} · read only.</p>
@@ -7,7 +7,7 @@
 <details><summary>Synthetic fixtures and connection</summary><p>Patient <code>synthetic-patient-1</code> · DOB <code>1980-01-02</code> · phone <code>2025550100</code>. Appointment slots <code>synthetic-slot-1</code> and <code>synthetic-slot-2</code>; providers and clinic identifiers are synthetic. Mock runs start with scenario fixtures; OpenEMR reads its persisted synthetic records.</p><p>Generic FHIR stays read only. Real OpenEMR uses separate standard API mutations with explicit authorization. No Slot/Schedule API is available; no free availability is invented. Cancellation deletes the selected synthetic calendar event. LLM mode accepts only mock or marker-checked isolated OpenEMR data.</p><button type="button" class="secondary" id="ehr-probe" {{'disabled' if not integration.fhir_configured}}>Probe configured FHIR endpoint</button><button type="button" class="secondary" id="openemr-probe" {{'disabled' if not integration.openemr_configured}}>Probe real local OpenEMR</button><pre id="ehr-probe-result" role="status">Probe results appear here; saved runs retain actual EHR execution evidence.</pre></details>
 </section>
 <section class="panel ehr-panel"><div class="section-heading"><h2>Guava Voice AI</h2><span class="badge status-pass">SDK callback simulation · Guava SDK {{voice.sdk_version}}</span></div>
-<p class="subtle">Scripted caller text drives SDK callbacks; queued instructions are not spoken audio. The selected EHR may be mock or real local OpenEMR. Live telephony: {{voice.live_credentials_status}}.</p>
+<p class="subtle">Scripted caller text drives SDK callbacks; queued instructions are not spoken audio. This run form uses mock or local OpenEMR replay. For genuine incoming phone or browser sessions, open <a href="/voice-demo">Voice Agent</a>.</p>
 </section>
 <section class="panel launch"><div><h2>Run an evaluation</h2><p>Mock agents receive fresh fixtures. Real OpenEMR retains its database; cancellation requires a fresh seeded target and a single agent.</p></div>
 <form id="run-form"><label>Scenario<select name="scenario"><option value="all">Original 8 scenarios (excludes live cancellation)</option>{% for s in scenarios %}<option value="{{s.id}}">{{s.title}}</option>{% endfor %}</select></label>

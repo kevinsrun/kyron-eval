@@ -375,6 +375,21 @@ class KyronVoiceService:
         )
         return response.model_copy(deep=True)
 
+    def complete_booking_transaction(self, transaction, call_id):
+        """Session lock precedes service lock, matching caller/revision processing."""
+        with transaction.session.lock:
+            if (
+                not self.bind_call(call_id)
+                or not self.identity_verified
+                or transaction.session.service is not self
+                or transaction.session.verified_patient != self.bound_patient_id
+            ):
+                return {
+                    "completed": False,
+                    "message": "Identity or active call is not verified. No booking was submitted.",
+                }
+            return transaction.commit()
+
     @serialized
     def create_appointment(self, **raw_inputs: Any) -> VoiceToolResult:
         try:

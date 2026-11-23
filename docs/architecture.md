@@ -1,5 +1,11 @@
 # Architecture and EHR evidence boundaries
 
+## Guarded booking, PSTN and presentation continuation
+
+`voice/booking.py` adds an explicit transaction with ordered transitions, current identity/disposition guards, a clinic-controlled exclusive synthetic slot inventory, fresh all-clinic conflict checks, expiring exact-selection consent anchored to actual agent/caller speech, durable slot reservation and independent cross-API EHR receipt. Generic replay/tool behavior is retained. The original readonly wrapper still blocks mutations; only the separately enabled coordinator performs authorized creation. Cancellation/rescheduling remain unavailable. Local locking does not establish distributed atomicity against independent external writers.
+
+`booking_email.py` separates verified-booking receipt from notification acceptance and delivery. SMTP/Mailpit and a clearly labeled Codex Gmail connector-assisted bridge share durable notification keys. The latter requires an active authorized dispatcher; it is not a standalone provider integration. `scripts/next_email_request.py` rechecks EHR evidence and claims each attempt before the dispatcher sends. Unknown attempts are not retried. PSTN and WebRTC share the same Guava agent and service; PSTN callbacks get a distinct network-speech evidence class without pretending to capture raw audio. `product.css` and existing templates supply the visual refresh without changing backend routes or evaluators. [Recording details and limits](booking-phone-recording.md).
+
 ## Name-first receptionist continuation
 
 `voice/receptionist.py` extends the existing read-only live session. It begins unmatched, calls `OpenEMRAdapter.match_name_and_dob` against the native patient API and requires an exact unique allowlisted marker/FHIR match. This creates a private candidate only. A later phone check through KyronVoiceService binds the actual patient before appointment disclosure. Candidate reuse is rejected; reidentification revokes prior records and selection. `get_receptionist_appointments` cross-checks FHIR/native collections, time and status, and reads the exact calendar actor for display names. Empty, unavailable and verified collections remain distinct.

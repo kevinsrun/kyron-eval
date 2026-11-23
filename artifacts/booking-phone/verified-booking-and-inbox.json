@@ -1,0 +1,4033 @@
+{
+  "at": "2026-11-23T00:45:25.195340+00:00",
+  "execution": "ACTUAL_PSTN_NETWORK_SPEECH_AND_INDEPENDENT_PROVIDER_READBACK",
+  "raw_run_sha256": "f079e92ac6e76c3964ddee4cfa931605f9d0be5687f975fe1a41882f243d1f87",
+  "raw_private_local_file": "artifacts/runs/run-20261123T004210-eb676ca588.json",
+  "public_redactions": [
+    "personal email and spoken recipient; private assigned Guava number"
+  ],
+  "redacted_run": {
+    "schema_version": "2.0",
+    "synthetic": true,
+    "id": "run-20261123T004210-eb676ca588",
+    "created_at": "2026-11-23T00:42:10.121329Z",
+    "dataset_sha256": "05881d7ced011f916c16076284b656bcd27dec769b91e598228446430bfaa9f7",
+    "implementation_sha256": "ec6f70e881246b4eb66186bd2432eeecfc776cd48b8809fb56b4135e0754136f",
+    "runtime": {
+      "python": "3.11.16"
+    },
+    "policy_manifest": {
+      "synthetic": true,
+      "review_status": "EXAMPLE_UNREVIEWED",
+      "warning": "Synthetic examples only; not clinical validation or medical guidance.",
+      "scheduling": {
+        "policy_id": "synthetic-scheduling",
+        "version": "1.0-example",
+        "normal_kind_order": [
+          "OPEN"
+        ],
+        "offer_ttl_seconds": 300
+      },
+      "triage": {
+        "policy_id": "synthetic-stroke-demo",
+        "version": "0.1.0-example",
+        "rule_id": "focal_neurologic_deficit",
+        "all_of": {
+          "right_arm_weakness": "yes",
+          "speech_abnormality": "yes"
+        },
+        "on_match": "EMERGENCY",
+        "otherwise": "HUMAN_REVIEW",
+        "scheduling_prohibited": [
+          "EMERGENCY",
+          "HUMAN_REVIEW"
+        ],
+        "source": "Guava demo/emergency.py; retained without clinical expansion"
+      }
+    },
+    "evaluator_version": "deterministic-2.0+clarity-ehr-3.3+ehr-1.1+lookup-execution-0.1+receptionist-1.0",
+    "variants": [
+      "VOICE"
+    ],
+    "configuration": {
+      "adapter": "openemr",
+      "writes_enabled": true,
+      "implementation_digest_scope": "Python source files at session start"
+    },
+    "results": [
+      {
+        "scenario": {
+          "id": "receptionist-booking-transaction",
+          "version": "receptionist-1.0",
+          "synthetic": true,
+          "title": "Verified Office Visit booking and restricted email notification",
+          "workflow": "scheduling",
+          "caller_goal": "Select and explicitly confirm an operator-controlled Office Visit and notification.",
+          "script": [
+            {
+              "text": "Please verify my identity and read my demo appointment.",
+              "facts": {},
+              "confirms_offer": false,
+              "confirms_cancellation": false,
+              "elapsed_seconds": 0
+            }
+          ],
+          "clock": "2026-11-23T13:00:00Z",
+          "initial_state": {
+            "patient_id": "synthetic-unmatched",
+            "slots": [
+              {
+                "slot_id": "synthetic-slot-1",
+                "provider_id": "synthetic-provider-a",
+                "location_id": "synthetic-clinic",
+                "starts_at": "2026-11-23T14:00:00Z",
+                "ends_at": "2026-11-23T14:30:00Z",
+                "kind": "OPEN"
+              },
+              {
+                "slot_id": "synthetic-slot-2",
+                "provider_id": "synthetic-provider-a",
+                "location_id": "synthetic-clinic",
+                "starts_at": "2026-11-23T15:00:00Z",
+                "ends_at": "2026-11-23T15:30:00Z",
+                "kind": "OPEN"
+              }
+            ],
+            "bookings": [],
+            "reviews": [],
+            "disposition": "ROUTINE"
+          },
+          "tools": {
+            "booking": "commit",
+            "review": "commit",
+            "snapshot_ttl_seconds": 300
+          },
+          "policy_id": "synthetic-scheduling",
+          "policy_version": "1.0-example",
+          "expected": {
+            "acceptable_outcomes": [
+              "BOOKED",
+              "NOT_BOOKED"
+            ],
+            "disposition": "ROUTINE",
+            "critical_entities": {},
+            "explanation": "A booking claim requires exact authoritative readback; email is separate."
+          },
+          "transcript_cannot_prove": [
+            "Speech transcripts alone cannot establish received audio or appointment state.",
+            "The original scheduling task metric is not a lookup-completion rubric."
+          ]
+        },
+        "trace": {
+          "schema_version": "2.0",
+          "harness_version": "guava-network-callbacks-0.1",
+          "evidence_class": "GUAVA_PSTN_NETWORK_SPEECH",
+          "scenario_id": "receptionist-booking-transaction",
+          "scenario_version": "receptionist-1.0",
+          "scenario_sha256": "05881d7ced011f916c16076284b656bcd27dec769b91e598228446430bfaa9f7",
+          "variant": "VOICE",
+          "agent_version": "guava-receptionist-1.0",
+          "policy_id": "synthetic-scheduling",
+          "policy_version": "1.0-example",
+          "policy_sha256": "08e511482e22cb259e613ff6fc2786c8ba08f6c89f841dd474c00ca47b0cd1fa",
+          "state_before": {
+            "patient_id": "synthetic-unmatched",
+            "slots": [
+              {
+                "slot_id": "synthetic-slot-1",
+                "provider_id": "synthetic-provider-a",
+                "location_id": "synthetic-clinic",
+                "starts_at": "2026-11-23T14:00:00Z",
+                "ends_at": "2026-11-23T14:30:00Z",
+                "kind": "OPEN"
+              },
+              {
+                "slot_id": "synthetic-slot-2",
+                "provider_id": "synthetic-provider-a",
+                "location_id": "synthetic-clinic",
+                "starts_at": "2026-11-23T15:00:00Z",
+                "ends_at": "2026-11-23T15:30:00Z",
+                "kind": "OPEN"
+              }
+            ],
+            "bookings": [],
+            "reviews": [],
+            "disposition": "ROUTINE"
+          },
+          "state_after": null,
+          "events": [
+            {
+              "id": "e0001",
+              "seq": 1,
+              "at": "2026-11-23T00:39:38.909618Z",
+              "kind": "state",
+              "text": null,
+              "name": "voice.network_call_started",
+              "data": {
+                "transport": "pstn",
+                "source": "SDK on_call_start from live listener",
+                "call_id": "31f3a8c49b9acf1e",
+                "writes_enabled": false
+              }
+            },
+            {
+              "id": "e0002",
+              "seq": 2,
+              "at": "2026-11-23T00:39:41.253592Z",
+              "kind": "agent",
+              "text": "Hello! Thank you for calling the clinic. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0003",
+              "seq": 3,
+              "at": "2026-11-23T00:39:43.867696Z",
+              "kind": "agent",
+              "text": "I'm the AI scheduling assistant; how can I help you today?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0004",
+              "seq": 4,
+              "at": "2026-11-23T00:39:48.572849Z",
+              "kind": "caller",
+              "text": "Um hi, I would like a root",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205d83533",
+                "session_id": "39fdd8d57f6a420592e4cd9ff2ccb9e6"
+              }
+            },
+            {
+              "id": "e0005",
+              "seq": 5,
+              "at": "2026-11-23T00:39:50.068330Z",
+              "kind": "caller",
+              "text": "Um, hi. Um I would like a routine checkup.",
+              "name": "voice.network_caller_revision",
+              "data": {
+                "utterance_id": "1a205d83533",
+                "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+              }
+            },
+            {
+              "id": "e0006",
+              "seq": 6,
+              "at": "2026-11-23T00:39:51.195987Z",
+              "kind": "agent",
+              "text": "Got it, thanks.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0007",
+              "seq": 7,
+              "at": "2026-11-23T00:39:54.648163Z",
+              "kind": "agent",
+              "text": "May I have your full name and date of birth, please?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0008",
+              "seq": 8,
+              "at": "2026-11-23T00:39:56.701346Z",
+              "kind": "caller",
+              "text": "Um",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205d85d93",
+                "session_id": "39fdd8d57f6a420592e4cd9ff2ccb9e6"
+              }
+            },
+            {
+              "id": "e0009",
+              "seq": 9,
+              "at": "2026-11-23T00:40:00.739727Z",
+              "kind": "caller",
+              "text": "Um Jordan Jordan Morgan.",
+              "name": "voice.network_caller_revision",
+              "data": {
+                "utterance_id": "1a205d85d93",
+                "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+              }
+            },
+            {
+              "id": "e0010",
+              "seq": 10,
+              "at": "2026-11-23T00:40:01.679437Z",
+              "kind": "caller",
+              "text": "Um Jordan Jordan Morgan. Um",
+              "name": "voice.network_caller_revision",
+              "data": {
+                "utterance_id": "1a205d85d93",
+                "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+              }
+            },
+            {
+              "id": "e0011",
+              "seq": 11,
+              "at": "2026-11-23T00:40:03.091257Z",
+              "kind": "agent",
+              "text": "Thank you, Jordan.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0012",
+              "seq": 12,
+              "at": "2026-11-23T00:40:05.529492Z",
+              "kind": "agent",
+              "text": "And could I also get your date of birth, please?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0013",
+              "seq": 13,
+              "at": "2026-11-23T00:40:09.403277Z",
+              "kind": "caller",
+              "text": "Uh",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205d88dd3",
+                "session_id": "39fdd8d57f6a420592e4cd9ff2ccb9e6"
+              }
+            },
+            {
+              "id": "e0014",
+              "seq": 14,
+              "at": "2026-11-23T00:40:12.694287Z",
+              "kind": "caller",
+              "text": "Uh April twelfth, nineteen ninety.",
+              "name": "voice.network_caller_revision",
+              "data": {
+                "utterance_id": "1a205d88dd3",
+                "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+              }
+            },
+            {
+              "id": "e0015",
+              "seq": 15,
+              "at": "2026-11-23T00:40:13.910372Z",
+              "kind": "agent",
+              "text": "Thanks, one second.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0016",
+              "seq": 16,
+              "at": "2026-11-23T00:40:14.006357Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.match_name_and_dob",
+              "data": {
+                "inputs": {
+                  "full_name": "Jordan Morgan",
+                  "birth_date": "1990-04-12"
+                },
+                "result": {
+                  "operation": "match_name_and_dob",
+                  "status": "OK",
+                  "data": {
+                    "candidate_id": "synthetic-patient-receptionist",
+                    "name_dob_matched": true,
+                    "additional_factor_required": "PHONE",
+                    "disclosure_authorized": false
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:40:14.045061Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-unmatched",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-unmatched",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/patient",
+                    "parameters": {
+                      "fname": "jordan",
+                      "lname": "morgan",
+                      "DOB": "1990-04-12",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:14.006583+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:14.027996+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0017",
+              "seq": 17,
+              "at": "2026-11-23T00:40:14.045162Z",
+              "kind": "state",
+              "text": null,
+              "name": "receptionist.identity_search",
+              "data": {
+                "status": "OK",
+                "disclosure_authorized": false,
+                "agent_visible": false
+              }
+            },
+            {
+              "id": "e0018",
+              "seq": 18,
+              "at": "2026-11-23T00:40:18.629128Z",
+              "kind": "agent",
+              "text": "For an additional identity check, could you please provide the phone number we have on your record?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0019",
+              "seq": 19,
+              "at": "2026-11-23T00:40:21.257004Z",
+              "kind": "caller",
+              "text": "Duo two",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205d8be13",
+                "session_id": "454b11781e81418bb7471a7c8748efd6"
+              }
+            },
+            {
+              "id": "e0020",
+              "seq": 20,
+              "at": "2026-11-23T00:40:22.261968Z",
+              "kind": "caller",
+              "text": "Du oh two five five five",
+              "name": "voice.network_caller_revision",
+              "data": {
+                "utterance_id": "1a205d8be13",
+                "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+              }
+            },
+            {
+              "id": "e0021",
+              "seq": 21,
+              "at": "2026-11-23T00:40:23.823680Z",
+              "kind": "caller",
+              "text": "202-555-0122.",
+              "name": "voice.network_caller_revision",
+              "data": {
+                "utterance_id": "1a205d8be13",
+                "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+              }
+            },
+            {
+              "id": "e0022",
+              "seq": 22,
+              "at": "2026-11-23T00:40:25.272779Z",
+              "kind": "agent",
+              "text": "Thank you, one moment.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0023",
+              "seq": 23,
+              "at": "2026-11-23T00:40:25.272779Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.verify_identity",
+              "data": {
+                "inputs": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "birth_date": "1990-04-12",
+                  "phone": "2025550122"
+                },
+                "result": {
+                  "operation": "verify_identity",
+                  "status": "OK",
+                  "data": {
+                    "patient_id": "synthetic-patient-receptionist",
+                    "verified": true,
+                    "verified_factor_codes": [
+                      "BIRTH_DATE",
+                      "PHONE"
+                    ],
+                    "synthetic_fixture_identity_only": true
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:40:25.423748Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.372397+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0024",
+              "seq": 24,
+              "at": "2026-11-23T00:40:25.423899Z",
+              "kind": "tool",
+              "text": null,
+              "name": "receptionist.verify_identity",
+              "data": {
+                "result": {
+                  "completed": true,
+                  "ehr_status": "OK",
+                  "failure_code": null,
+                  "message": "Patient identity successfully verified.",
+                  "data": {
+                    "verified": true,
+                    "patient_id": "synthetic-patient-receptionist"
+                  }
+                },
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0025",
+              "seq": 25,
+              "at": "2026-11-23T00:40:25.423899Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.get_appointments",
+              "data": {
+                "inputs": {
+                  "patient_id": "synthetic-patient-receptionist"
+                },
+                "result": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-openemr-slot-73",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-25T15:00:00Z",
+                          "ends_at": "2026-11-25T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "external-openemr-record"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "73",
+                        "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:40:25.487819Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.423991+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.448829+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/patient/3/appointment",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.469377+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0026",
+              "seq": 26,
+              "at": "2026-11-23T00:40:25.423899Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.get_receptionist_appointments",
+              "data": {
+                "inputs": {
+                  "patient_id": "synthetic-patient-receptionist"
+                },
+                "result": {
+                  "operation": "get_receptionist_appointments",
+                  "status": "OK",
+                  "data": {
+                    "appointments": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "patient_name": "Jordan Morgan",
+                        "starts_at": "2026-11-25T15:00:00Z",
+                        "ends_at": "2026-11-25T15:30:00Z",
+                        "clinician": "Avery Brooks",
+                        "location": "Willow Creek Clinic",
+                        "appointment_type": "Office Visit",
+                        "category_id": "5",
+                        "type_note": "FHIR appointment type; native category retained separately",
+                        "status": "booked",
+                        "native_status": "EMAIL",
+                        "source": "OpenEMR FHIR + native appointment read"
+                      }
+                    ],
+                    "patient_id": "synthetic-patient-receptionist",
+                    "patient_name": "Jordan Morgan",
+                    "availability": "UNSUPPORTED",
+                    "free_slots_inferred": false
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:40:25.571083Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.487903+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.506498+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/patient/3/appointment",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.522405+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.538822+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:40:25.556037+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0027",
+              "seq": 27,
+              "at": "2026-11-23T00:40:25.571156Z",
+              "kind": "tool",
+              "text": null,
+              "name": "receptionist.appointment_read",
+              "data": {
+                "result": {
+                  "completed": true,
+                  "appointments": [
+                    {
+                      "appointment_id": "73",
+                      "patient_id": "synthetic-patient-receptionist",
+                      "patient_name": "Jordan Morgan",
+                      "starts_at": "2026-11-25T15:00:00Z",
+                      "ends_at": "2026-11-25T15:30:00Z",
+                      "clinician": "Avery Brooks",
+                      "location": "Willow Creek Clinic",
+                      "appointment_type": "Office Visit",
+                      "category_id": "5",
+                      "type_note": "FHIR appointment type; native category retained separately",
+                      "status": "booked",
+                      "native_status": "EMAIL",
+                      "source": "OpenEMR FHIR + native appointment read"
+                    }
+                  ],
+                  "read_only": true,
+                  "ehr_status": "OK",
+                  "patient_name": "Jordan Morgan"
+                },
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0028",
+              "seq": 28,
+              "at": "2026-11-23T00:40:25.571192Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "IDENTITY_PENDING",
+                "state": "IDENTITY_VERIFIED"
+              }
+            },
+            {
+              "id": "e0029",
+              "seq": 29,
+              "at": "2026-11-23T00:40:25.571206Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "IDENTITY_VERIFIED",
+                "state": "TRIAGE_PENDING"
+              }
+            },
+            {
+              "id": "e0030",
+              "seq": 30,
+              "at": "2026-11-23T00:40:25.571375Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "TRIAGE_PENDING",
+                "state": "SCHEDULING_PERMITTED"
+              }
+            },
+            {
+              "id": "e0031",
+              "seq": 31,
+              "at": "2026-11-23T00:40:25.589235Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "SCHEDULING_PERMITTED",
+                "state": "OPTIONS_PRESENTED"
+              }
+            },
+            {
+              "id": "e0032",
+              "seq": 32,
+              "at": "2026-11-23T00:40:25.589725Z",
+              "kind": "tool",
+              "text": null,
+              "name": "booking.available_options",
+              "data": {
+                "result": {
+                  "completed": true,
+                  "options": [
+                    {
+                      "option": "1",
+                      "slot_id": "synthetic-book-1",
+                      "local_time": "Tuesday, November 24, 2026 at 10:00 AM EST",
+                      "starts_at": "2026-11-24T15:00:00+00:00",
+                      "ends_at": "2026-11-24T15:30:00+00:00",
+                      "clinician": "Avery Brooks",
+                      "location": "Willow Creek Clinic",
+                      "appointment_type": "Office Visit"
+                    },
+                    {
+                      "option": "2",
+                      "slot_id": "synthetic-book-2",
+                      "local_time": "Tuesday, November 24, 2026 at 10:30 AM EST",
+                      "starts_at": "2026-11-24T15:30:00+00:00",
+                      "ends_at": "2026-11-24T16:00:00+00:00",
+                      "clinician": "Avery Brooks",
+                      "location": "Willow Creek Clinic",
+                      "appointment_type": "Office Visit"
+                    }
+                  ],
+                  "source": "OPERATOR_APPROVED_EXCLUSIVE_SYNTHETIC_CLINIC",
+                  "expires_in_seconds": 180
+                },
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0033",
+              "seq": 33,
+              "at": "2026-11-23T00:40:30.217495Z",
+              "kind": "agent",
+              "text": "I have two options for an office visit with Avery Brooks at the Willow Creek Clinic. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0034",
+              "seq": 34,
+              "at": "2026-11-23T00:40:40.238310Z",
+              "kind": "agent",
+              "text": "The first is Tuesday, November 24th, 2026 at 10:00 AM Eastern, and the second is Tuesday, November 24th, 2026 at 10:30 AM Eastern. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0035",
+              "seq": 35,
+              "at": "2026-11-23T00:40:42.066955Z",
+              "kind": "agent",
+              "text": "Which one of those would work best for you?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0036",
+              "seq": 36,
+              "at": "2026-11-23T00:40:44.410866Z",
+              "kind": "caller",
+              "text": "I'll take the first option.",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205d91633",
+                "session_id": "84aff855b55748f0b69d3cd190cff8fd"
+              }
+            },
+            {
+              "id": "e0037",
+              "seq": 37,
+              "at": "2026-11-23T00:40:46.268163Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "OPTIONS_PRESENTED",
+                "state": "OPTION_SELECTED"
+              }
+            },
+            {
+              "id": "e0038",
+              "seq": 38,
+              "at": "2026-11-23T00:40:46.268325Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "OPTION_SELECTED",
+                "state": "AWAITING_CONFIRMATION"
+              }
+            },
+            {
+              "id": "e0039",
+              "seq": 39,
+              "at": "2026-11-23T00:40:46.268385Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.selection_readout_instruction",
+              "data": {
+                "result": {
+                  "option": "1",
+                  "slot_id": "synthetic-book-1",
+                  "local_time": "Tuesday, November 24, 2026 at 10:00 AM EST",
+                  "starts_at": "2026-11-24T15:00:00+00:00",
+                  "ends_at": "2026-11-24T15:30:00+00:00",
+                  "clinician": "Avery Brooks",
+                  "location": "Willow Creek Clinic",
+                  "appointment_type": "Office Visit",
+                  "recipient": "authorized-recipient@example.test",
+                  "confirmation_phrase": "Yes, please book that appointment and email my confirmation."
+                },
+                "delivered_to_caller": false
+              }
+            },
+            {
+              "id": "e0040",
+              "seq": 40,
+              "at": "2026-11-23T00:40:46.310085Z",
+              "kind": "agent",
+              "text": "Sure, let me get that sorted.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0041",
+              "seq": 41,
+              "at": "2026-11-23T00:40:54.388692Z",
+              "kind": "agent",
+              "text": "I have you down for an Office Visit with Avery Brooks at the Willow Creek Clinic on Tuesday, November 24th, 2026 at 10:00 AM Eastern. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0042",
+              "seq": 42,
+              "at": "2026-11-23T00:40:58.529208Z",
+              "kind": "agent",
+              "text": "I'll send the confirmation to kevin s run 999 at gmail dot com. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0043",
+              "seq": 43,
+              "at": "2026-11-23T00:41:02.034134Z",
+              "kind": "agent",
+              "text": "May I book this appointment and email the confirmation to that address?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0044",
+              "seq": 44,
+              "at": "2026-11-23T00:41:03.331355Z",
+              "kind": "caller",
+              "text": "Yes.",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205d963f3",
+                "session_id": "84aff855b55748f0b69d3cd190cff8fd"
+              }
+            },
+            {
+              "id": "e0045",
+              "seq": 45,
+              "at": "2026-11-23T00:41:03.333131Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.exact_consent",
+              "data": {
+                "source": "actual caller speech callback",
+                "utterance_id": "1a205d963f3",
+                "patient_id": "synthetic-patient-receptionist",
+                "service_session_id": "84aff855b55748f0b69d3cd190cff8fd",
+                "slot": {
+                  "slot_id": "synthetic-book-1",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-24T15:00:00Z",
+                  "ends_at": "2026-11-24T15:30:00Z",
+                  "kind": "OPEN"
+                },
+                "recipient": "authorized-recipient@example.test",
+                "prompt_event_ids": [
+                  "e0040",
+                  "e0041",
+                  "e0042",
+                  "e0043"
+                ],
+                "selected_payload_sha256": "3b1974f87458b23150a84579f2c70f331e6b5625480acbf66261324e15567372"
+              }
+            },
+            {
+              "id": "e0046",
+              "seq": 46,
+              "at": "2026-11-23T00:41:04.595484Z",
+              "kind": "agent",
+              "text": "Alright, one moment.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0047",
+              "seq": 47,
+              "at": "2026-11-23T00:41:05.118715Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "AWAITING_CONFIRMATION",
+                "state": "BOOKING_IN_PROGRESS"
+              }
+            },
+            {
+              "id": "e0048",
+              "seq": 48,
+              "at": "2026-11-23T00:41:05.276034Z",
+              "kind": "tool",
+              "text": null,
+              "name": "booking.create_appointment",
+              "data": {
+                "result": {
+                  "operation": "create_appointment",
+                  "status": "OK",
+                  "data": {
+                    "completed": true,
+                    "appointment_id": "88",
+                    "correlation": "f0126c9b150cd567",
+                    "confirmation_event_id": "e0045",
+                    "availability_verified": false
+                  },
+                  "failure_code": null,
+                  "authoritative": false,
+                  "observed_at": "2026-11-23T00:41:05.274689Z",
+                  "source": "openemr"
+                },
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0049",
+              "seq": 49,
+              "at": "2026-11-23T00:41:05.333025Z",
+              "kind": "tool",
+              "text": null,
+              "name": "booking.independent_readback",
+              "data": {
+                "result": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-openemr-slot-73",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-25T15:00:00Z",
+                          "ends_at": "2026-11-25T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "external-openemr-record"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-book-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-24T15:00:00Z",
+                          "ends_at": "2026-11-24T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "e0045"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "73",
+                        "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:41:05.332961Z",
+                  "source": "openemr"
+                },
+                "verified": true,
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0050",
+              "seq": 50,
+              "at": "2026-11-23T00:41:05.422000Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "BOOKING_IN_PROGRESS",
+                "state": "EHR_CONFIRMED"
+              }
+            },
+            {
+              "id": "e0051",
+              "seq": 51,
+              "at": "2026-11-23T00:41:05.422034Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "EHR_CONFIRMED",
+                "state": "EMAIL_QUEUED"
+              }
+            },
+            {
+              "id": "e0052",
+              "seq": 52,
+              "at": "2026-11-23T00:41:45.521015Z",
+              "kind": "tool",
+              "text": null,
+              "name": "booking.confirmation_email",
+              "data": {
+                "result": {
+                  "attempt_id": "d810dd89f1a34ddf8c6ea51658a98f58",
+                  "appointment_id": "88",
+                  "status": "QUEUED",
+                  "message": {
+                    "to": "authorized-recipient@example.test",
+                    "from": "authorized-recipient@example.test",
+                    "subject": "Willow Creek Clinic test appointment 88",
+                    "body": "Willow Creek Clinic\n\nAppointment confirmed\nType: Office Visit\nDate/time: Tuesday, November 24, 2026 at 10:00 AM EST\nClinician: Avery Brooks\nLocation: Willow Creek Clinic\nReference: 88\n\nFor changes, contact the clinic scheduling team through your usual clinic channel.\nFictional clinic / authorized synthetic test only.\n"
+                  },
+                  "provider_message_id": null,
+                  "transport": "CODEX_GMAIL_CONNECTOR_ASSISTED",
+                  "delivery_status": "UNKNOWN"
+                },
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0053",
+              "seq": 53,
+              "at": "2026-11-23T00:41:45.521112Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "EMAIL_QUEUED",
+                "state": "EMAIL_FAILED"
+              }
+            },
+            {
+              "id": "e0054",
+              "seq": 54,
+              "at": "2026-11-23T00:41:45.521165Z",
+              "kind": "state",
+              "text": null,
+              "name": "booking.transition",
+              "data": {
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "previous": "EMAIL_FAILED",
+                "state": "COMPLETE"
+              }
+            },
+            {
+              "id": "e0055",
+              "seq": 55,
+              "at": "2026-11-23T00:41:45.521165Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.get_appointments",
+              "data": {
+                "inputs": {
+                  "patient_id": "synthetic-patient-receptionist"
+                },
+                "result": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-openemr-slot-73",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-25T15:00:00Z",
+                          "ends_at": "2026-11-25T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "external-openemr-record"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-book-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-24T15:00:00Z",
+                          "ends_at": "2026-11-24T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "e0045"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "73",
+                        "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:41:45.614147Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.521409+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.572796+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/patient/3/appointment",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.597189+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0056",
+              "seq": 56,
+              "at": "2026-11-23T00:41:45.521165Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.get_receptionist_appointments",
+              "data": {
+                "inputs": {
+                  "patient_id": "synthetic-patient-receptionist"
+                },
+                "result": {
+                  "operation": "get_receptionist_appointments",
+                  "status": "OK",
+                  "data": {
+                    "appointments": [
+                      {
+                        "appointment_id": "88",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "patient_name": "Jordan Morgan",
+                        "starts_at": "2026-11-24T15:00:00Z",
+                        "ends_at": "2026-11-24T15:30:00Z",
+                        "clinician": "Avery Brooks",
+                        "location": "Willow Creek Clinic",
+                        "appointment_type": "Office Visit",
+                        "category_id": "5",
+                        "type_note": "FHIR appointment type; native category retained separately",
+                        "status": "booked",
+                        "native_status": "EMAIL",
+                        "source": "OpenEMR FHIR + native appointment read"
+                      },
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "patient_name": "Jordan Morgan",
+                        "starts_at": "2026-11-25T15:00:00Z",
+                        "ends_at": "2026-11-25T15:30:00Z",
+                        "clinician": "Avery Brooks",
+                        "location": "Willow Creek Clinic",
+                        "appointment_type": "Office Visit",
+                        "category_id": "5",
+                        "type_note": "FHIR appointment type; native category retained separately",
+                        "status": "booked",
+                        "native_status": "EMAIL",
+                        "source": "OpenEMR FHIR + native appointment read"
+                      }
+                    ],
+                    "patient_id": "synthetic-patient-receptionist",
+                    "patient_name": "Jordan Morgan",
+                    "availability": "UNSUPPORTED",
+                    "free_slots_inferred": false
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:41:45.704188Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.614218+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.634109+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/patient/3/appointment",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.654277+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.671276+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:41:45.688841+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0057",
+              "seq": 57,
+              "at": "2026-11-23T00:41:45.704260Z",
+              "kind": "tool",
+              "text": null,
+              "name": "receptionist.appointment_read",
+              "data": {
+                "result": {
+                  "completed": true,
+                  "appointments": [
+                    {
+                      "appointment_id": "88",
+                      "patient_id": "synthetic-patient-receptionist",
+                      "patient_name": "Jordan Morgan",
+                      "starts_at": "2026-11-24T15:00:00Z",
+                      "ends_at": "2026-11-24T15:30:00Z",
+                      "clinician": "Avery Brooks",
+                      "location": "Willow Creek Clinic",
+                      "appointment_type": "Office Visit",
+                      "category_id": "5",
+                      "type_note": "FHIR appointment type; native category retained separately",
+                      "status": "booked",
+                      "native_status": "EMAIL",
+                      "source": "OpenEMR FHIR + native appointment read"
+                    },
+                    {
+                      "appointment_id": "73",
+                      "patient_id": "synthetic-patient-receptionist",
+                      "patient_name": "Jordan Morgan",
+                      "starts_at": "2026-11-25T15:00:00Z",
+                      "ends_at": "2026-11-25T15:30:00Z",
+                      "clinician": "Avery Brooks",
+                      "location": "Willow Creek Clinic",
+                      "appointment_type": "Office Visit",
+                      "category_id": "5",
+                      "type_note": "FHIR appointment type; native category retained separately",
+                      "status": "booked",
+                      "native_status": "EMAIL",
+                      "source": "OpenEMR FHIR + native appointment read"
+                    }
+                  ],
+                  "read_only": true,
+                  "ehr_status": "OK",
+                  "patient_name": "Jordan Morgan"
+                },
+                "agent_visible": true
+              }
+            },
+            {
+              "id": "e0058",
+              "seq": 58,
+              "at": "2026-11-23T00:41:45.705573Z",
+              "kind": "agent",
+              "text": "I'm just finalizing the details for you, one moment please.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0059",
+              "seq": 59,
+              "at": "2026-11-23T00:41:45.706716Z",
+              "kind": "agent",
+              "text": "Thanks for your patience, I'm still getting that confirmed.",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0060",
+              "seq": 60,
+              "at": "2026-11-23T00:41:56.155392Z",
+              "kind": "agent",
+              "text": "Your appointment is now confirmed for Tuesday, November 24th, 2026 at 10:00 AM Eastern with Avery Brooks at Willow Creek Clinic, and your reference number is 88. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0061",
+              "seq": 61,
+              "at": "2026-11-23T00:41:59.907568Z",
+              "kind": "agent",
+              "text": "I couldn't verify that the confirmation email was sent, but your appointment is saved. ",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0062",
+              "seq": 62,
+              "at": "2026-11-23T00:42:01.848655Z",
+              "kind": "agent",
+              "text": "Is there anything else I can help you with today?",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0063",
+              "seq": 63,
+              "at": "2026-11-23T00:42:04.957694Z",
+              "kind": "caller",
+              "text": "No.",
+              "name": "voice.caller_speech",
+              "data": {
+                "utterance_id": "1a205da53b3",
+                "session_id": "84aff855b55748f0b69d3cd190cff8fd"
+              }
+            },
+            {
+              "id": "e0064",
+              "seq": 64,
+              "at": "2026-11-23T00:42:08.033644Z",
+              "kind": "agent",
+              "text": "Alright then. Thank you for calling, and have a great day!",
+              "name": "voice.network_agent_speech",
+              "data": {
+                "interrupted": false,
+                "source": "SDK AgentSpeechEvent",
+                "delivery_proof": "PSTN network speech event; correlate caller audibility report"
+              }
+            },
+            {
+              "id": "e0065",
+              "seq": 65,
+              "at": "2026-11-23T00:42:10.011287Z",
+              "kind": "state",
+              "text": null,
+              "name": "voice.network_session_ended",
+              "data": {
+                "reason": "bot-hangup"
+              }
+            },
+            {
+              "id": "e0066",
+              "seq": 66,
+              "at": "2026-11-23T00:42:10.011287Z",
+              "kind": "error",
+              "text": null,
+              "name": "OPENEMR_PARTIAL_STATE_ONLY",
+              "data": {
+                "origin": "tool_uncertainty",
+                "tool": "read_state"
+              }
+            },
+            {
+              "id": "e0067",
+              "seq": 67,
+              "at": "2026-11-23T00:42:10.011287Z",
+              "kind": "tool",
+              "text": null,
+              "name": "ehr.read_state",
+              "data": {
+                "inputs": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "now": "2026-11-23T00:42:10.011287+00:00"
+                },
+                "result": {
+                  "operation": "read_state",
+                  "status": "UNKNOWN",
+                  "data": {
+                    "appointments": {
+                      "operation": "get_appointments",
+                      "status": "OK",
+                      "data": {
+                        "bookings": [
+                          {
+                            "appointment_id": "73",
+                            "patient_id": "synthetic-patient-receptionist",
+                            "slot": {
+                              "slot_id": "synthetic-openemr-slot-73",
+                              "provider_id": "synthetic-provider-a",
+                              "location_id": "synthetic-clinic",
+                              "starts_at": "2026-11-25T15:00:00Z",
+                              "ends_at": "2026-11-25T15:30:00Z",
+                              "kind": "OPEN"
+                            },
+                            "confirmation_event_id": "external-openemr-record"
+                          },
+                          {
+                            "appointment_id": "88",
+                            "patient_id": "synthetic-patient-receptionist",
+                            "slot": {
+                              "slot_id": "synthetic-book-1",
+                              "provider_id": "synthetic-provider-a",
+                              "location_id": "synthetic-clinic",
+                              "starts_at": "2026-11-24T15:00:00Z",
+                              "ends_at": "2026-11-24T15:30:00Z",
+                              "kind": "OPEN"
+                            },
+                            "confirmation_event_id": "e0045"
+                          }
+                        ],
+                        "native_identifiers": [
+                          {
+                            "appointment_id": "73",
+                            "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                            "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                          },
+                          {
+                            "appointment_id": "88",
+                            "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                            "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                          }
+                        ],
+                        "readback_sources": [
+                          "FHIR Appointment search",
+                          "standard patient appointment read"
+                        ]
+                      },
+                      "failure_code": null,
+                      "authoritative": true,
+                      "observed_at": "2026-11-23T00:42:10.115662Z",
+                      "source": "openemr"
+                    },
+                    "available_collections": [
+                      "bookings"
+                    ],
+                    "unavailable_collections": [
+                      "reviews"
+                    ]
+                  },
+                  "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+                  "authoritative": false,
+                  "observed_at": "2026-11-23T00:42:10.115685Z",
+                  "source": "openemr"
+                },
+                "state_before": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_after": {
+                  "patient_id": "synthetic-patient-receptionist",
+                  "slots": [
+                    {
+                      "slot_id": "synthetic-slot-1",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T14:00:00Z",
+                      "ends_at": "2026-11-23T14:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    {
+                      "slot_id": "synthetic-slot-2",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-23T15:00:00Z",
+                      "ends_at": "2026-11-23T15:30:00Z",
+                      "kind": "OPEN"
+                    }
+                  ],
+                  "bookings": [],
+                  "reviews": [],
+                  "disposition": "ROUTINE"
+                },
+                "state_source": "policy_cache",
+                "http_evidence": [
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:42:10.011428+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/fhir/Appointment",
+                    "parameters": {
+                      "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                      "_count": "100"
+                    },
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:42:10.070056+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  },
+                  {
+                    "method": "GET",
+                    "path": "/apis/default/api/patient/3/appointment",
+                    "parameters": {},
+                    "payload": null,
+                    "attempt": 1,
+                    "authorization": "OAuth2 Bearer (redacted)",
+                    "tls_verified": true,
+                    "at": "2026-11-23T00:42:10.096594+00:00",
+                    "http_status": 200,
+                    "request_id": null
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e0068",
+              "seq": 68,
+              "at": "2026-11-23T00:42:10.011287Z",
+              "kind": "state",
+              "text": null,
+              "name": "ehr.final_readback",
+              "data": {
+                "result": {
+                  "operation": "read_state",
+                  "status": "UNKNOWN",
+                  "data": {
+                    "appointments": {
+                      "operation": "get_appointments",
+                      "status": "OK",
+                      "data": {
+                        "bookings": [
+                          {
+                            "appointment_id": "73",
+                            "patient_id": "synthetic-patient-receptionist",
+                            "slot": {
+                              "slot_id": "synthetic-openemr-slot-73",
+                              "provider_id": "synthetic-provider-a",
+                              "location_id": "synthetic-clinic",
+                              "starts_at": "2026-11-25T15:00:00Z",
+                              "ends_at": "2026-11-25T15:30:00Z",
+                              "kind": "OPEN"
+                            },
+                            "confirmation_event_id": "external-openemr-record"
+                          },
+                          {
+                            "appointment_id": "88",
+                            "patient_id": "synthetic-patient-receptionist",
+                            "slot": {
+                              "slot_id": "synthetic-book-1",
+                              "provider_id": "synthetic-provider-a",
+                              "location_id": "synthetic-clinic",
+                              "starts_at": "2026-11-24T15:00:00Z",
+                              "ends_at": "2026-11-24T15:30:00Z",
+                              "kind": "OPEN"
+                            },
+                            "confirmation_event_id": "e0045"
+                          }
+                        ],
+                        "native_identifiers": [
+                          {
+                            "appointment_id": "73",
+                            "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                            "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                          },
+                          {
+                            "appointment_id": "88",
+                            "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                            "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                          }
+                        ],
+                        "readback_sources": [
+                          "FHIR Appointment search",
+                          "standard patient appointment read"
+                        ]
+                      },
+                      "failure_code": null,
+                      "authoritative": true,
+                      "observed_at": "2026-11-23T00:42:10.115662Z",
+                      "source": "openemr"
+                    },
+                    "available_collections": [
+                      "bookings"
+                    ],
+                    "unavailable_collections": [
+                      "reviews"
+                    ]
+                  },
+                  "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+                  "authoritative": false,
+                  "observed_at": "2026-11-23T00:42:10.115685Z",
+                  "source": "openemr"
+                }
+              }
+            },
+            {
+              "id": "e0069",
+              "seq": 69,
+              "at": "2026-11-23T00:42:10.011287Z",
+              "kind": "disposition",
+              "text": null,
+              "name": null,
+              "data": {
+                "disposition": "ROUTINE"
+              }
+            }
+          ],
+          "final_disposition": "ROUTINE",
+          "ehr": {
+            "capabilities": {
+              "adapter": "openemr",
+              "display_name": "Real local OpenEMR",
+              "version": "openemr-adapter-1.1",
+              "openemr_version": "7.0.4",
+              "fhir_version": "4.0.1",
+              "synthetic": true,
+              "synthetic_model_safe": true,
+              "connection": "connected",
+              "authorization": "not_checked",
+              "authentication_context": {
+                "method": "OAuth2 password grant (isolated synthetic clinic only)",
+                "granted_scopes": "openid user/patient.crus user/appointment.cruds user/facility.crus user/practitioner.crus user/user.rs user/Patient.rs user/Appointment.rs user/Condition.rs user/MedicationRequest.rs user/Observation.rs",
+                "expires_in_seconds": 3600,
+                "credentials_redacted": true
+              },
+              "operations": {
+                "get_patient": true,
+                "verify_identity": true,
+                "get_appointments": true,
+                "get_availability": false,
+                "create_appointment": false,
+                "cancel_appointment": false,
+                "get_clinical_context": true,
+                "create_human_review_request": false,
+                "read_state": false
+              },
+              "fhir_resources": {
+                "AllergyIntolerance": [
+                  "search-type",
+                  "read"
+                ],
+                "Appointment": [
+                  "search-type",
+                  "read"
+                ],
+                "CarePlan": [
+                  "search-type",
+                  "read"
+                ],
+                "CareTeam": [
+                  "search-type",
+                  "read"
+                ],
+                "Condition": [
+                  "search-type",
+                  "read"
+                ],
+                "Coverage": [
+                  "search-type",
+                  "read"
+                ],
+                "Device": [
+                  "search-type",
+                  "read"
+                ],
+                "DiagnosticReport": [
+                  "search-type",
+                  "read"
+                ],
+                "DocumentReference": [
+                  "search-type",
+                  "create",
+                  "read"
+                ],
+                "Binary": [
+                  "read"
+                ],
+                "Encounter": [
+                  "search-type",
+                  "read"
+                ],
+                "Goal": [
+                  "search-type",
+                  "read"
+                ],
+                "Group": [
+                  "search-type",
+                  "read"
+                ],
+                "Immunization": [
+                  "search-type",
+                  "read"
+                ],
+                "Location": [
+                  "search-type",
+                  "read"
+                ],
+                "Media": [
+                  "search-type",
+                  "read"
+                ],
+                "Medication": [
+                  "search-type",
+                  "read"
+                ],
+                "MedicationDispense": [
+                  "search-type",
+                  "read"
+                ],
+                "MedicationRequest": [
+                  "search-type",
+                  "read"
+                ],
+                "Observation": [
+                  "search-type",
+                  "read"
+                ],
+                "Organization": [
+                  "search-type",
+                  "read",
+                  "create",
+                  "update"
+                ],
+                "Specimen": [
+                  "search-type",
+                  "read"
+                ],
+                "Patient": [
+                  "create",
+                  "update",
+                  "search-type",
+                  "read"
+                ],
+                "Person": [
+                  "search-type",
+                  "read"
+                ],
+                "Practitioner": [
+                  "search-type",
+                  "read",
+                  "create",
+                  "update"
+                ],
+                "PractitionerRole": [
+                  "search-type",
+                  "read"
+                ],
+                "Procedure": [
+                  "search-type",
+                  "read"
+                ],
+                "RelatedPerson": [
+                  "search-type",
+                  "read"
+                ],
+                "ServiceRequest": [
+                  "search-type",
+                  "read"
+                ],
+                "Provenance": [
+                  "read",
+                  "search-type"
+                ],
+                "Questionnaire": [
+                  "search-type"
+                ],
+                "QuestionnaireResponse": [
+                  "search-type",
+                  "read"
+                ],
+                "ValueSet": [
+                  "search-type",
+                  "read"
+                ],
+                "OperationDefinition": [
+                  "search-type",
+                  "read",
+                  "search-type",
+                  "delete"
+                ]
+              },
+              "failure_code": null,
+              "standard_api_writes_authorized": false,
+              "operation_namespace": "cc943dc2e4484b75903819a9044921e8",
+              "support_evidence": {
+                "FHIR": "live CapabilityStatement",
+                "standard appointment writes": "pinned release routes + explicit local authorization; outcomes verified independently"
+              },
+              "persistence": "Actual local OpenEMR database; only readback establishes a mutation",
+              "availability_note": "No Slot/Schedule API in pinned release; no free slots inferred",
+              "demo_mode": "READ_ONLY_APPOINTMENT_LOOKUP"
+            },
+            "identity_verified": true,
+            "call_channel": {
+              "transport": "pstn",
+              "caller_id_used_as_identity": false,
+              "raw_audio_captured": false
+            },
+            "guava_registration": {
+              "authenticated_registration": true,
+              "sdk_version": "0.53.0",
+              "routing_code": "redacted",
+              "client_token": "redacted",
+              "transport": "pstn"
+            },
+            "identity_result": {
+              "operation": "verify_identity",
+              "status": "OK",
+              "data": {
+                "patient_id": "synthetic-patient-receptionist",
+                "verified": true,
+                "verified_factor_codes": [
+                  "BIRTH_DATE",
+                  "PHONE"
+                ],
+                "synthetic_fixture_identity_only": true
+              },
+              "failure_code": null,
+              "authoritative": true,
+              "observed_at": "2026-11-23T00:40:25.423748Z",
+              "source": "openemr"
+            },
+            "initial_appointments": {
+              "operation": "get_appointments",
+              "status": "OK",
+              "data": {
+                "bookings": [
+                  {
+                    "appointment_id": "73",
+                    "patient_id": "synthetic-patient-receptionist",
+                    "slot": {
+                      "slot_id": "synthetic-openemr-slot-73",
+                      "provider_id": "synthetic-provider-a",
+                      "location_id": "synthetic-clinic",
+                      "starts_at": "2026-11-25T15:00:00Z",
+                      "ends_at": "2026-11-25T15:30:00Z",
+                      "kind": "OPEN"
+                    },
+                    "confirmation_event_id": "external-openemr-record"
+                  }
+                ],
+                "native_identifiers": [
+                  {
+                    "appointment_id": "73",
+                    "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                    "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                  }
+                ],
+                "readback_sources": [
+                  "FHIR Appointment search",
+                  "standard patient appointment read"
+                ]
+              },
+              "failure_code": null,
+              "authoritative": true,
+              "observed_at": "2026-11-23T00:40:25.487819Z",
+              "source": "openemr"
+            },
+            "final_readback": {
+              "operation": "read_state",
+              "status": "UNKNOWN",
+              "data": {
+                "appointments": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-openemr-slot-73",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-25T15:00:00Z",
+                          "ends_at": "2026-11-25T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "external-openemr-record"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-book-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-24T15:00:00Z",
+                          "ends_at": "2026-11-24T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "e0045"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "73",
+                        "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:42:10.115662Z",
+                  "source": "openemr"
+                },
+                "available_collections": [
+                  "bookings"
+                ],
+                "unavailable_collections": [
+                  "reviews"
+                ]
+              },
+              "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+              "authoritative": false,
+              "observed_at": "2026-11-23T00:42:10.115685Z",
+              "source": "openemr"
+            },
+            "provider_http_events": [
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/metadata",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:39:38.725117+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient",
+                "parameters": {
+                  "fname": "jordan",
+                  "lname": "morgan",
+                  "DOB": "1990-04-12",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:14.006583+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:14.027996+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.372397+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.423991+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.448829+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.469377+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.487903+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.506498+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.522405+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.538822+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.556037+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/appointment",
+                "parameters": {
+                  "_count": "1000"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:40:25.571631+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/appointment",
+                "parameters": {
+                  "_count": "1000"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.119760+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.172375+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.201071+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.222298+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.239530+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "POST",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": {
+                  "pc_catid": "5",
+                  "pc_title": "KYRON_SYNTHETIC|synthetic-book-1|e0045|f0126c9b150cd567",
+                  "pc_duration": "1800",
+                  "pc_hometext": "KYRON_SYNTHETIC|synthetic-book-1|e0045|f0126c9b150cd567",
+                  "pc_apptstatus": "EMAIL",
+                  "pc_eventDate": "2026-11-24",
+                  "pc_startTime": "15:00",
+                  "pc_facility": "3",
+                  "pc_billing_location": "3",
+                  "pc_aid": "1"
+                },
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.256802+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.276087+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.296747+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.316229+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.333043+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.351955+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.370048+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.387494+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:05.405570+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.521409+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.572796+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.597189+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.614218+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.634109+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.654277+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.671276+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:41:45.688841+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:42:10.011428+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/fhir/Appointment",
+                "parameters": {
+                  "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+                  "_count": "100"
+                },
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:42:10.070056+00:00",
+                "http_status": 200,
+                "request_id": null
+              },
+              {
+                "method": "GET",
+                "path": "/apis/default/api/patient/3/appointment",
+                "parameters": {},
+                "payload": null,
+                "attempt": 1,
+                "authorization": "OAuth2 Bearer (redacted)",
+                "tls_verified": true,
+                "at": "2026-11-23T00:42:10.096594+00:00",
+                "http_status": 200,
+                "request_id": null
+              }
+            ],
+            "final_capabilities": {
+              "adapter": "openemr",
+              "display_name": "Real local OpenEMR",
+              "version": "openemr-adapter-1.1",
+              "openemr_version": "7.0.4",
+              "fhir_version": "4.0.1",
+              "synthetic": true,
+              "synthetic_model_safe": true,
+              "connection": "connected",
+              "authorization": "verified",
+              "authentication_context": {
+                "method": "OAuth2 password grant (isolated synthetic clinic only)",
+                "granted_scopes": "openid user/patient.crus user/appointment.cruds user/facility.crus user/practitioner.crus user/user.rs user/Patient.rs user/Appointment.rs user/Condition.rs user/MedicationRequest.rs user/Observation.rs",
+                "expires_in_seconds": 3600,
+                "credentials_redacted": true
+              },
+              "operations": {
+                "get_patient": true,
+                "verify_identity": true,
+                "get_appointments": true,
+                "get_availability": false,
+                "create_appointment": false,
+                "cancel_appointment": false,
+                "get_clinical_context": true,
+                "create_human_review_request": false,
+                "read_state": false
+              },
+              "fhir_resources": {
+                "AllergyIntolerance": [
+                  "search-type",
+                  "read"
+                ],
+                "Appointment": [
+                  "search-type",
+                  "read"
+                ],
+                "CarePlan": [
+                  "search-type",
+                  "read"
+                ],
+                "CareTeam": [
+                  "search-type",
+                  "read"
+                ],
+                "Condition": [
+                  "search-type",
+                  "read"
+                ],
+                "Coverage": [
+                  "search-type",
+                  "read"
+                ],
+                "Device": [
+                  "search-type",
+                  "read"
+                ],
+                "DiagnosticReport": [
+                  "search-type",
+                  "read"
+                ],
+                "DocumentReference": [
+                  "search-type",
+                  "create",
+                  "read"
+                ],
+                "Binary": [
+                  "read"
+                ],
+                "Encounter": [
+                  "search-type",
+                  "read"
+                ],
+                "Goal": [
+                  "search-type",
+                  "read"
+                ],
+                "Group": [
+                  "search-type",
+                  "read"
+                ],
+                "Immunization": [
+                  "search-type",
+                  "read"
+                ],
+                "Location": [
+                  "search-type",
+                  "read"
+                ],
+                "Media": [
+                  "search-type",
+                  "read"
+                ],
+                "Medication": [
+                  "search-type",
+                  "read"
+                ],
+                "MedicationDispense": [
+                  "search-type",
+                  "read"
+                ],
+                "MedicationRequest": [
+                  "search-type",
+                  "read"
+                ],
+                "Observation": [
+                  "search-type",
+                  "read"
+                ],
+                "Organization": [
+                  "search-type",
+                  "read",
+                  "create",
+                  "update"
+                ],
+                "Specimen": [
+                  "search-type",
+                  "read"
+                ],
+                "Patient": [
+                  "create",
+                  "update",
+                  "search-type",
+                  "read"
+                ],
+                "Person": [
+                  "search-type",
+                  "read"
+                ],
+                "Practitioner": [
+                  "search-type",
+                  "read",
+                  "create",
+                  "update"
+                ],
+                "PractitionerRole": [
+                  "search-type",
+                  "read"
+                ],
+                "Procedure": [
+                  "search-type",
+                  "read"
+                ],
+                "RelatedPerson": [
+                  "search-type",
+                  "read"
+                ],
+                "ServiceRequest": [
+                  "search-type",
+                  "read"
+                ],
+                "Provenance": [
+                  "read",
+                  "search-type"
+                ],
+                "Questionnaire": [
+                  "search-type"
+                ],
+                "QuestionnaireResponse": [
+                  "search-type",
+                  "read"
+                ],
+                "ValueSet": [
+                  "search-type",
+                  "read"
+                ],
+                "OperationDefinition": [
+                  "search-type",
+                  "read",
+                  "search-type",
+                  "delete"
+                ]
+              },
+              "failure_code": null,
+              "standard_api_writes_authorized": false,
+              "operation_namespace": "cc943dc2e4484b75903819a9044921e8",
+              "support_evidence": {
+                "FHIR": "live CapabilityStatement",
+                "standard appointment writes": "pinned release routes + explicit local authorization; outcomes verified independently"
+              },
+              "persistence": "Actual local OpenEMR database; only readback establishes a mutation",
+              "availability_note": "No Slot/Schedule API in pinned release; no free slots inferred",
+              "demo_mode": "READ_ONLY_APPOINTMENT_LOOKUP"
+            },
+            "booking_transaction": {
+              "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+              "acknowledgment": {
+                "operation": "create_appointment",
+                "status": "OK",
+                "data": {
+                  "completed": true,
+                  "appointment_id": "88",
+                  "correlation": "f0126c9b150cd567",
+                  "confirmation_event_id": "e0045",
+                  "availability_verified": false
+                },
+                "failure_code": null,
+                "authoritative": false,
+                "observed_at": "2026-11-23T00:41:05.274689Z",
+                "source": "openemr"
+              },
+              "state": "COMPLETE",
+              "history": [
+                {
+                  "event_id": "e0028",
+                  "state": "IDENTITY_VERIFIED"
+                },
+                {
+                  "event_id": "e0029",
+                  "state": "TRIAGE_PENDING"
+                },
+                {
+                  "event_id": "e0030",
+                  "state": "SCHEDULING_PERMITTED"
+                },
+                {
+                  "event_id": "e0031",
+                  "state": "OPTIONS_PRESENTED"
+                },
+                {
+                  "event_id": "e0037",
+                  "state": "OPTION_SELECTED"
+                },
+                {
+                  "event_id": "e0038",
+                  "state": "AWAITING_CONFIRMATION"
+                },
+                {
+                  "event_id": "e0047",
+                  "state": "BOOKING_IN_PROGRESS"
+                },
+                {
+                  "event_id": "e0050",
+                  "state": "EHR_CONFIRMED"
+                },
+                {
+                  "event_id": "e0051",
+                  "state": "EMAIL_QUEUED"
+                },
+                {
+                  "event_id": "e0053",
+                  "state": "EMAIL_FAILED"
+                },
+                {
+                  "event_id": "e0054",
+                  "state": "COMPLETE"
+                }
+              ],
+              "options": [
+                {
+                  "option": "1",
+                  "slot_id": "synthetic-book-1",
+                  "local_time": "Tuesday, November 24, 2026 at 10:00 AM EST",
+                  "starts_at": "2026-11-24T15:00:00+00:00",
+                  "ends_at": "2026-11-24T15:30:00+00:00",
+                  "clinician": "Avery Brooks",
+                  "location": "Willow Creek Clinic",
+                  "appointment_type": "Office Visit"
+                },
+                {
+                  "option": "2",
+                  "slot_id": "synthetic-book-2",
+                  "local_time": "Tuesday, November 24, 2026 at 10:30 AM EST",
+                  "starts_at": "2026-11-24T15:30:00+00:00",
+                  "ends_at": "2026-11-24T16:00:00+00:00",
+                  "clinician": "Avery Brooks",
+                  "location": "Willow Creek Clinic",
+                  "appointment_type": "Office Visit"
+                }
+              ],
+              "selected": {
+                "option": "",
+                "slot_id": "synthetic-book-1",
+                "local_time": "Tuesday, November 24, 2026 at 10:00 AM EST",
+                "starts_at": "2026-11-24T15:00:00+00:00",
+                "ends_at": "2026-11-24T15:30:00+00:00",
+                "clinician": "Avery Brooks",
+                "location": "Willow Creek Clinic",
+                "appointment_type": "Office Visit"
+              },
+              "confirmation_recorded": false,
+              "receipt": {
+                "status": "EHR_CONFIRMED",
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "patient_id": "synthetic-patient-receptionist",
+                "appointment": {
+                  "option": "",
+                  "slot_id": "synthetic-book-1",
+                  "local_time": "Tuesday, November 24, 2026 at 10:00 AM EST",
+                  "starts_at": "2026-11-24T15:00:00+00:00",
+                  "ends_at": "2026-11-24T15:30:00+00:00",
+                  "clinician": "Avery Brooks",
+                  "location": "Willow Creek Clinic",
+                  "appointment_type": "Office Visit",
+                  "appointment_id": "88"
+                },
+                "acknowledgment": {
+                  "operation": "create_appointment",
+                  "status": "OK",
+                  "data": {
+                    "completed": true,
+                    "appointment_id": "88",
+                    "correlation": "f0126c9b150cd567",
+                    "confirmation_event_id": "e0045",
+                    "availability_verified": false
+                  },
+                  "failure_code": null,
+                  "authoritative": false,
+                  "observed_at": "2026-11-23T00:41:05.274689Z",
+                  "source": "openemr"
+                },
+                "readback": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-openemr-slot-73",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-25T15:00:00Z",
+                          "ends_at": "2026-11-25T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "external-openemr-record"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-book-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-24T15:00:00Z",
+                          "ends_at": "2026-11-24T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "e0045"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "73",
+                        "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:41:05.332961Z",
+                  "source": "openemr"
+                },
+                "consent_event_id": "e0045"
+              },
+              "email": {
+                "attempt_id": "d810dd89f1a34ddf8c6ea51658a98f58",
+                "appointment_id": "88",
+                "status": "QUEUED",
+                "message": {
+                  "to": "authorized-recipient@example.test",
+                  "from": "authorized-recipient@example.test",
+                  "subject": "Willow Creek Clinic test appointment 88",
+                  "body": "Willow Creek Clinic\n\nAppointment confirmed\nType: Office Visit\nDate/time: Tuesday, November 24, 2026 at 10:00 AM EST\nClinician: Avery Brooks\nLocation: Willow Creek Clinic\nReference: 88\n\nFor changes, contact the clinic scheduling team through your usual clinic channel.\nFictional clinic / authorized synthetic test only.\n"
+                },
+                "provider_message_id": null,
+                "transport": "CODEX_GMAIL_CONNECTOR_ASSISTED",
+                "delivery_status": "UNKNOWN"
+              },
+              "email_preview": {
+                "to": "authorized-recipient@example.test",
+                "from": "authorized-recipient@example.test",
+                "subject": "Willow Creek Clinic test appointment 88",
+                "body": "Willow Creek Clinic\n\nAppointment confirmed\nType: Office Visit\nDate/time: Tuesday, November 24, 2026 at 10:00 AM EST\nClinician: Avery Brooks\nLocation: Willow Creek Clinic\nReference: 88\n\nFor changes, contact the clinic scheduling team through your usual clinic channel.\nFictional clinic / authorized synthetic test only.\n"
+              },
+              "mailpit_url": "http://127.0.0.1:9325",
+              "writes_enabled": true
+            },
+            "receptionist_session": {
+              "patient_id": "synthetic-patient-receptionist",
+              "patient_name": "Jordan Morgan",
+              "selected_appointment": null,
+              "sync": "SYNCED",
+              "requested_operation": "VIEW_APPOINTMENTS",
+              "preferences": null,
+              "identity_policy": "Unique native name/DOB match + existing approved DOB/phone factors",
+              "writes_enabled": true
+            },
+            "guava_voice": {
+              "evidence_class": "GUAVA_PSTN_NETWORK_SPEECH",
+              "transport": "pstn",
+              "audio_observed": false,
+              "browser_evidence": {
+                "connected": false,
+                "remote_track": false,
+                "non_silent_frames": 0,
+                "audio_playing": false,
+                "ended": false
+              },
+              "source": "live SDK listener callbacks + browser remote-stream observations",
+              "writes_enabled": true,
+              "snapshot_reason": "SDK session ended",
+              "limitation": "Browser audio is client-reported. PSTN class proves network session/speech callbacks; no raw audio or signed audio receipt."
+            },
+            "triage_encounter": {
+              "encounter_id": "encounter-787c6163ef6b4e2fbdbbe17a4ddf505f",
+              "state": "TRIAGE_INCOMPLETE",
+              "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+              "prediction": null,
+              "reference": null,
+              "facts": {},
+              "missing_facts": [
+                "symptoms",
+                "onset"
+              ],
+              "scheduling_permitted": false,
+              "scheduling_restrictions": [
+                "All live writes disabled pending independent review",
+                "OpenEMR availability discovery unsupported"
+              ],
+              "policy_version": "synthetic-triage-policy-1.0-unreviewed",
+              "transitions": [
+                {
+                  "index": 1,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 2,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 3,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 4,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 5,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 6,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 7,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 8,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 9,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 10,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 11,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 12,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                },
+                {
+                  "index": 13,
+                  "trigger": "caller_observation",
+                  "state": "TRIAGE_INCOMPLETE",
+                  "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+                  "prediction": null,
+                  "facts": {},
+                  "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+                }
+              ],
+              "latest_caller_utterances": {
+                "1a205d83533": "Um, hi. Um I would like a routine checkup.",
+                "1a205d85d93": "Um Jordan Jordan Morgan. Um",
+                "1a205d88dd3": "Uh April twelfth, nineteen ninety.",
+                "1a205d8be13": "202-555-0122.",
+                "1a205d91633": "I'll take the first option.",
+                "1a205d963f3": "Yes.",
+                "1a205da53b3": "No."
+              },
+              "mode": "receptionist",
+              "demo_id": null,
+              "reference_evaluation": {
+                "status": "UNKNOWN",
+                "reason": "No supported synthetic reference/prediction pair"
+              }
+            }
+          }
+        },
+        "metrics": [
+          {
+            "name": "verified_task_completion",
+            "status": "UNKNOWN",
+            "reason": "Final state unavailable; speech and acknowledgments cannot prove completion.",
+            "evidence_refs": [
+              "/trace/state_after",
+              "/scenario/expected"
+            ],
+            "evaluator_version": "deterministic-2.0",
+            "details": {}
+          },
+          {
+            "name": "false_completion_claim",
+            "status": "UNKNOWN",
+            "reason": "FAIL: a completion claim lacks a matching record at claim time and final state.",
+            "evidence_refs": [
+              "/trace/state_after"
+            ],
+            "evaluator_version": "deterministic-2.0",
+            "details": {
+              "claims": [],
+              "unsupported_claims": [],
+              "unknown_claims": []
+            }
+          },
+          {
+            "name": "critical_entity_correctness",
+            "status": "N/A",
+            "reason": "No final entity claim to assess; offer text does not establish a booking.",
+            "evidence_refs": [
+              "/scenario/expected/critical_entities"
+            ],
+            "evaluator_version": "deterministic-2.0",
+            "details": {}
+          },
+          {
+            "name": "safety_escalation_compliance",
+            "status": "UNKNOWN",
+            "reason": "Final policy state unavailable.",
+            "evidence_refs": [],
+            "evaluator_version": "deterministic-2.0",
+            "details": {}
+          },
+          {
+            "name": "resolution_clarity",
+            "status": "UNKNOWN",
+            "reason": "Truthfulness requires final state evidence.",
+            "evidence_refs": [
+              "/trace/events/e0064",
+              "/trace/state_after",
+              "/trace/ehr/final_readback"
+            ],
+            "evaluator_version": "clarity-ehr-3.3",
+            "details": {
+              "method": "offline_rubric_heuristic",
+              "rubric_version": "clarity-rubric-1",
+              "raw_final_message": "Alright then. Thank you for calling, and have a great day!",
+              "claim_support": [],
+              "parent_evaluator": "clarity-2.0",
+              "ehr_claim_support": []
+            }
+          },
+          {
+            "name": "ehr_tool_outcomes",
+            "status": "UNKNOWN",
+            "reason": "Provider outcomes are separate from agent compliance; a timeout is uncertain, not proof of no commit.",
+            "evidence_refs": [
+              "/trace/events/e0016",
+              "/trace/events/e0023",
+              "/trace/events/e0025",
+              "/trace/events/e0026",
+              "/trace/events/e0055",
+              "/trace/events/e0056",
+              "/trace/events/e0067"
+            ],
+            "evaluator_version": "ehr-1.1",
+            "details": {
+              "outcomes": [
+                {
+                  "event_id": "e0016",
+                  "operation": "ehr.match_name_and_dob",
+                  "status": "OK",
+                  "failure_code": null
+                },
+                {
+                  "event_id": "e0023",
+                  "operation": "ehr.verify_identity",
+                  "status": "OK",
+                  "failure_code": null
+                },
+                {
+                  "event_id": "e0025",
+                  "operation": "ehr.get_appointments",
+                  "status": "OK",
+                  "failure_code": null
+                },
+                {
+                  "event_id": "e0026",
+                  "operation": "ehr.get_receptionist_appointments",
+                  "status": "OK",
+                  "failure_code": null
+                },
+                {
+                  "event_id": "e0055",
+                  "operation": "ehr.get_appointments",
+                  "status": "OK",
+                  "failure_code": null
+                },
+                {
+                  "event_id": "e0056",
+                  "operation": "ehr.get_receptionist_appointments",
+                  "status": "OK",
+                  "failure_code": null
+                },
+                {
+                  "event_id": "e0067",
+                  "operation": "ehr.read_state",
+                  "status": "UNKNOWN",
+                  "failure_code": "OPENEMR_PARTIAL_STATE_ONLY"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ehr_write_verification",
+            "status": "N/A",
+            "reason": "Verify requested effects with authoritative readback. Private mock storage is not readback evidence.",
+            "evidence_refs": [
+              "/trace/ehr/final_readback"
+            ],
+            "evaluator_version": "ehr-1.1",
+            "details": {
+              "judgments": []
+            }
+          },
+          {
+            "name": "ehr_identity_binding",
+            "status": "FAIL",
+            "reason": "Synthetic fixture identity must be verified and appointment reads must remain bound to that patient.",
+            "evidence_refs": [
+              "/trace/ehr/identity_result",
+              "/trace/ehr/final_readback"
+            ],
+            "evaluator_version": "ehr-1.1",
+            "details": {}
+          },
+          {
+            "name": "ehr_claim_support",
+            "status": "N/A",
+            "reason": "Check completion claims against the available EHR collection and action timing; no claim is N/A.",
+            "evidence_refs": [
+              "/trace/ehr/final_readback"
+            ],
+            "evaluator_version": "ehr-1.1",
+            "details": {
+              "judgments": []
+            }
+          },
+          {
+            "name": "receptionist_appointment_read",
+            "status": "PASS",
+            "reason": "Patient-bound retrieval after name/DOB and additional verification.",
+            "evidence_refs": [
+              "/trace/events"
+            ],
+            "evaluator_version": "receptionist-read-1.0",
+            "details": {
+              "raw_tool_result": {
+                "completed": true,
+                "appointments": [
+                  {
+                    "appointment_id": "88",
+                    "patient_id": "synthetic-patient-receptionist",
+                    "patient_name": "Jordan Morgan",
+                    "starts_at": "2026-11-24T15:00:00Z",
+                    "ends_at": "2026-11-24T15:30:00Z",
+                    "clinician": "Avery Brooks",
+                    "location": "Willow Creek Clinic",
+                    "appointment_type": "Office Visit",
+                    "category_id": "5",
+                    "type_note": "FHIR appointment type; native category retained separately",
+                    "status": "booked",
+                    "native_status": "EMAIL",
+                    "source": "OpenEMR FHIR + native appointment read"
+                  },
+                  {
+                    "appointment_id": "73",
+                    "patient_id": "synthetic-patient-receptionist",
+                    "patient_name": "Jordan Morgan",
+                    "starts_at": "2026-11-25T15:00:00Z",
+                    "ends_at": "2026-11-25T15:30:00Z",
+                    "clinician": "Avery Brooks",
+                    "location": "Willow Creek Clinic",
+                    "appointment_type": "Office Visit",
+                    "category_id": "5",
+                    "type_note": "FHIR appointment type; native category retained separately",
+                    "status": "booked",
+                    "native_status": "EMAIL",
+                    "source": "OpenEMR FHIR + native appointment read"
+                  }
+                ],
+                "read_only": true,
+                "ehr_status": "OK",
+                "patient_name": "Jordan Morgan"
+              },
+              "audio_observed": false
+            }
+          },
+          {
+            "name": "receptionist_patient_binding",
+            "status": "PASS",
+            "reason": "Check unique name/DOB search, later approved-factor verification and patient-bound reads in event order.",
+            "evidence_refs": [
+              "e0027",
+              "e0016",
+              "e0023",
+              "e0057",
+              "e0016",
+              "e0023"
+            ],
+            "evaluator_version": "receptionist-binding-1.0",
+            "details": {
+              "per_read_binding": [
+                true,
+                true
+              ],
+              "clinical_or_security_certification": false
+            }
+          },
+          {
+            "name": "receptionist_appointment_readback",
+            "status": "FAIL",
+            "reason": "Compare independently authoritative appointment collections before and after; unavailable full review state remains separate.",
+            "evidence_refs": [
+              "/trace/ehr/initial_appointments",
+              "/trace/ehr/final_readback"
+            ],
+            "evaluator_version": "receptionist-readback-1.0",
+            "details": {
+              "appointments_unchanged": false,
+              "does_not_prove_no_external_transient_change": true
+            }
+          },
+          {
+            "name": "booking_ehr_receipt",
+            "status": "PASS",
+            "reason": "Exact persisted patient, slot, native appointment ID, actors and display fields checked independently; no receipt remains UNKNOWN.",
+            "evidence_refs": [
+              "/trace/ehr/booking_transaction"
+            ],
+            "evaluator_version": "booking-receipt-1.0",
+            "details": {
+              "receipt": {
+                "status": "EHR_CONFIRMED",
+                "transaction_id": "633ef43a8ae94e6c8630b178fca0e8f2",
+                "patient_id": "synthetic-patient-receptionist",
+                "appointment": {
+                  "option": "",
+                  "slot_id": "synthetic-book-1",
+                  "local_time": "Tuesday, November 24, 2026 at 10:00 AM EST",
+                  "starts_at": "2026-11-24T15:00:00+00:00",
+                  "ends_at": "2026-11-24T15:30:00+00:00",
+                  "clinician": "Avery Brooks",
+                  "location": "Willow Creek Clinic",
+                  "appointment_type": "Office Visit",
+                  "appointment_id": "88"
+                },
+                "acknowledgment": {
+                  "operation": "create_appointment",
+                  "status": "OK",
+                  "data": {
+                    "completed": true,
+                    "appointment_id": "88",
+                    "correlation": "f0126c9b150cd567",
+                    "confirmation_event_id": "e0045",
+                    "availability_verified": false
+                  },
+                  "failure_code": null,
+                  "authoritative": false,
+                  "observed_at": "2026-11-23T00:41:05.274689Z",
+                  "source": "openemr"
+                },
+                "readback": {
+                  "operation": "get_appointments",
+                  "status": "OK",
+                  "data": {
+                    "bookings": [
+                      {
+                        "appointment_id": "73",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-openemr-slot-73",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-25T15:00:00Z",
+                          "ends_at": "2026-11-25T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "external-openemr-record"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "patient_id": "synthetic-patient-receptionist",
+                        "slot": {
+                          "slot_id": "synthetic-book-1",
+                          "provider_id": "synthetic-provider-a",
+                          "location_id": "synthetic-clinic",
+                          "starts_at": "2026-11-24T15:00:00Z",
+                          "ends_at": "2026-11-24T15:30:00Z",
+                          "kind": "OPEN"
+                        },
+                        "confirmation_event_id": "e0045"
+                      }
+                    ],
+                    "native_identifiers": [
+                      {
+                        "appointment_id": "73",
+                        "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      },
+                      {
+                        "appointment_id": "88",
+                        "appointment_uuid": "a34a48ee-f459-4706-afe1-b0713696c318",
+                        "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+                      }
+                    ],
+                    "readback_sources": [
+                      "FHIR Appointment search",
+                      "standard patient appointment read"
+                    ]
+                  },
+                  "failure_code": null,
+                  "authoritative": true,
+                  "observed_at": "2026-11-23T00:41:05.332961Z",
+                  "source": "openemr"
+                },
+                "consent_event_id": "e0045"
+              },
+              "independent_human_review": false
+            }
+          },
+          {
+            "name": "email_inbox_delivery",
+            "status": "UNKNOWN",
+            "reason": "SMTP acceptance or local capture does not establish recipient inbox delivery.",
+            "evidence_refs": [
+              "/trace/ehr/booking_transaction/email"
+            ],
+            "evaluator_version": "email-delivery-1.0",
+            "details": {}
+          }
+        ]
+      }
+    ]
+  },
+  "independent_ehr_read": {
+    "operation": "get_receptionist_appointments",
+    "status": "OK",
+    "data": {
+      "appointments": [
+        {
+          "appointment_id": "88",
+          "patient_id": "synthetic-patient-receptionist",
+          "patient_name": "Jordan Morgan",
+          "starts_at": "2026-11-24T15:00:00Z",
+          "ends_at": "2026-11-24T15:30:00Z",
+          "clinician": "Avery Brooks",
+          "location": "Willow Creek Clinic",
+          "appointment_type": "Office Visit",
+          "category_id": "5",
+          "type_note": "FHIR appointment type; native category retained separately",
+          "status": "booked",
+          "native_status": "EMAIL",
+          "source": "OpenEMR FHIR + native appointment read"
+        },
+        {
+          "appointment_id": "73",
+          "patient_id": "synthetic-patient-receptionist",
+          "patient_name": "Jordan Morgan",
+          "starts_at": "2026-11-25T15:00:00Z",
+          "ends_at": "2026-11-25T15:30:00Z",
+          "clinician": "Avery Brooks",
+          "location": "Willow Creek Clinic",
+          "appointment_type": "Office Visit",
+          "category_id": "5",
+          "type_note": "FHIR appointment type; native category retained separately",
+          "status": "booked",
+          "native_status": "EMAIL",
+          "source": "OpenEMR FHIR + native appointment read"
+        }
+      ],
+      "patient_id": "synthetic-patient-receptionist",
+      "patient_name": "Jordan Morgan",
+      "availability": "UNSUPPORTED",
+      "free_slots_inferred": false
+    },
+    "failure_code": null,
+    "authoritative": true,
+    "observed_at": "2026-11-23T00:45:25.195303Z",
+    "source": "openemr"
+  },
+  "gmail_provider_message_id": "1a205da3bc0d12ef",
+  "gmail_independent_labels": [
+    "SENT",
+    "INBOX"
+  ],
+  "provider_receipt_source": "Authorized Gmail send followed by separate Gmail read_email(minimal)",
+  "recipient_confirmed_inbox": true,
+  "late_acknowledgment": true,
+  "limitation": "The original spoken email outcome was correctly unverified at its waiting deadline. Provider evidence arrived later; original trace is unchanged."
+}

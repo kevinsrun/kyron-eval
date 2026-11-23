@@ -1,0 +1,21 @@
+Checked 28 packages in 3ms
+{
+  "api_key_present": true,
+  "agent_number_present": true,
+  "cli_auth_present": true,
+  "authenticated": true,
+  "webrtc_does_not_require_phone_number": true,
+  "actual_audio_observed": false,
+  "phone_number_count": 1,
+  "openemr_patient_read": "OK",
+  "openemr_appointment_read": "OK",
+  "demo_target_present": true,
+  "writes_enabled": false,
+  "receptionist_fixture_configured": true,
+  "receptionist_name_search": "OK",
+  "guarded_booking_configured": true,
+  "conflict_checked_option_count": 2,
+  "local_smtp_ready": true,
+  "email_transport": "LOCAL_MAILPIT_CAPTURE",
+  "inbox_delivery_verified": false
+}

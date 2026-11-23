@@ -1,0 +1,11 @@
+{
+  "execution": "ACTUAL_PSTN_NETWORK_SPEECH",
+  "outcome": "NO_BOOKING_OR_EMAIL",
+  "reason": "Overly rigid code phrase; natural yes/no revision follows.",
+  "raw_run_sha256": "46e0f7980549b45409fc12c654a687db9986dc1990c38501b2ca1f049503b75a",
+  "raw_local_file": "artifacts/runs/run-20261123T002644-61b7e1f765.json",
+  "private_transcript_withheld_from_public_repository": true,
+  "booking_state": "AWAITING_CONFIRMATION",
+  "receipt": null,
+  "email": null
+}
