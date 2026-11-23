@@ -1,0 +1,24 @@
+{
+  "recorded_at_utc": "2026-11-23T01:18:39.978138+00:00",
+  "branch": "codex/postdeadline-booking-recovery",
+  "previous_verification": "verification.json",
+  "failed_call": {
+    "run_id": "run-20261123T011635-f8b1ad4403",
+    "raw_sha256": "0fbb65c48853ddd2081db185715d2c07dcc52ec53e6f348b1e464f7c4c2de1c1",
+    "evidence_class": "GUAVA_PSTN_NETWORK_SPEECH",
+    "cause": "Natural affirmative responses rejected by narrow response parser, causing repeated clarification",
+    "actual_responses": [
+      "Yep, that's correct.",
+      "Yes, that's correct."
+    ],
+    "booking_attempted": false,
+    "email_attempted": false
+  },
+  "final_synthetic_openemr_suite": {
+    "passed": 293,
+    "failed": 0,
+    "existing_deprecation_warnings": 1
+  },
+  "new_successful_live_call_verified": false,
+  "self_review_only": true
+}

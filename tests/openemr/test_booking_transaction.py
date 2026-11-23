@@ -424,7 +424,14 @@ def test_sdk_booking_tasks_dispatch_without_model_supplied_consent(tmp_path, mon
 
 
 @pytest.mark.parametrize(
-    "answer", ["Yes", "Yes please", "Yes, book, please email my confirmation."]
+    "answer",
+    [
+        "Yes",
+        "Yes please",
+        "Yes, that's correct.",
+        "Yep, that's correct.",
+        "Yes, book, please email my confirmation.",
+    ],
 )
 def test_natural_confirmation_binds_to_exact_actual_readback(tmp_path, monkeypatch, answer):
     _, tx, p, _ = make(tmp_path, monkeypatch)
@@ -575,6 +582,26 @@ def test_sentence_chunked_sdk_service_question_is_supported(tmp_path, monkeypatc
     tx.observe_caller("call", "answer", "Yes")
     assert tx.present("routine checkup", {})["completed"]
     assert p.calls == 0
+
+
+@pytest.mark.parametrize(
+    "answer", ["Yep, that's correct.", "Yes, that's correct.", "Yeah", "That's right."]
+)
+def test_natural_service_confirmation_from_failed_phone_call(tmp_path, monkeypatch, answer):
+    _, tx, p, _ = make(tmp_path, monkeypatch, clarify=False)
+    result = tx.present("routine checkup", {})
+    tx.observe_agent("question", result["message"])
+    tx.observe_caller("call", "answer", answer)
+    assert tx.present("routine checkup", {})["completed"] and p.calls == 0
+
+
+@pytest.mark.parametrize(
+    "answer", ["Yes, but I have chest pain", "Yes no", "Yes, don't book it", "Maybe", "No"]
+)
+def test_qualified_or_negative_answer_is_not_a_plain_yes(answer):
+    from kyron_eval.voice.booking import affirmative_response
+
+    assert not affirmative_response(answer)
 
 
 def test_revised_visit_confirmation_blocks_even_after_booking_yes(tmp_path, monkeypatch):

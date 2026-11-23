@@ -44,6 +44,23 @@ def normalized(text):
     return " ".join(re.findall(r"[a-z0-9]+", text.casefold()))
 
 
+def affirmative_response(text):
+    """Recognize a plain affirmative, rejecting mixed/qualified clinical answers.
+
+    This only interprets speech; current exact question and session evidence are
+    separately required. A model field never calls this on the caller's behalf.
+    """
+    return bool(
+        re.fullmatch(
+            r"(?:yes|yeah|yep|yup|sure|absolutely|correct|"
+            r"(?:that s|that is) (?:correct|right|fine))"
+            r"(?: (?:(?:that s|that is) (?:correct|right|fine)|it is(?: routine)?|"
+            r"please(?: do| book it)?|go ahead|book (?:it|that appointment|the appointment)))*",
+            normalized(text),
+        )
+    )
+
+
 def serialized(method):
     @wraps(method)
     def locked(self, *args, **kwargs):
@@ -342,7 +359,7 @@ class BookingTransaction:
                 prompt
                 and prompt["reason"] == self.reason
                 and datetime.now(UTC) <= prompt["at"] + timedelta(seconds=90)
-                and words in {"yes", "yes please", "yes it is", "correct", "no", "no thanks"}
+                and (affirmative_response(text) or words in {"no", "no thanks"})
             ):
                 self.visit_consent = {
                     "accepted": words not in {"no", "no thanks"},
@@ -391,15 +408,7 @@ class BookingTransaction:
         if not address_present or not readout_complete:
             return
         words = normalized(text)
-        contextual_yes = words in {
-            "yes",
-            "yes please",
-            "yes please do",
-            "yes book it",
-            "yes please book it",
-            "yes book that appointment",
-            "yes book the appointment",
-        }
+        contextual_yes = affirmative_response(text)
         explicit_booking_email = bool(
             re.fullmatch(
                 r"yes (?:please )?book(?: (?:it|that appointment|the appointment|appointment))?"
