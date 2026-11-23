@@ -1,5 +1,7 @@
 # Kyron Eval
 
+Current continuation: `codex/receptionist-p0` adds a natural AI receptionist, real name/DOB patient search plus phone verification, and synchronized appointment list/calendar. A genuine browser-audio call retrieved and read appointment 73; the caller kept it unchanged. All 244 tests passed with the isolated OpenEMR environment enabled. No authoritative availability feed was established; live booking, cancellation and rescheduling remain disabled pending independent safety review. See [current recording instructions and exact evidence](docs/receptionist-recording.md). Earlier checkpoints below remain historical.
+
 A synthetic healthcare voice-agent evaluation platform built on the existing FastAPI/Pydantic/Jinja workbench at `56b0a8e`. The working path is **scenario → agent → guarded EHR tools → captured trace → authoritative readback → versioned evaluation → saved artifact → inspection UI**. The default path runs offline; an optional read-only Guava WebRTC path has now completed a genuine audio/triage/appointment lookup. See the [recording-readiness report](docs/triage-recording-readiness.md).
 
 ## Run

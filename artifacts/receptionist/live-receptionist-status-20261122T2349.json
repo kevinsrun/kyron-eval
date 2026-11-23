@@ -1,0 +1,567 @@
+{
+  "mode": "READ_ONLY_WEBRTC_CANDIDATE",
+  "guava_registration_verified": true,
+  "writes_enabled": false,
+  "listener_started": true,
+  "listener_ready": true,
+  "listener_error": null,
+  "call_started": true,
+  "audio_observed": true,
+  "browser": {
+    "connected": true,
+    "remote_track": true,
+    "non_silent_frames": 342,
+    "audio_playing": true,
+    "ended": true
+  },
+  "latest_run": "run-20261122T234909-9afd407be7",
+  "independent_fix_approval": "pending; cancellation disabled",
+  "encounter": {
+    "encounter_id": "encounter-32da7e74d2444f95b93fba6a68a85018",
+    "mode": "receptionist",
+    "demo_id": null,
+    "duration_seconds": 87,
+    "transcripts": [
+      {
+        "id": "e0005",
+        "kind": "agent",
+        "text": "Hello! Thank you for calling the clinic. ",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0007",
+        "kind": "agent",
+        "text": "I'm the AI scheduling assistant. ",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0009",
+        "kind": "agent",
+        "text": "May I have your full name and date of birth, please?",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0011",
+        "kind": "caller",
+        "text": "Um,",
+        "source": "SDK caller speech callback"
+      },
+      {
+        "id": "e0014",
+        "kind": "caller",
+        "text": "Um Jordan Morgan, April 12th, 1990.",
+        "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+      },
+      {
+        "id": "e0016",
+        "kind": "agent",
+        "text": "Thanks, one second.",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0023",
+        "kind": "agent",
+        "text": "Thank you. For an additional identity check, could you please provide the phone number on your record?",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0026",
+        "kind": "caller",
+        "text": "Two oh two five five five.",
+        "source": "SDK caller speech callback"
+      },
+      {
+        "id": "e0028",
+        "kind": "caller",
+        "text": "Two oh two five five five zero one two two",
+        "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+      },
+      {
+        "id": "e0030",
+        "kind": "agent",
+        "text": "Thanks, one second.",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0041",
+        "kind": "agent",
+        "text": "I found one appointment for you on November 25th, 2026, from 3:00 PM to 3:30 PM UTC with Avery Brooks at the Willow Creek Clinic. ",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0044",
+        "kind": "agent",
+        "text": "Would you like to keep that appointment, request a new one, reschedule, or cancel? ",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0047",
+        "kind": "agent",
+        "text": "Just so you know, any changes will need to be confirmed by our scheduling team.",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0049",
+        "kind": "caller",
+        "text": "Uh",
+        "source": "SDK caller speech callback"
+      },
+      {
+        "id": "e0051",
+        "kind": "caller",
+        "text": "Uh that's good.",
+        "source": "SDK CallerSpeechEvent; replaces earlier same-ID text"
+      },
+      {
+        "id": "e0053",
+        "kind": "agent",
+        "text": "I understand.",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0063",
+        "kind": "agent",
+        "text": "Just to make sure I have this right, would you like to keep that appointment as it is, or were you looking to reschedule, cancel, or request a new one?",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0065",
+        "kind": "caller",
+        "text": "Keep it.",
+        "source": "SDK caller speech callback"
+      },
+      {
+        "id": "e0067",
+        "kind": "agent",
+        "text": "Got it, one moment please.",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0070",
+        "kind": "agent",
+        "text": "Thank you for calling. ",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0073",
+        "kind": "agent",
+        "text": "No changes were made to your appointment, but please contact the clinic if you need any further assistance. ",
+        "source": "SDK AgentSpeechEvent"
+      },
+      {
+        "id": "e0075",
+        "kind": "agent",
+        "text": "Have a great day!",
+        "source": "SDK AgentSpeechEvent"
+      }
+    ],
+    "triage": {
+      "encounter_id": "encounter-32da7e74d2444f95b93fba6a68a85018",
+      "state": "TRIAGE_INCOMPLETE",
+      "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+      "prediction": null,
+      "reference": null,
+      "facts": {},
+      "missing_facts": [
+        "symptoms",
+        "onset"
+      ],
+      "scheduling_permitted": false,
+      "scheduling_restrictions": [
+        "All live writes disabled pending independent review",
+        "OpenEMR availability discovery unsupported"
+      ],
+      "policy_version": "synthetic-triage-policy-1.0-unreviewed",
+      "transitions": [
+        {
+          "index": 1,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        },
+        {
+          "index": 2,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        },
+        {
+          "index": 3,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        },
+        {
+          "index": 4,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        },
+        {
+          "index": 5,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        },
+        {
+          "index": 6,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        },
+        {
+          "index": 7,
+          "trigger": "caller_observation",
+          "state": "TRIAGE_INCOMPLETE",
+          "reason": "Collect/clarify symptoms and onset; no automatic appointment changes.",
+          "prediction": null,
+          "facts": {},
+          "policy_version": "synthetic-triage-policy-1.0-unreviewed"
+        }
+      ],
+      "latest_caller_utterances": {
+        "1a205a8b523": "Um Jordan Morgan, April 12th, 1990.",
+        "1a205a8f4e2": "Two oh two five five five zero one two two",
+        "1a205a95082": "Uh that's good.",
+        "1a205a9aa22": "Keep it."
+      }
+    },
+    "reference_evaluation": {
+      "status": "UNKNOWN",
+      "reason": "No supported synthetic reference/prediction pair"
+    },
+    "identity_verified": false,
+    "identity_was_verified": true,
+    "patient_id": "synthetic-patient-receptionist",
+    "requested_operation": "VIEW_APPOINTMENTS",
+    "consent": "No mutation requested or authorized",
+    "appointment_id": "",
+    "lookup": {
+      "completed": true,
+      "appointments": [
+        {
+          "appointment_id": "73",
+          "patient_id": "synthetic-patient-receptionist",
+          "patient_name": "Jordan Morgan",
+          "starts_at": "2026-11-25T15:00:00Z",
+          "ends_at": "2026-11-25T15:30:00Z",
+          "clinician": "Avery Brooks",
+          "location": "Willow Creek Clinic",
+          "appointment_type": "Office Visit",
+          "category_id": "5",
+          "type_note": "FHIR appointment type; native category retained separately",
+          "status": "booked",
+          "native_status": "EMAIL",
+          "source": "OpenEMR FHIR + native appointment read"
+        }
+      ],
+      "read_only": true,
+      "ehr_status": "OK",
+      "patient_name": "Jordan Morgan"
+    },
+    "availability": null,
+    "ehr_acknowledgment": "No write was attempted",
+    "readback": {
+      "operation": "read_state",
+      "status": "UNKNOWN",
+      "data": {
+        "appointments": {
+          "operation": "get_appointments",
+          "status": "OK",
+          "data": {
+            "bookings": [
+              {
+                "appointment_id": "73",
+                "patient_id": "synthetic-patient-receptionist",
+                "slot": {
+                  "slot_id": "synthetic-openemr-slot-73",
+                  "provider_id": "synthetic-provider-a",
+                  "location_id": "synthetic-clinic",
+                  "starts_at": "2026-11-25T15:00:00Z",
+                  "ends_at": "2026-11-25T15:30:00Z",
+                  "kind": "OPEN"
+                },
+                "confirmation_event_id": "external-openemr-record"
+              }
+            ],
+            "native_identifiers": [
+              {
+                "appointment_id": "73",
+                "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+                "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+              }
+            ],
+            "readback_sources": [
+              "FHIR Appointment search",
+              "standard patient appointment read"
+            ]
+          },
+          "failure_code": null,
+          "authoritative": true,
+          "observed_at": "2026-11-22T23:49:09.567859Z",
+          "source": "openemr"
+        },
+        "available_collections": [
+          "bookings"
+        ],
+        "unavailable_collections": [
+          "reviews"
+        ]
+      },
+      "failure_code": "OPENEMR_PARTIAL_STATE_ONLY",
+      "authoritative": false,
+      "observed_at": "2026-11-22T23:49:09.567890Z",
+      "source": "openemr"
+    },
+    "http_events": [
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/metadata",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:47:42.305115+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/api/patient",
+        "parameters": {
+          "fname": "jordan",
+          "lname": "morgan",
+          "DOB": "1990-04-12",
+          "_count": "100"
+        },
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:01.642434+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:01.693841+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.116557+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.169585+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Appointment",
+        "parameters": {
+          "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+          "_count": "100"
+        },
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.196617+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/api/patient/3/appointment",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.217405+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.236825+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Appointment",
+        "parameters": {
+          "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+          "_count": "100"
+        },
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.255354+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/api/patient/3/appointment",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.273178+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Appointment",
+        "parameters": {
+          "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+          "_count": "100"
+        },
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.289637+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:48:14.308458+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:49:09.464667+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/fhir/Appointment",
+        "parameters": {
+          "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+          "_count": "100"
+        },
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:49:09.521215+00:00",
+        "http_status": 200,
+        "request_id": null
+      },
+      {
+        "method": "GET",
+        "path": "/apis/default/api/patient/3/appointment",
+        "parameters": {},
+        "payload": null,
+        "attempt": 1,
+        "authorization": "OAuth2 Bearer (redacted)",
+        "tls_verified": true,
+        "at": "2026-11-22T23:49:09.546724+00:00",
+        "http_status": 200,
+        "request_id": null
+      }
+    ],
+    "latest_run": "run-20261122T234909-9afd407be7",
+    "ended": true,
+    "active_task": "ended",
+    "patient_name": "Jordan Morgan",
+    "appointments": [
+      {
+        "appointment_id": "73",
+        "patient_id": "synthetic-patient-receptionist",
+        "patient_name": "Jordan Morgan",
+        "starts_at": "2026-11-25T15:00:00Z",
+        "ends_at": "2026-11-25T15:30:00Z",
+        "clinician": "Avery Brooks",
+        "location": "Willow Creek Clinic",
+        "appointment_type": "Office Visit",
+        "category_id": "5",
+        "type_note": "FHIR appointment type; native category retained separately",
+        "status": "booked",
+        "native_status": "EMAIL",
+        "source": "OpenEMR FHIR + native appointment read"
+      }
+    ],
+    "selected_appointment": "73",
+    "synchronization": "SYNCED",
+    "preferences": null,
+    "request_catalog": [
+      "General consultation",
+      "Follow-up visit",
+      "Annual wellness visit",
+      "Specialist consultation"
+    ],
+    "catalog_source": "Demonstration request catalog; not verified bookable EHR types"
+  },
+  "configured_mode": "receptionist",
+  "demo_id": null
+}

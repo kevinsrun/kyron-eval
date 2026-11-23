@@ -322,6 +322,145 @@ class OpenEMRAdapter:
 
         return self._run("search_patients", read)
 
+    def match_name_and_dob(self, full_name, birth_date):
+        """Native API search + exact local filtering + marker/FHIR verification.
+
+        This establishes a private candidate, not permission to disclose records.
+        Duplicate/unmarked/unallowlisted matches fail closed without returning details.
+        """
+
+        def normalize(value):
+            return " ".join(str(value).casefold().split())
+
+        def read():
+            name = normalize(full_name)
+            parts = name.split()
+            if len(parts) < 2 or len(name) > 160:
+                raise OpenEMRFailure("IDENTITY_NOT_VERIFIED", "ERROR")
+            date = datetime.strptime(birth_date, "%Y-%m-%d").date().isoformat()
+            payload = self._request(
+                "GET",
+                "api/patient",
+                params={"fname": parts[0], "lname": parts[-1], "DOB": date, "_count": "100"},
+            )
+            rows = payload.get("data") if isinstance(payload, dict) else payload
+            links = payload.get("links", {}) if isinstance(payload, dict) else {}
+            has_next = (
+                bool(links.get("next"))
+                if isinstance(links, dict)
+                else any(x.get("relation") == "next" for x in links)
+            )
+            if not isinstance(rows, list) or len(rows) >= 100 or has_next:
+                raise OpenEMRFailure("IDENTITY_SEARCH_INCOMPLETE")
+            matches = [
+                r
+                for r in rows
+                if normalize(" ".join(str(r.get(k) or "") for k in ["fname", "mname", "lname"]))
+                == name
+                and str(r.get("DOB", "")).split(" ")[0] == date
+            ]
+            if len(matches) != 1:
+                raise OpenEMRFailure("IDENTITY_NOT_VERIFIED", "ERROR")
+            row = matches[0]
+            aliases = [
+                alias
+                for alias, p in self.patient_map.items()
+                if str(row.get("pid")) == str(p["pid"])
+                and row.get("uuid") == p["uuid"]
+                and row.get("pubpid") == p["pubpid"]
+            ]
+            if len(aliases) != 1:
+                raise OpenEMRFailure("IDENTITY_NOT_VERIFIED", "ERROR")
+            patient = self._patient(aliases[0])
+            fhir_names = [
+                normalize(" ".join([*n.get("given", []), n.get("family", "")]))
+                for n in patient.get("name", [])
+            ]
+            if name not in fhir_names or patient.get("birthDate") != date:
+                raise OpenEMRFailure("IDENTITY_NOT_VERIFIED", "ERROR")
+            return {
+                "candidate_id": aliases[0],
+                "name_dob_matched": True,
+                "additional_factor_required": "PHONE",
+                "disclosure_authorized": False,
+            }
+
+        return self._run("match_name_and_dob", read)
+
+    def get_receptionist_appointments(self, patient_id):
+        """Display fields from positively bound actual records, separate from legacy contracts."""
+
+        def read():
+            records, raw = self._appointments(patient_id)
+            p = self._allowed(patient_id)
+            fhir = self._bundle("Appointment", {"patient": p["uuid"]})
+            native_by_id = {str(r["pc_eid"]): r for r in raw}
+            fhir_by_id = {r["id"]: r for r in fhir}
+            if {r["pc_uuid"] for r in raw} != set(fhir_by_id):
+                raise OpenEMRFailure("OPENEMR_CONCURRENT_APPOINTMENT_CHANGE")
+            # The seeded calendar actor is a User/Person; it is not necessarily
+            # exposed by Practitioner search. Read the exact persisted actor.
+            provider = self._request("GET", "api/user/" + self.manifest["provider"]["uuid"])
+            if isinstance(provider, dict):
+                provider = provider.get("data", provider)
+            if isinstance(provider, list):
+                if len(provider) != 1:
+                    raise OpenEMRFailure("OPENEMR_PROVIDER_AMBIGUOUS")
+                provider = provider[0]
+            if (
+                not isinstance(provider, dict)
+                or provider.get("uuid") != self.manifest["provider"]["uuid"]
+            ):
+                raise OpenEMRFailure("OPENEMR_PROVIDER_AMBIGUOUS")
+            clinician = " ".join(str(provider.get(k) or "") for k in ["fname", "lname"]).strip()
+            details = []
+            for record in records:
+                source = native_by_id[record["appointment_id"]]
+                resource = fhir_by_id[source["pc_uuid"]]
+                if resource.get("status") not in {
+                    "booked",
+                    "arrived",
+                    "checked-in",
+                    "fulfilled",
+                } or (
+                    datetime.fromisoformat(resource["start"])
+                    != datetime.fromisoformat(record["slot"]["starts_at"])
+                ):
+                    raise OpenEMRFailure("OPENEMR_CONCURRENT_APPOINTMENT_CHANGE")
+                appointment_type = resource.get("appointmentType", {})
+                codes = appointment_type.get("coding", [])
+                type_name = appointment_type.get("text") or (
+                    codes[0].get("display") if len(codes) == 1 else None
+                )
+                details.append(
+                    {
+                        "appointment_id": record["appointment_id"],
+                        "patient_id": patient_id,
+                        "patient_name": " ".join([p["fname"], p["lname"]]),
+                        "starts_at": record["slot"]["starts_at"],
+                        "ends_at": record["slot"]["ends_at"],
+                        "clinician": clinician or None,
+                        "location": source.get("facility_name"),
+                        "appointment_type": type_name,
+                        "category_id": str(source.get("pc_catid", "")),
+                        "type_note": "FHIR appointment type; native category retained separately",
+                        "status": resource["status"],
+                        "native_status": source.get("pc_apptstatus") or None,
+                        "source": "OpenEMR FHIR + native appointment read",
+                    }
+                )
+            return {
+                "appointments": sorted(
+                    details, key=lambda r: (r["starts_at"], r["appointment_id"])
+                ),
+                "patient_id": patient_id,
+                "patient_name": " ".join([p["fname"], p["lname"]]),
+                "availability": "UNSUPPORTED",
+                "free_slots_inferred": False,
+            }
+
+        return self._run("get_receptionist_appointments", read)
+
     def verify_identity(self, patient_id, birth_date, phone):
         def read():
             p = self._patient(patient_id)

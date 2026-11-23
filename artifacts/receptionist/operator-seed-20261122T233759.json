@@ -1,0 +1,192 @@
+{
+  "created_at": "2026-11-22T23:37:59.332278+00:00",
+  "execution": "OPERATOR_SETUP",
+  "fictional_only": true,
+  "patient_name": "Jordan Morgan",
+  "appointments": {
+    "operation": "get_appointments",
+    "status": "OK",
+    "data": {
+      "bookings": [
+        {
+          "appointment_id": "73",
+          "patient_id": "synthetic-patient-receptionist",
+          "slot": {
+            "slot_id": "synthetic-openemr-slot-73",
+            "provider_id": "synthetic-provider-a",
+            "location_id": "synthetic-clinic",
+            "starts_at": "2026-11-25T15:00:00Z",
+            "ends_at": "2026-11-25T15:30:00Z",
+            "kind": "OPEN"
+          },
+          "confirmation_event_id": "external-openemr-record"
+        }
+      ],
+      "native_identifiers": [
+        {
+          "appointment_id": "73",
+          "appointment_uuid": "a34a325d-fbbe-45d2-aad6-d6aa09e27474",
+          "patient_uuid": "a34a325d-abc6-481f-8501-7beb711607dc"
+        }
+      ],
+      "readback_sources": [
+        "FHIR Appointment search",
+        "standard patient appointment read"
+      ]
+    },
+    "failure_code": null,
+    "authoritative": true,
+    "observed_at": "2026-11-22T23:37:59.331791Z",
+    "source": "openemr"
+  },
+  "http_events": [
+    {
+      "method": "GET",
+      "path": "/apis/default/api/patient",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:58.999287+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "POST",
+      "path": "/apis/default/api/patient",
+      "parameters": {},
+      "payload": {
+        "fname": "Jordan",
+        "lname": "Morgan",
+        "DOB": "1990-04-12",
+        "phone_home": "2025550122",
+        "pubpid": "KYRON-SYNTHETIC-RECEPTIONIST",
+        "sex": "Unknown"
+      },
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.051941+00:00",
+      "http_status": 201,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/api/patient",
+      "parameters": {
+        "pubpid": "KYRON-SYNTHETIC-RECEPTIONIST"
+      },
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.078272+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/fhir/metadata",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.097516+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.219269+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/fhir/Appointment",
+      "parameters": {
+        "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+        "_count": "100"
+      },
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.239997+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "POST",
+      "path": "/apis/default/api/patient/3/appointment",
+      "parameters": {},
+      "payload": {
+        "pc_catid": "5",
+        "pc_title": "KYRON_SYNTHETIC_RECEPTIONIST_EXISTING",
+        "pc_duration": "1800",
+        "pc_hometext": "Fictional operator-seeded existing appointment; not availability",
+        "pc_apptstatus": "EMAIL",
+        "pc_eventDate": "2026-11-25",
+        "pc_startTime": "15:00",
+        "pc_facility": "3",
+        "pc_billing_location": "3",
+        "pc_aid": "1"
+      },
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.258777+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/fhir/Patient/a34a325d-abc6-481f-8501-7beb711607dc",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.279385+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/fhir/Appointment",
+      "parameters": {
+        "patient": "a34a325d-abc6-481f-8501-7beb711607dc",
+        "_count": "100"
+      },
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.298863+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/api/patient/3/appointment",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:37:59.316415+00:00",
+      "http_status": 200,
+      "request_id": null
+    }
+  ],
+  "not_agent_booking": true,
+  "availability_established": false
+}

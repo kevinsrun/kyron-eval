@@ -1,5 +1,13 @@
 # Architecture and EHR evidence boundaries
 
+## Name-first receptionist continuation
+
+`voice/receptionist.py` extends the existing read-only live session. It begins unmatched, calls `OpenEMRAdapter.match_name_and_dob` against the native patient API and requires an exact unique allowlisted marker/FHIR match. This creates a private candidate only. A later phone check through KyronVoiceService binds the actual patient before appointment disclosure. Candidate reuse is rejected; reidentification revokes prior records and selection. `get_receptionist_appointments` cross-checks FHIR/native collections, time and status, and reads the exact calendar actor for display names. Empty, unavailable and verified collections remain distinct.
+
+One encounter snapshot drives `/voice-demo` and the observing `/appointments` tab. The calendar contains actual appointments; an empty cell grants no availability. Guava instructions, received speech, service calls, HTTP metadata and independent readback remain separate events. The readonly wrapper and forced process configuration reject live writes. New `receptionist-binding-1.0` and `receptionist-readback-1.0` metrics use ordered identity receipts and authoritative appointment collections. Historical fixed-patient metrics are retained. No free-slot provider or transactional reschedule was added; [current evidence and limits](receptionist-recording.md).
+
+## Historical deterministic and EHR implementation
+
 The upgrade continues `56b0a8e` in place. FastAPI, JSON storage, scenario definitions, A/B replay and the original Guava validators remain. Minimal integration points: `MockWorld.ehr_call` delegates provider operations, `finish` captures authoritative readback, `Store.execute` selects provider/agent and persists artifacts, and the evaluator adds EHR judgments. No framework migration or live voice transport was introduced. The optional OpenEMR Compose stack adds its own isolated MariaDB; evaluation evidence stays in the existing JSON store.
 
 | Layer | Responsibility |

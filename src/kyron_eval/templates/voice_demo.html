@@ -1,39 +1,42 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Kyron · Voice + triage evaluation</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Clinic AI Receptionist · Appointments</title>
 <link rel="stylesheet" href="/static/style.css">
 <script type="importmap">{"integrity":{"https://cdn.jsdelivr.net/npm/@guava-ai/guava-sdk@0.44.0/dist/guava-webrtc.esm.min.js":"sha384-Lf/SBkHjXX4aPSR9S2XcqQXaI21CnugMUu7ROfHLJGnvtPMS0lFNuYTnUal6eAZ8"}}</script>
 <style>
-.demo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.demo-grid pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:25rem;overflow:auto;font-size:.8rem}.demo-grid h2{font-size:1.15rem}.transcript{max-height:20rem;overflow:auto}.transcript p{padding:.5rem;border-bottom:1px solid #e5e7eb}.route{font-size:1.1rem;font-weight:700;color:#8b3a0b}.live-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}select{max-width:100%;padding:.5rem}.demo-grid .panel{min-width:0}.muted{color:#627080}@media(max-width:1000px){.demo-grid{grid-template-columns:1fr}}
+[hidden]{display:none!important}
+.demo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.demo-grid pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:25rem;overflow:auto;font-size:.8rem}.demo-grid h2{font-size:1.15rem}.transcript{max-height:20rem;overflow:auto}.transcript p{padding:.5rem;border-bottom:1px solid #e5e7eb}.route{font-size:1.1rem;font-weight:700;color:#8b3a0b}.live-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}select{max-width:100%;padding:.5rem}.demo-grid .panel{min-width:0}.muted{color:#627080}.appointment-card{border:1px solid #d5dce5;border-radius:8px;padding:.8rem;margin:.8rem 0}.appointment-card p{margin:.25rem 0}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;font-size:.7rem}.calendar-day{border:1px solid #d5dce5;min-height:65px;padding:3px;overflow-wrap:anywhere}.calendar-day p{background:#e5edf4}@media(max-width:1000px){.demo-grid{grid-template-columns:1fr}}
 </style></head><body><main style="max-width:1450px;margin:2rem auto;padding:1rem">
-<p><a href="/">Evaluation runs</a> · <a href="/triage-benchmarks">Triage Benchmarks</a> · FICTIONAL LIVE CALLER ONLY</p>
-<h1>Voice → triage → appointment evidence</h1>
-<div class="notice">Unvalidated demonstration policy. No appointment writes, cancellation or transfer are enabled. Benchmark context stays local. Only actual SDK speech callbacks appear as transcripts; replay is explicitly separate.</div>
-<section class="panel"><div class="live-controls"><label>Mode <select id="mode"><option value="lookup">Read-only appointment lookup</option><option value="triage">Triage + appointment routing</option></select></label>
-<label>Fictional demo <select id="demo"><option value="nonurgent">Nonurgent request</option><option value="urgent">Urgent escalation</option><option value="insufficient">Insufficient information</option></select></label>
+<nav><a href="/voice-demo">AI Receptionist</a> · <a href="/appointments" target="_blank" rel="noopener">Appointments</a> · <a href="/triage-benchmarks">Triage Benchmarks</a> · <a href="/">Evaluation runs</a></nav>
+<h1>Clinic AI receptionist</h1>
+<div class="notice">Fictional clinic in an isolated local environment — not a real healthcare service. This assistant is AI. Use only the fictional identity in the operator guide.</div>
+<section class="panel"><div class="live-controls"><label>Session <select id="mode"><option value="receptionist">AI receptionist</option><option value="lookup">Earlier appointment lookup</option><option value="triage">Triage evaluation</option></select></label>
+<label>Scenario <select id="demo"><option value="nonurgent">Nonurgent request</option><option value="urgent">Urgent escalation</option><option value="insufficient">Insufficient information</option></select></label>
 <button id="start">Start microphone session</button><button id="stop" disabled>End session</button></div>
-<p id="script"></p><p>Fictional identity when asked: <strong>January 2, 1980</strong> · <strong>202-555-0100</strong>. No real personal or medical details.</p>
-<p id="state" role="status">Not started. No live audio observed.</p><p id="audio">Remote audio: not observed.</p><p id="result"></p></section>
-<section class="panel"><h2>Saved demonstration fallback</h2><p>Scripted fictional dialogue + actual read-only OpenEMR. No audio or model inference. Loading a replay disables microphone controls until page reload.</p><select id="replay"><option value="">Choose saved replay</option></select> <button id="loadReplay">Inspect scripted replay</button></section>
-<p id="encounter" class="muted">No encounter started. All three panels will use the same authoritative encounter ID.</p>
+<p id="state" role="status">Ready to start a call.</p><p id="audio">Audio: not received.</p><p id="result"></p>
+<details><summary>Operator call guide · fictional identity</summary><p id="script"></p><p>For the AI receptionist: <strong>Jordan Morgan</strong>, date of birth <strong>April 12, 1990</strong>. Additional phone verification: <strong>202-555-0122</strong>. Say: “Please check my appointments.” Then request an annual wellness visit next Tuesday morning to demonstrate truthful scheduling limitations.</p><p>Earlier lookup/triage fixtures use January 2, 1980 and 202-555-0100.</p></details></section>
+<p id="encounter" class="muted">No encounter started.</p>
 <div class="demo-grid">
-<section class="panel"><h2>A · Live voice</h2><p id="task">Awaiting microphone session</p><p id="duration">Duration: —</p><div id="transcripts" class="transcript"><p>No actual caller or agent transcript received.</p></div><h3>Extracted facts</h3><pre id="facts">Not observed</pre></section>
-<section class="panel"><h2>B · Triage evaluation</h2><p id="route" class="route">TRIAGE INCOMPLETE</p><p id="routeReason">No structured prediction received.</p><pre id="triage">Reference: no benchmark case loaded.
-Agent prediction: NOT RUN.</pre><h3>Sequential transitions</h3><pre id="transitions">No transitions observed</pre><p>No green clinical safety badge: reference agreement does not authorize scheduling.</p></section>
-<section class="panel"><h2>C · Appointment / OpenEMR</h2><p id="patient">Fictional patient: synthetic-patient-1</p><p id="identity">Identity: NOT VERIFIED</p><p id="schedule" class="route">WRITES DISABLED</p><pre id="appointment">No protected appointment lookup yet</pre><details><summary>Actual OpenEMR HTTP metadata</summary><pre id="http">No encounter HTTP requests yet</pre></details><details><summary>Independent final readback</summary><pre id="readback">Pending session completion</pre></details></section>
+<section class="panel"><h2>AI Receptionist</h2><p id="task">Waiting for your call</p><p id="duration">Call duration: —</p><div id="transcripts" class="transcript"><p>No speech received.</p></div><details><summary>Extracted clinical facts</summary><pre id="facts">Not observed</pre></details></section>
+<section class="panel"><h2>Appointments</h2><p id="patientDetails">Verify your identity to see appointments.</p><p id="syncState" role="status">Not synchronized</p><div class="live-controls"><button id="listView">Chronological list</button><button id="calendarView">Calendar</button></div>
+<div id="appointmentList">No patient records displayed before verification.</div>
+<div id="calendarPane" hidden><div class="live-controls"><button id="previousMonth">Previous month</button><strong id="calendarTitle"></strong><button id="nextMonth">Next month</button></div><div id="calendarGrid" class="calendar-grid"></div><p class="muted">Existing appointments only. A blank date does not establish availability.</p></div>
+<p id="selectedRecord">No appointment selected</p><h3>Appointment requests</h3><p id="availabilityState">The clinic must confirm available appointment times.</p><pre id="preferences">No request preferences recorded</pre><p><a href="/appointments" target="_blank" rel="noopener">Open Appointments tab</a> · <a href="https://localhost:9310/interface/main/calendar/index.php" target="_blank" rel="noopener">Open local OpenEMR calendar</a></p></section>
+<section class="panel"><h2>Verification</h2><p id="identity">Identity: not verified</p><p id="schedule" class="route">Appointment changes restricted</p><p id="routeReason">The clinic must confirm scheduling availability.</p><pre id="appointment">No verified appointment tool result</pre><details><summary>EHR requests</summary><pre id="http">No patient request yet</pre></details><details><summary>Independent final readback</summary><pre id="readback">Pending</pre></details>
+<details><summary>Evaluation results</summary><pre id="evaluationResults">Not finalized</pre></details><details><summary>Triage and reference evaluation</summary><p id="route" class="route">TRIAGE INCOMPLETE</p><pre id="triage">No prediction received</pre><pre id="transitions">No transitions observed</pre></details></section>
 </div>
-<section class="panel"><h2>Evidence boundary</h2><p>Browser connection, remote track, decoded non-silent audio, SDK speech callbacks, structured SDK task outputs, Kyron tool calls, HTTP metadata and independent readback remain separate. WebRTC is not PSTN. No model identity, token usage, speaker-delivery guarantee or clinical validation is claimed.</p><p>Cancellation stays disabled pending independent review. Unsupported free-slot discovery is never replaced with invented availability.</p><a href="/api/triage/demos">Fictional scripts and source attribution</a></section>
-<details><summary>Full session status</summary><pre id="details"></pre></details>
+<details class="panel"><summary>Developer / audit evidence and saved fallback</summary><p>Live speech, SDK actions, service calls, HTTP metadata and readback remain separate. No booking/cancellation/reschedule is enabled without authoritative availability and independent safety review. Request categories are a demonstration planning catalog, not confirmed EHR bookable types. No PSTN, clinical validation or accepted human transfer is claimed.</p><p>Saved entries below are SCRIPTED_TRIAGE_REPLAY, not received audio or model inference. Loading one disables microphone controls until reload.</p><select id="replay"><option value="">Choose saved replay</option></select> <button id="loadReplay">Inspect scripted replay</button><pre id="details"></pre><a href="/api/triage/demos">Scenario provenance</a></details>
 <audio id="decoded" muted></audio>
 </main>
 <script type="module">
 import {Call} from 'https://cdn.jsdelivr.net/npm/@guava-ai/guava-sdk@0.44.0/dist/guava-webrtc.esm.min.js';
 const nonce='__DEMO_NONCE__';
-const scripts={lookup:'Say: “Please look up my synthetic demo appointment.”',nonurgent:'Say: “I have a mild itchy patch on my arm for two weeks. It is not worsening. I would like a routine appointment to have it checked.”',urgent:'Say only the fictional scenario: “I have severe chest pain and trouble breathing that started ten minutes ago.”',insufficient:'First say: “I do not feel well.” Wait for clarification, then describe a mild itchy patch on your arm for two weeks and request a routine appointment.'};
-function setScript(){document.querySelector('#script').textContent=scripts[document.querySelector('#mode').value==='lookup'?'lookup':document.querySelector('#demo').value];}
+const scripts={receptionist:'Say: “Please check my appointments.” Give Jordan Morgan and April 12, 1990 when asked, then 202-555-0122 for the additional check.',lookup:'Say: “Please look up my synthetic demo appointment.”',nonurgent:'Say: “I have a mild itchy patch on my arm for two weeks. It is not worsening. I would like a routine appointment to have it checked.”',urgent:'Say only the fictional scenario: “I have severe chest pain and trouble breathing that started ten minutes ago.”',insufficient:'First say: “I do not feel well.” Wait for clarification, then describe a mild itchy patch on your arm for two weeks and request a routine appointment.'};
+function setScript(){document.querySelector('#demo').closest('label').hidden=document.querySelector('#mode').value==='receptionist';document.querySelector('#script').textContent=scripts[document.querySelector('#mode').value==='receptionist'?'receptionist':document.querySelector('#mode').value==='lookup'?'lookup':document.querySelector('#demo').value];}
 document.querySelector('#mode').onchange=setScript;document.querySelector('#demo').onchange=setScript;setScript();
 const headers={'Content-Type':'application/json','X-Kyron-Demo':nonce};
 const state=document.querySelector('#state'), audio=document.querySelector('#audio');
 let call, audioContext, analyser, timer, sampleTimer, replayView=false;
+let currentAppointments=[],calendarMonth=new Date(Date.UTC(2026,10,1));
 let observed={connected:false,remote_track:false,non_silent_frames:0,audio_playing:false,ended:false};
 async function report(){
   const r=await fetch('/api/live-demo/evidence',{method:'POST',headers,body:JSON.stringify(observed)});
@@ -42,7 +45,7 @@ async function report(){
 function update(s){
   document.querySelector('#details').textContent=JSON.stringify(s,null,2);
   if(s.encounter){
-    const e=s.encounter,t=e.triage;
+    const e=s.encounter,t=e.triage; renderAppointments(e);
     document.querySelector('#encounter').textContent='Encounter '+e.encounter_id+' · '+e.mode+' · '+(e.latest_run||'active; trace not yet finalized');
     document.querySelector('#task').textContent=(s.execution==='SCRIPTED_TRIAGE_REPLAY'?'SCRIPTED REPLAY — no actual voice. ':'')+'Active task: '+e.active_task;
     document.querySelector('#duration').textContent='Call duration: '+e.duration_seconds+'s';
@@ -50,7 +53,8 @@ function update(s){
     for(const turn of e.transcripts){const p=document.createElement('p');p.textContent=turn.kind.toUpperCase()+' ['+turn.source+']: '+turn.text;target.append(p);}
     document.querySelector('#facts').textContent=JSON.stringify(t.facts,null,2);
     document.querySelector('#route').textContent=e.mode==='lookup'?'LOOKUP ONLY':t.state.replaceAll('_',' ');
-    document.querySelector('#routeReason').textContent=t.reason;
+    document.querySelector('#routeReason').textContent=e.mode==='receptionist'?(t.state==='URGENT_ESCALATION'?'Routine scheduling is suspended; no transfer is confirmed.':'Appointment viewing requires verified identity. The clinic must confirm changes.'):t.reason;
+    document.querySelector('#evaluationResults').textContent=JSON.stringify(e.evaluation_summary||[],null,2);
     document.querySelector('#triage').textContent=JSON.stringify({agent_prediction:t.prediction,reference:t.reference,agreement:e.reference_evaluation||'UNKNOWN — scripted reference not matched to the current prefix',missing_facts:t.missing_facts,evaluator_version:'triage-reference-1.0',policy_version:t.policy_version,evidence_quality:s.audio_observed?'Observed WebRTC + SDK speech':'Audio unverified'},null,2);
     document.querySelector('#transitions').textContent=JSON.stringify(t.transitions,null,2);
     document.querySelector('#identity').textContent='Identity: '+(e.identity_verified?'VERIFIED':e.identity_was_verified?'WAS VERIFIED; session now closed':'NOT VERIFIED');
@@ -63,7 +67,9 @@ function update(s){
     const link=document.createElement('a');link.href='/runs/'+s.latest_run;link.textContent='Inspect saved trace and evaluator judgments';
     document.querySelector('#result').replaceChildren(link);
   }
-  audio.textContent='Remote track: '+observed.remote_track+' · decoded non-silent frames: '+observed.non_silent_frames+' · overall audio evidence: '+Boolean(s.audio_observed);
+  const transport=call?observed:(s.browser||observed);
+  if(!call&&s.call_started){state.textContent=transport.ended?'Encounter ended; showing saved call evidence.':'Observing the active encounter from another tab.';document.querySelector('#start').disabled=true;}
+  audio.textContent='Encounter remote track: '+transport.remote_track+' · decoded non-silent frames: '+transport.non_silent_frames+' · overall audio evidence: '+Boolean(s.audio_observed);
 }
 async function status(){if(replayView)return;try{const r=await fetch('/api/live-demo/status');update(await r.json());}catch{state.textContent='Local server unavailable; no result inferred.';}}
 document.querySelector('#start').addEventListener('click',async()=>{
@@ -108,6 +114,35 @@ document.querySelector('#start').addEventListener('click',async()=>{
   }catch(e){state.textContent=e.message;document.querySelector('#start').disabled=false;}
 });
 document.querySelector('#stop').addEventListener('click',async()=>{if(call)await call.hangup();});
+function renderAppointments(e){
+ const verified=e.identity_verified||e.identity_was_verified;
+ document.querySelector('#patientDetails').textContent=e.patient_name?e.patient_name:verified?'Identity verified':'Verify your identity to see appointments.';
+ document.querySelector('#syncState').textContent='EHR synchronization: '+(e.synchronization||'Not requested');
+ document.querySelector('#selectedRecord').textContent=e.selected_appointment?'Selected appointment: '+e.selected_appointment:'No appointment selected';
+ document.querySelector('#preferences').textContent=JSON.stringify(e.preferences||{},null,2);
+ document.querySelector('#availabilityState').textContent='The clinic must confirm an available time. No appointment openings have been verified here.';
+ currentAppointments=verified?(e.appointments||e.lookup?.appointments||[]):[];
+ const list=document.querySelector('#appointmentList');list.replaceChildren();
+ if(!verified){list.textContent='Verify your identity to display appointments.';renderCalendar();return;}
+ if(['UNKNOWN','ERROR','UNSUPPORTED','PATIENT_BINDING_REJECTED'].includes(e.synchronization)){list.textContent='Appointments unavailable. Please contact the clinic.';renderCalendar();return;}
+ if(!currentAppointments.length){list.textContent=e.synchronization==='LOADING'?'Loading appointments…':e.synchronization==='EMPTY'?'No appointments found.':'No appointment records received.';renderCalendar();return;}
+ for(const row of currentAppointments){const card=document.createElement('article');card.className='appointment-card';
+ const title=document.createElement('h3');title.textContent=new Date(row.starts_at).toLocaleString('en-US',{timeZone:'UTC'})+' UTC';card.append(title);
+ for(const text of ['Clinician: '+(row.clinician||'Not provided'),'Location: '+(row.location||'Not provided'),'Type: '+(row.appointment_type||'Not provided'),'Status: '+(row.status||'Not provided'),'OpenEMR ID: '+row.appointment_id]){const p=document.createElement('p');p.textContent=text;card.append(p);}
+ const button=document.createElement('button');button.textContent=row.appointment_id===e.selected_appointment?'Selected':'Select appointment';button.onclick=async()=>{const response=await fetch('/api/receptionist/select',{method:'POST',headers,body:JSON.stringify({appointment_id:row.appointment_id})});const result=await response.json();if(!result.completed)document.querySelector('#selectedRecord').textContent='Selection not verified.';else status();};card.append(button);list.append(card);}
+ renderCalendar();
+}
+function renderCalendar(){
+ const grid=document.querySelector('#calendarGrid');grid.replaceChildren();
+ const year=calendarMonth.getUTCFullYear(),month=calendarMonth.getUTCMonth();document.querySelector('#calendarTitle').textContent=calendarMonth.toLocaleString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});
+ for(const day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']){const cell=document.createElement('strong');cell.textContent=day;grid.append(cell);}
+ for(let n=0;n<new Date(Date.UTC(year,month,1)).getUTCDay();n++)grid.append(document.createElement('div'));
+ for(let d=1;d<=new Date(Date.UTC(year,month+1,0)).getUTCDate();d++){const cell=document.createElement('div');cell.className='calendar-day';cell.textContent=d;const date=new Date(Date.UTC(year,month,d)).toISOString().slice(0,10);for(const row of currentAppointments.filter(a=>a.starts_at.slice(0,10)===date)){const entry=document.createElement('p');entry.textContent=row.starts_at.slice(11,16)+' UTC · #'+row.appointment_id;cell.append(entry);}grid.append(cell);}
+}
+document.querySelector('#listView').onclick=()=>{document.querySelector('#appointmentList').hidden=false;document.querySelector('#calendarPane').hidden=true;};
+document.querySelector('#calendarView').onclick=()=>{document.querySelector('#appointmentList').hidden=true;document.querySelector('#calendarPane').hidden=false;renderCalendar();};
+document.querySelector('#previousMonth').onclick=()=>{calendarMonth.setUTCMonth(calendarMonth.getUTCMonth()-1);renderCalendar();};
+document.querySelector('#nextMonth').onclick=()=>{calendarMonth.setUTCMonth(calendarMonth.getUTCMonth()+1);renderCalendar();};
 let replays=[];
 fetch('/api/triage/replays').then(r=>r.json()).then(rows=>{replays=rows;for(const row of rows){const option=document.createElement('option');option.value=row.replay_id;option.textContent=row.encounter.demo_id+' · '+row.encounter.triage.state;document.querySelector('#replay').append(option);}}).catch(()=>{});
 document.querySelector('#loadReplay').onclick=()=>{

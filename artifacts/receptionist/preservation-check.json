@@ -1,0 +1,9 @@
+{
+  "baseline": "20fd724",
+  "preserved_tracked_artifacts": 393,
+  "changed_historical_artifacts": [],
+  "frozen_zip_sha256": "31e585866ea046c71d61473a56d29f4ba1aaebcd930b771878a0d41799f355ea",
+  "original_pr_head_unchanged": "0f1714f6a763a384597637c063a7c0f3b31608f6",
+  "original_worktree_status": "M uv.lock",
+  "branch": "codex/receptionist-p0"
+}

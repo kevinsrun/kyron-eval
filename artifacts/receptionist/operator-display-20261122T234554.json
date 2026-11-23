@@ -1,0 +1,123 @@
+{
+  "execution": "OPERATOR_CONFIGURATION_NOT_AGENT_MUTATION",
+  "fictional_only": true,
+  "before": {
+    "actor": {
+      "uuid": "a349f3f4-4cff-4845-a829-6243d5df0c32",
+      "fname": "Synthetic",
+      "lname": "Clinician",
+      "name": null
+    },
+    "facility": {
+      "uuid": "a349f3e3-0fa6-4b99-971d-b32d61c00006",
+      "fname": null,
+      "lname": null,
+      "name": "Kyron Synthetic Clinic"
+    }
+  },
+  "after": {
+    "actor": {
+      "uuid": "a349f3f4-4cff-4845-a829-6243d5df0c32",
+      "fname": "Avery",
+      "lname": "Brooks",
+      "name": null
+    },
+    "facility": {
+      "uuid": "a349f3e3-0fa6-4b99-971d-b32d61c00006",
+      "fname": null,
+      "lname": null,
+      "name": "Willow Creek Clinic"
+    }
+  },
+  "http_events": [
+    {
+      "method": "GET",
+      "path": "/apis/default/api/patient",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.344681+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.402556+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/api/facility/a349f3e3-0fa6-4b99-971d-b32d61c00006",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.420833+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "PUT",
+      "path": "/apis/default/api/practitioner/a349f3f4-4cff-4845-a829-6243d5df0c32",
+      "parameters": {},
+      "payload": {
+        "fname": "Avery",
+        "lname": "Brooks"
+      },
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.441340+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "PUT",
+      "path": "/apis/default/api/facility/a349f3e3-0fa6-4b99-971d-b32d61c00006",
+      "parameters": {},
+      "payload": {
+        "name": "Willow Creek Clinic"
+      },
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.457447+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/api/user/a349f3f4-4cff-4845-a829-6243d5df0c32",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.471737+00:00",
+      "http_status": 200,
+      "request_id": null
+    },
+    {
+      "method": "GET",
+      "path": "/apis/default/api/facility/a349f3e3-0fa6-4b99-971d-b32d61c00006",
+      "parameters": {},
+      "payload": null,
+      "attempt": 1,
+      "authorization": "OAuth2 Bearer (redacted)",
+      "tls_verified": true,
+      "at": "2026-11-22T23:45:54.483520+00:00",
+      "http_status": 200,
+      "request_id": null
+    }
+  ]
+}

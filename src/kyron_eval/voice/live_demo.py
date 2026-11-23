@@ -93,20 +93,25 @@ class DemoController:
         self.listener_started = False
         self.listener_error = None
         self.provider_factory = provider_factory or openemr_adapter
-        self.mode = "lookup"
+        self.mode = "receptionist"
         self.demo_id = None
 
     def start_session(self, call_id):
         with self.lock:
             if self.session is not None:
                 return None
-            self.session = LiveLookupSession(
-                self.provider_factory(),
-                self.target,
-                self.root,
-                mode=self.mode,
-                demo_id=self.demo_id,
-            )
+            if self.mode == "receptionist":
+                from kyron_eval.voice.receptionist import ReceptionistSession
+
+                self.session = ReceptionistSession(self.provider_factory(), self.root)
+            else:
+                self.session = LiveLookupSession(
+                    self.provider_factory(),
+                    self.target,
+                    self.root,
+                    mode=self.mode,
+                    demo_id=self.demo_id,
+                )
             self.session.world.trace.ehr["guava_registration"] = {
                 "authenticated_registration": bool(self.client and self.code),
                 "sdk_version": "0.53.0",
@@ -187,8 +192,12 @@ def create_demo_app(controller):
             payload = json.loads(raw)
         except ValueError:
             raise HTTPException(400, "JSON configuration required") from None
-        if not isinstance(payload, dict) or payload.get("mode") not in {"lookup", "triage"}:
-            raise HTTPException(422, "Choose lookup or triage")
+        if not isinstance(payload, dict) or payload.get("mode") not in {
+            "lookup",
+            "triage",
+            "receptionist",
+        }:
+            raise HTTPException(422, "Choose receptionist, lookup or triage")
         if payload.get("demo_id") not in {None, "nonurgent", "urgent", "insufficient"}:
             raise HTTPException(422, "Unknown fictional scenario")
         with controller.lock:
@@ -197,6 +206,27 @@ def create_demo_app(controller):
             controller.mode = payload["mode"]
             controller.demo_id = payload.get("demo_id")
         return controller.public_status()
+
+    @app.get("/appointments", response_class=HTMLResponse)
+    def appointments_page():
+        template = Path(__file__).parents[1] / "templates" / "appointments.html"
+        return template.read_text().replace("__DEMO_NONCE__", controller.nonce)
+
+    @app.post("/api/receptionist/select")
+    async def select_appointment(request: Request):
+        authorize(request)
+        raw = await request.body()
+        if len(raw) > 512:
+            raise HTTPException(413, "Small appointment selection only")
+        try:
+            payload = json.loads(raw)
+        except ValueError:
+            raise HTTPException(400, "JSON selection required") from None
+        if not isinstance(payload, dict) or not isinstance(payload.get("appointment_id"), str):
+            raise HTTPException(422, "Appointment identifier required")
+        if not controller.session or controller.mode != "receptionist":
+            raise HTTPException(409, "No verified receptionist session")
+        return controller.session.select(payload["appointment_id"])
 
     @app.post("/api/live-demo/evidence")
     async def evidence(request: Request):
@@ -234,8 +264,15 @@ def main():
     try:
         patient = provider.get_patient("synthetic-patient-1")
         appointments = provider.get_appointments("synthetic-patient-1")
-        target = str(
-            json.loads((openemr_directory() / "manifest.json").read_text())["seeded_appointment_id"]
+        manifest = json.loads((openemr_directory() / "manifest.json").read_text())
+        target = str(manifest["seeded_appointment_id"])
+        receptionist_fixture = manifest.get("receptionist_fixture")
+        receptionist_match = (
+            provider.match_name_and_dob(
+                receptionist_fixture["patient_name"], receptionist_fixture["birth_date"]
+            )
+            if receptionist_fixture
+            else None
         )
         target_present = appointments.ok and any(
             a["appointment_id"] == target for a in appointments.data.get("bookings", [])
@@ -245,6 +282,10 @@ def main():
             openemr_appointment_read=appointments.status,
             demo_target_present=target_present,
             writes_enabled=False,
+            receptionist_fixture_configured=bool(receptionist_fixture),
+            receptionist_name_search=receptionist_match.status
+            if receptionist_match
+            else "NOT_CONFIGURED",
         )
     finally:
         provider.close()
@@ -261,7 +302,7 @@ def main():
         print(f"Blocked UI preview only: http://127.0.0.1:{args.port}/voice-demo")
         uvicorn.run(create_demo_app(controller), host="127.0.0.1", port=args.port)
         return
-    if not client or not target_present:
+    if not client or not receptionist_match or not receptionist_match.ok:
         raise SystemExit("Blocked. Resolve preflight; no voice call was created.")
     try:
         code = client.create_webrtc_agent(ttl=timedelta(minutes=30), require_token=True)

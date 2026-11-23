@@ -33,6 +33,8 @@ class ReadOnlyDemoEHR:
         "read_state",
         "close",
         "http_events",
+        "match_name_and_dob",
+        "get_receptionist_appointments",
     }
 
     def __init__(self, provider):
@@ -91,8 +93,16 @@ def lookup_scenario():
 
 
 class LiveLookupSession:
-    def __init__(self, provider, target, artifact_root="artifacts", mode="lookup", demo_id=None):
-        self.scenario = lookup_scenario()
+    def __init__(
+        self,
+        provider,
+        target,
+        artifact_root="artifacts",
+        mode="lookup",
+        demo_id=None,
+        scenario=None,
+    ):
+        self.scenario = scenario or lookup_scenario()
         self.world = MockWorld(self.scenario, "VOICE", adapter=ReadOnlyDemoEHR(provider))
         self.world.trace.evidence_class = "GUAVA_NETWORK_SESSION_UNVERIFIED"
         self.world.trace.agent_version = "guava-readonly-lookup-0.1"
@@ -122,6 +132,7 @@ class LiveLookupSession:
         self.started_at = datetime.now(UTC)
         self.implementation_at_start = implementation_digest()
         self.availability_result = None
+        self.last_metrics = []
         self.caller_revisions = {}
 
     def event(self, kind, **data):
@@ -249,6 +260,7 @@ class LiveLookupSession:
                 "http_events": list(getattr(self.world.adapter, "http_events", [])),
                 "latest_run": self.latest_run,
                 "ended": self.ended,
+                "evaluation_summary": self.last_metrics,
                 "active_task": "ended"
                 if self.ended
                 else (
@@ -388,16 +400,27 @@ class LiveLookupSession:
         metrics = evaluate(self.scenario, trace, clarity_version="clarity-ehr-3.3")
         metrics.append(
             Metric(
-                name="appointment_lookup_execution",
+                name="receptionist_appointment_read"
+                if self.mode == "receptionist"
+                else "appointment_lookup_execution",
                 status=Status.PASS
                 if self.lookup_result and self.lookup_result["completed"]
                 else Status.UNKNOWN,
-                reason="Protected exact-target lookup after identity verification.",
+                reason="Patient-bound retrieval after name/DOB and additional verification."
+                if self.mode == "receptionist"
+                else "Protected exact-target lookup after identity verification.",
                 evidence_refs=["/trace/events"],
-                evaluator_version="lookup-execution-0.1",
+                evaluator_version="receptionist-read-1.0"
+                if self.mode == "receptionist"
+                else "lookup-execution-0.1",
                 details={"raw_tool_result": self.lookup_result, "audio_observed": observed},
             )
         )
+        if self.mode == "receptionist":
+            from kyron_eval.voice.receptionist_evaluate import evaluate_receptionist
+
+            metrics.extend(evaluate_receptionist(trace))
+        self.last_metrics = [m.model_dump(mode="json") for m in metrics]
         run = Run(
             schema_version="2.0",
             id=f"run-{datetime.now(UTC):%Y%m%dT%H%M%S}-{uuid4().hex[:10]}",
@@ -406,7 +429,8 @@ class LiveLookupSession:
             implementation_sha256=self.implementation_at_start,
             runtime={"python": platform.python_version()},
             policy_manifest=json.loads((DATA / "policies.json").read_text()),
-            evaluator_version="deterministic-2.0+clarity-ehr-3.3+ehr-1.1+lookup-execution-0.1",
+            evaluator_version="deterministic-2.0+clarity-ehr-3.3+ehr-1.1+lookup-execution-0.1"
+            + ("+receptionist-1.0" if self.mode == "receptionist" else ""),
             variants=["VOICE"],
             configuration={
                 "adapter": "openemr",
@@ -425,13 +449,18 @@ def build_lookup_agent(controller):
     from guava.types.call_info import WebRTCCallInfo
 
     agent = guava.Agent(
-        name="Kyron Synthetic Lookup",
-        organization="Fabricated Demo Clinic",
-        purpose="Assist with fictional symptom clarification and read-only appointment lookup. "
+        name="AI Scheduling Assistant",
+        organization="the clinic",
+        purpose="Thank callers warmly and clearly identify yourself as the clinic's AI "
+        "scheduling assistant. Use natural receptionist language. Ask for full name and date "
+        "of birth when the current task requests identification. "
+        "Assist with symptom clarification and appointment lookup. "
         "Follow the current task. Ask focused questions; do not guess clinical facts. "
         "Verify identity through the expert before reading records. Use only returned "
         "appointment facts. Never book, cancel, diagnose, claim emergency care is unnecessary "
-        "or claim a transfer. This is an unvalidated fictional-data demonstration.",
+        "or claim a transfer. Do not describe internal testing or evaluation terminology "
+        "in patient-facing speech. Availability and appointment changes "
+        "require actual tool evidence.",
     )
 
     @agent.on_call_received
@@ -464,6 +493,175 @@ def build_lookup_agent(controller):
             ],
         )
 
+    def receptionist_name_task(call):
+        call.set_task(
+            "receptionist_name",
+            objective="May I have your full name and date of birth? "
+            "Normalize the date to YYYY-MM-DD. Do not guess or disclose patient records.",
+            checklist=[
+                guava.Field(key="full_name", description="Caller's full legal name"),
+                guava.Field(key="birth_date", description="Date of birth YYYY-MM-DD"),
+            ],
+        )
+
+    @agent.on_task_complete("receptionist_name")
+    def receptionist_named(call):
+        session = controller.session
+        if not session or session.mode != "receptionist" or session.phase != "receptionist_name":
+            return
+        result = session.identify(
+            call.id, str(call.get_field("full_name") or ""), str(call.get_field("birth_date") or "")
+        )
+        if not result["completed"]:
+            call.hangup(
+                result.get("message", "I could not verify your details. Please contact the clinic.")
+            )
+            return
+        session.phase = "receptionist_phone"
+        call.set_task(
+            "receptionist_phone",
+            objective="For an additional identity check, "
+            "please ask for the phone number on the patient's record. Do not read it to them.",
+            checklist=[
+                guava.Field(
+                    key="identity_phone",
+                    field_type="digit_sequence",
+                    description="Phone number provided by caller",
+                )
+            ],
+        )
+
+    @agent.on_task_complete("receptionist_phone")
+    def receptionist_verified(call):
+        session = controller.session
+        if not session or session.mode != "receptionist" or session.phase != "receptionist_phone":
+            return
+        result = session.verify_phone_and_read(
+            call.id, "".join(c for c in str(call.get_field("identity_phone") or "") if c.isdigit())
+        )
+        if not result["completed"]:
+            call.hangup(
+                result.get(
+                    "message", "I could not verify your identity. Please contact the clinic."
+                )
+            )
+            return
+        session.phase = "receptionist_operation"
+        session.event(
+            "state",
+            name="receptionist.readout_instruction",
+            result=result,
+            delivered_to_caller=False,
+        )
+        call.send_instruction(
+            "Read the returned appointment dates and times with the UTC "
+            "timezone. If the list is empty, say no appointments were found. "
+            "Do not invent clinician names, availability or changes. " + json.dumps(result)
+        )
+        call.set_task(
+            "receptionist_operation",
+            objective="Ask how you can help with these "
+            "appointments: view/keep an appointment, request a new appointment, "
+            "reschedule, or cancel. Explain that changes need the clinic scheduling "
+            "team to confirm. If selecting an existing appointment, use its exact "
+            "identifier from the returned record, never a guessed ID.",
+            checklist=[
+                guava.Field(
+                    key="requested_operation",
+                    field_type="multiple_choice",
+                    choices=["VIEW_APPOINTMENTS", "NEW_APPOINTMENT", "RESCHEDULE", "CANCEL"],
+                ),
+                guava.Field(
+                    key="selected_appointment_id",
+                    required=False,
+                    description="Exact returned appointment ID, if caller selected one",
+                ),
+            ],
+        )
+
+    @agent.on_task_complete("receptionist_operation")
+    def receptionist_requested(call):
+        session = controller.session
+        if (
+            not session
+            or session.mode != "receptionist"
+            or session.phase != "receptionist_operation"
+        ):
+            return
+        operation = str(call.get_field("requested_operation") or "")
+        target = str(call.get_field("selected_appointment_id") or "")
+        if operation in {"CANCEL", "RESCHEDULE"} and not session.select(target)["completed"]:
+            call.hangup(
+                "I could not confirm which appointment you selected. "
+                "Please contact the clinic. No appointment has been changed."
+            )
+            return
+        if operation == "VIEW_APPOINTMENTS":
+            session.phase = "complete"
+            call.hangup(
+                "Thank you for calling. No appointment changes were made. "
+                "Please contact the clinic if you need further assistance."
+            )
+            return
+        if operation == "CANCEL":
+            session.phase = "complete"
+            result = session.request(call.id, operation)
+            call.hangup(result["message"])
+            return
+        if operation not in {"NEW_APPOINTMENT", "RESCHEDULE"}:
+            call.hangup(
+                "Please contact the clinic's scheduling team. No appointment has been changed."
+            )
+            return
+        session.requested_operation = operation
+        session.phase = "receptionist_preferences"
+        from kyron_eval.voice.receptionist import REQUEST_CATALOG
+
+        call.set_task(
+            "receptionist_preferences",
+            objective="What type of appointment would "
+            "you like to request? Collect preferred day/date range and morning or "
+            "afternoon. Ask about clinician and in-person/virtual preference if relevant, "
+            "but do not promise either is supported. These are request preferences, "
+            "not available appointment offers. Tell the caller the clinic must confirm a time.",
+            checklist=[
+                guava.Field(
+                    key="appointment_type", field_type="multiple_choice", choices=REQUEST_CATALOG
+                ),
+                guava.Field(key="preferred_date", description="Caller's requested day/date range"),
+                guava.Field(
+                    key="time_preference",
+                    field_type="multiple_choice",
+                    choices=["Morning", "Afternoon", "No preference"],
+                ),
+                guava.Field(key="preferred_clinician", required=False),
+                guava.Field(key="visit_method", required=False),
+            ],
+        )
+
+    @agent.on_task_complete("receptionist_preferences")
+    def receptionist_preferences(call):
+        session = controller.session
+        if (
+            not session
+            or session.mode != "receptionist"
+            or session.phase != "receptionist_preferences"
+        ):
+            return
+        session.phase = "complete"
+        preferences = {
+            key: call.get_field(key)
+            for key in [
+                "appointment_type",
+                "preferred_date",
+                "time_preference",
+                "preferred_clinician",
+                "visit_method",
+            ]
+        }
+        result = session.request(call.id, session.requested_operation, preferences)
+        call.hangup(result["message"])
+
     def triage_task(call):
         call.set_task(
             "triage",
@@ -495,7 +693,9 @@ def build_lookup_agent(controller):
         if session is None:
             call.hangup("This demo is busy. Please try again later.")
             return
-        if session.mode == "triage":
+        if session.mode == "receptionist":
+            receptionist_name_task(call)
+        elif session.mode == "triage":
             triage_task(call)
         else:
             identity_task(call)
@@ -504,10 +704,13 @@ def build_lookup_agent(controller):
     def caller(call, event):
         if controller.session:
             controller.session.caller(call.id, event)
-            if controller.session.mode == "triage" and controller.session.triage.urgent_latched:
+            if (
+                controller.session.mode in {"triage", "receptionist"}
+                and controller.session.triage.urgent_latched
+            ):
                 call.hangup(
-                    "This demo detected potentially urgent language. Routine scheduling "
-                    "is blocked. If you may be experiencing a medical emergency, call "
+                    "Your symptoms may need urgent attention. Routine scheduling "
+                    "is suspended. If you may be experiencing a medical emergency, call "
                     "911 now. I cannot connect an emergency call or a clinical transfer. "
                     "No appointment was changed."
                 )
@@ -597,7 +800,10 @@ def build_lookup_agent(controller):
             controller.session.event(
                 "policy", name="voice.action_rejected", action_key=key, reason="READ_ONLY_DEMO"
             )
-        call.send_instruction("This demo supports read-only lookup only; no mutation is available.")
+        call.send_instruction(
+            "I can help review appointments. Please contact the clinic's "
+            "scheduling team for changes. No appointment has been changed."
+        )
 
     @agent.on_escalate
     def escalation(call, event):

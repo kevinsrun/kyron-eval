@@ -1,5 +1,7 @@
 # Production priorities
 
+Current receptionist continuation remains a local fictional read-only demonstration. Full name/DOB plus phone is the configured test policy, not a validated clinical identity standard. Before real use, independently review identity extraction, disclosure authorization, provider-specific availability and concurrency contracts, exact-slot consent receipts, durable idempotency, lifecycle-safe rescheduling/recovery, access controls and clinical routing. No free-slot provider or live mutation approval was established here. The existing appointment calendar must never be interpreted as available-time discovery. See [current recording boundaries](receptionist-recording.md).
+
 The local prototype answers whether evidence supports a claim. At thousands of calls per day, the first production work is making that evidence complete and appropriately protected.
 
 1. **Ingest independently verifiable effects.** Normalize conversation turns, tool attempts, retries, transaction IDs, downstream commit/read receipts, queue acceptance and actual human/transfer acceptance into a versioned event schema. Link events by call and operation IDs. Track ingestion completeness and late events; missing evidence stays UNKNOWN until its collection window closes. A queue acknowledgment and an accepted human handoff are separate effects. Customer EHR adapters need capability-tested write/read contracts, idempotency keys and reconciliation, not optimistic SDK response assumptions.
