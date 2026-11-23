@@ -1,0 +1,27 @@
+{
+  "recorded_at_utc": "2026-11-23T01:16:04.879793+00:00",
+  "work_class": "POST_DEADLINE_USER_AUTHORIZED_CONTINUATION",
+  "base_commit": "99c319c",
+  "branch": "codex/postdeadline-booking-recovery",
+  "failed_call": {
+    "run_id": "run-20261123T005958-39e0c57a0f",
+    "raw_sha256": "a7873c0bc140ef7dc86d77c2b01f98fdcae2fc3da69220000864be9e33df91ef",
+    "reason": "phrase allowlist rejected routine screening after identity verification",
+    "booking_attempted": false,
+    "email_attempted": false
+  },
+  "offline_baseline": {
+    "passed": 261,
+    "skipped": 11
+  },
+  "final_synthetic_openemr_suite": {
+    "passed": 282,
+    "failed": 0,
+    "existing_deprecation_warnings": 1
+  },
+  "evidence_class": "OFFLINE_PROTOCOL_AND_REAL_LOCAL_SYNTHETIC_OPENEMR_TESTS_NOT_NEW_AUDIO",
+  "prior_tracked_artifacts_checked": 424,
+  "changed_prior_artifacts": [],
+  "frozen_zip_sha256": "31e585866ea046c71d61473a56d29f4ba1aaebcd930b771878a0d41799f355ea",
+  "new_live_call_verified": false
+}

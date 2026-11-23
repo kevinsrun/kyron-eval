@@ -7,7 +7,6 @@ exclusive synthetic namespace. No availability is inferred from an empty calenda
 import fcntl
 import json
 import re
-import secrets
 import sqlite3
 from datetime import UTC, datetime, timedelta
 from functools import wraps
@@ -152,13 +151,17 @@ class BookingTransaction:
         self.prompt_events, self.prompt_text = [], ""
         self.prompt_intent = False
         self.prompt_at = None
-        self.challenge = ""
         self.seen_caller = {}
         self.writes_enabled = writes_enabled
         self.final_message = None
         self.last_ack = None
         self.preferences = None
         self.issued_at = None
+        self.reason = None
+        self.visit_prompt = None
+        self.visit_consent = None
+        self.visit_prompt_text = ""
+        self.visit_prompt_events = []
 
     def transition(self, target):
         if target not in STATES[self.state]:
@@ -181,26 +184,42 @@ class BookingTransaction:
 
     @serialized
     def present(self, reason, preferences):
-        if self.state != "IDENTITY_PENDING" or not self.authorized():
+        if self.state not in {"IDENTITY_PENDING", "TRIAGE_PENDING"} or not self.authorized():
             return {"completed": False, "message": "Identity verification is required."}
-        self.transition("IDENTITY_VERIFIED")
-        self.transition("TRIAGE_PENDING")
-        # Only an explicitly administrative routine visit is supported here. Other
-        # dispositions require the existing structured nonurgent pathway or human review.
-        caller = " ".join(self.session.caller_revisions.values()).casefold()
-        if (
-            not reason
-            or reason.casefold() not in caller
-            or not re.search(
-                r"routine (?:checkup|check-up)|annual wellness|routine follow.?up", reason, re.I
-            )
-        ):
+        if self.state == "IDENTITY_PENDING":
+            self.transition("IDENTITY_VERIFIED")
+            self.transition("TRIAGE_PENDING")
+        # A free-text request is not a diagnosis or proof of clinical eligibility.
+        # Ground it in speech, then clarify the actual configured service rather
+        # than rejecting callers whose wording is absent from a phrase allowlist.
+        caller = [normalized(t) for t in self.session.caller_revisions.values()]
+        if not normalized(reason or "") or not any(normalized(reason) in t for t in caller):
+            return {
+                "completed": False,
+                "status": "NEEDS_REASON",
+                "message": "What would you like the appointment for?",
+            }
+        if self.reason != normalized(reason):
+            self.visit_consent = self.visit_prompt = None
+            self.visit_prompt_text = ""
+            self.visit_prompt_events = []
+        self.reason = normalized(reason)
+        proof = self.visit_consent
+        if not proof or not self._visit_consent_valid():
+            return {
+                "completed": False,
+                "status": "NEEDS_CLARIFICATION",
+                "message": (
+                    "We can schedule a routine Office Visit. Is this a routine visit "
+                    "with no new or worsening symptoms?"
+                ),
+            }
+        if not proof["accepted"]:
             self.transition("COMPLETE")
             return {
                 "completed": False,
-                "message": (
-                    "Please contact the clinic for clinical review. No appointment was booked."
-                ),
+                "message": "Please contact the clinic for help choosing appropriate care. "
+                "No appointment was booked and no email was sent.",
             }
         self.preferences = preferences
         self.transition("SCHEDULING_PERMITTED")
@@ -259,8 +278,6 @@ class BookingTransaction:
             }
         self.selected = self.options[int(option) - 1]
         self.transition("OPTION_SELECTED")
-        words = ["maple", "river", "cedar", "meadow", "willow", "garden", "silver", "sunrise"]
-        self.challenge = " ".join(secrets.SystemRandom().sample(words, 2))
         self.transition("AWAITING_CONFIRMATION")
         result = self.describe(self.selected, option)
         result.update(
@@ -277,6 +294,22 @@ class BookingTransaction:
 
     @serialized
     def observe_agent(self, event_id, text):
+        if self.state == "TRIAGE_PENDING":
+            self.visit_prompt_text += " " + text
+            self.visit_prompt_events.append(event_id)
+            words = normalized(self.visit_prompt_text)
+            if "routine office visit" in words and "no new or worsening symptoms" in words:
+                self.visit_prompt = {
+                    "event_id": event_id,
+                    "at": datetime.now(UTC),
+                    "reason": self.reason,
+                    "event_ids": list(self.visit_prompt_events),
+                }
+            elif "?" in text:
+                self.visit_prompt = None
+                self.visit_prompt_text = ""
+                self.visit_prompt_events = []
+            return
         if self.state != "AWAITING_CONFIRMATION":
             return
         self.prompt_text += " " + text
@@ -300,6 +333,34 @@ class BookingTransaction:
             return
         self.seen_caller[utterance_id] = text
         self.consent = None
+        if self.visit_consent and self.visit_consent["utterance_id"] == utterance_id:
+            self.visit_consent = None
+        if self.state == "TRIAGE_PENDING" and self.authorized():
+            prompt = self.visit_prompt
+            words = normalized(text)
+            if (
+                prompt
+                and prompt["reason"] == self.reason
+                and datetime.now(UTC) <= prompt["at"] + timedelta(seconds=90)
+                and words in {"yes", "yes please", "yes it is", "correct", "no", "no thanks"}
+            ):
+                self.visit_consent = {
+                    "accepted": words not in {"no", "no thanks"},
+                    "utterance_id": utterance_id,
+                    "text": text,
+                    "patient_id": self.session.verified_patient,
+                    "service_session_id": self.session.service.session_id,
+                    "reason": self.reason,
+                }
+                self.session.event(
+                    "state",
+                    name="booking.visit_clarification",
+                    source="actual caller speech callback",
+                    prompt_event_id=prompt["event_id"],
+                    prompt_event_ids=prompt["event_ids"],
+                    **self.visit_consent,
+                )
+            return
         if self.state != "AWAITING_CONFIRMATION" or not self.authorized():
             return
         prompt = normalized(self.prompt_text)
@@ -330,7 +391,6 @@ class BookingTransaction:
         if not address_present or not readout_complete:
             return
         words = normalized(text)
-        exact_code = words == "yes book " + self.challenge + " and email my confirmation"
         contextual_yes = words in {
             "yes",
             "yes please",
@@ -351,10 +411,7 @@ class BookingTransaction:
         prompt_fresh = self.prompt_at and datetime.now(UTC) <= self.prompt_at + timedelta(
             seconds=90
         )
-        if not (
-            exact_code
-            or (self.prompt_intent and prompt_fresh and (contextual_yes or explicit_booking_email))
-        ):
+        if not (self.prompt_intent and prompt_fresh and (contextual_yes or explicit_booking_email)):
             return
         selection_hash = sha256(
             json.dumps(
@@ -384,6 +441,16 @@ class BookingTransaction:
             "service_session_id": self.session.service.session_id,
         }
 
+    def _visit_consent_valid(self):
+        proof = self.visit_consent
+        return bool(
+            proof
+            and proof["reason"] == self.reason
+            and proof["patient_id"] == self.session.verified_patient
+            and proof["service_session_id"] == self.session.service.session_id
+            and self.seen_caller.get(proof["utterance_id"]) == proof["text"]
+        )
+
     @serialized
     def commit(self):
         if self.receipt or self.state == "COMPLETE":
@@ -401,6 +468,8 @@ class BookingTransaction:
         if (
             self.state != "AWAITING_CONFIRMATION"
             or not self.authorized()
+            or not self._visit_consent_valid()
+            or not self.visit_consent["accepted"]
             or not c
             or c["patient_id"] != self.session.verified_patient
             or c["service_session_id"] != self.session.service.session_id
@@ -625,4 +694,6 @@ class BookingTransaction:
             "email_preview": self.email.preview(self.receipt) if self.receipt else None,
             "mailpit_url": "http://127.0.0.1:9325",
             "writes_enabled": self.writes_enabled,
+            "request_reason": self.reason,
+            "visit_clarification": self.visit_consent,
         }

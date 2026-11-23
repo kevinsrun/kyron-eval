@@ -95,7 +95,7 @@ class Provider:
         )
 
 
-def make(tmp_path, monkeypatch):
+def make(tmp_path, monkeypatch, *, clarify=True):
     p, _, _ = adapter(tmp_path / "ehr")
     session = ReceptionistSession(p, tmp_path / "artifacts")
     session.start("call")
@@ -162,21 +162,27 @@ def make(tmp_path, monkeypatch):
         session, provider, inventory, email, tmp_path / "receipts", writes_enabled=True
     )
     session.booking = tx
+    if clarify:
+        result = tx.present("routine checkup", {})
+        assert result["status"] == "NEEDS_CLARIFICATION"
+        tx.observe_agent("fixture-service-question", result["message"])
+        tx.observe_caller("call", "fixture-service-answer", "Yes")
     return session, tx, provider, counts
 
 
-def ready(tx):
+def ready(tx, *, question=True):
     assert tx.present("routine checkup", {})["completed"]
     assert tx.select("1")["completed"]
     tx.observe_agent(
         "speech-readout",
-        tx.challenge + " patient@example.test Office Visit Avery Brooks Willow Creek Clinic "
-        "November 24 2026 10:00 AM Eastern",
+        "patient@example.test Office Visit Avery Brooks Willow Creek Clinic "
+        "November 24 2026 10:00 AM Eastern"
+        + (". May I book this appointment and email the confirmation?" if question else ""),
     )
 
 
 def consent(tx):
-    tx.observe_caller("call", "confirm", "Yes book " + tx.challenge + " and email my confirmation")
+    tx.observe_caller("call", "confirm", "Yes")
 
 
 def test_exact_confirmed_booking_readback_email_and_duplicate_callbacks(tmp_path, monkeypatch):
@@ -195,7 +201,7 @@ def test_exact_confirmed_booking_readback_email_and_duplicate_callbacks(tmp_path
 @pytest.mark.parametrize("phrase", ["yes", "Yes book wrong code and email my confirmation"])
 def test_missing_or_wrong_exact_confirmation_cannot_book(tmp_path, monkeypatch, phrase):
     _, tx, p, counts = make(tmp_path, monkeypatch)
-    ready(tx)
+    ready(tx, question=False)
     tx.observe_caller("call", "bad", phrase)
     assert not tx.commit()["completed"] and p.calls == counts["smtp"] == 0
 
@@ -295,8 +301,8 @@ def test_incorrect_readout_cannot_arm_booking_consent(tmp_path, monkeypatch):
     tx.select("1")
     tx.observe_agent(
         "wrong-readout",
-        tx.challenge + " patient@example.test Office Visit Avery Brooks Willow Creek Clinic "
-        "November 25 2026 11:00 AM Eastern",
+        "patient@example.test Office Visit Avery Brooks Willow Creek Clinic "
+        "November 25 2026 11:00 AM Eastern. May I book and email the confirmation?",
     )
     consent(tx)
     assert tx.consent is None and not tx.commit()["completed"] and p.calls == 0
@@ -321,7 +327,7 @@ def test_unsupported_structured_triage_blocks_routine_inventory(tmp_path, monkey
 def test_wrong_call_cannot_grant_consent(tmp_path, monkeypatch):
     _, tx, p, _ = make(tmp_path, monkeypatch)
     ready(tx)
-    tx.observe_caller("other-call", "c", "Yes book " + tx.challenge + " and email my confirmation")
+    tx.observe_caller("other-call", "c", "Yes")
     assert not tx.commit()["completed"] and p.calls == 0
 
 
@@ -348,7 +354,13 @@ def test_phone_registration_accepts_only_configured_destination(tmp_path, monkey
 def test_sdk_booking_tasks_dispatch_without_model_supplied_consent(tmp_path, monkeypatch):
     from kyron_eval.voice.live_lookup import build_lookup_agent
 
-    session, tx, p, counts = make(tmp_path, monkeypatch)
+    session, tx, p, counts = make(tmp_path, monkeypatch, clarify=False)
+    session.caller(
+        "call",
+        CallerSpeechEvent(
+            utterance="Hi, I would like to schedule a routine screening.", utterance_id="reason"
+        ),
+    )
     controller = SimpleNamespace(session=session, phone_number=None, nonce="n")
     agent = build_lookup_agent(controller)
 
@@ -357,7 +369,7 @@ def test_sdk_booking_tasks_dispatch_without_model_supplied_consent(tmp_path, mon
 
         def __init__(self):
             self.fields = {
-                "booking_reason": "routine checkup",
+                "booking_reason": "routine screening",
                 "booking_day": "Tuesday",
                 "booking_time": "morning",
                 "booking_option": "1",
@@ -380,6 +392,20 @@ def test_sdk_booking_tasks_dispatch_without_model_supplied_consent(tmp_path, mon
     call = Call()
     session.phase = "booking_preferences"
     agent._on_task_complete_handlers["booking_preferences"](call)
+    assert call.tasks[-1][0][0] == "booking_clarification_1"
+    call.fields["booking_clarification_1_response"] = "Yes"
+    agent._on_task_complete_handlers["booking_clarification_1"](call)
+    assert call.tasks[-1][0][0] == "booking_clarification_2"
+    agent._on_task_complete_handlers["booking_clarification_1"](call)
+    assert session.phase == "booking_clarification_2"
+    tx.observe_agent(
+        "offline-visit-question",
+        "We can schedule a routine Office Visit. "
+        "Is this a routine visit with no new or worsening symptoms?",
+    )
+    session.caller("call", CallerSpeechEvent(utterance="Yes", utterance_id="visit-answer"))
+    call.fields["booking_clarification_2_response"] = "Yes"
+    agent._on_task_complete_handlers["booking_clarification_2"](call)
     assert call.tasks[-1][0][0] == "booking_option"
     agent._on_task_complete_handlers["booking_option"](call)
     assert call.tasks[-1][0][0] == "booking_confirmation"
@@ -387,8 +413,8 @@ def test_sdk_booking_tasks_dispatch_without_model_supplied_consent(tmp_path, mon
     agent._on_task_complete_handlers["booking_confirmation"](call)
     assert p.calls == counts["smtp"] == 0
     ready_text = (
-        tx.challenge + " patient@example.test Office Visit Avery Brooks Willow Creek Clinic "
-        "November 24 2026 10:00 AM Eastern"
+        "patient@example.test Office Visit Avery Brooks Willow Creek Clinic "
+        "November 24 2026 10:00 AM Eastern. May I book and email the confirmation?"
     )
     tx.observe_agent("offline-protocol-readout", ready_text)
     consent(tx)
@@ -478,3 +504,83 @@ def test_connected_email_waits_for_matching_provider_receipt_and_deduplicates(
     assert first == second and first["status"] == "SENT"
     assert first["delivery_status"] == "DELIVERED" and first["inbox_delivery_proven"]
     assert len(list(bridge.glob("*.request.json"))) == 1
+
+
+@pytest.mark.parametrize("reason", ["routine screening", "preventive care", "a health check"])
+def test_free_text_reason_requires_spoken_service_clarification(tmp_path, monkeypatch, reason):
+    session, tx, p, counts = make(tmp_path, monkeypatch, clarify=False)
+    session.caller("call", CallerSpeechEvent(utterance=reason, utterance_id="reason"))
+    result = tx.present(reason, {})
+    assert result["status"] == "NEEDS_CLARIFICATION"
+    assert p.calls == counts["smtp"] == 0
+    tx.observe_agent("service-question", result["message"])
+    session.caller("call", CallerSpeechEvent(utterance="Yes", utterance_id="visit-answer"))
+    assert tx.present(reason, {})["completed"]
+    assert tx.select("1")["completed"]
+    tx.observe_agent(
+        "exact-readback",
+        "Office Visit Avery Brooks Willow Creek Clinic "
+        "November 24 2026 10:00 AM Eastern. Email patient@example.test. "
+        "May I book this appointment and email the confirmation?",
+    )
+    consent(tx)
+    assert tx.commit()["completed"] and p.calls == counts["smtp"] == 1
+
+
+def test_missing_or_ungrounded_reason_clarifies_without_mutation(tmp_path, monkeypatch):
+    _, tx, p, counts = make(tmp_path, monkeypatch, clarify=False)
+    for reason in ["", "model invented a reason"]:
+        assert tx.present(reason, {})["status"] == "NEEDS_REASON"
+    assert tx.state == "TRIAGE_PENDING" and p.calls == counts["smtp"] == 0
+
+
+@pytest.mark.parametrize(
+    "question,answer",
+    [
+        ("Can you hear me?", "Yes"),
+        ("For a routine Office Visit, do you have new or worsening symptoms?", "Yes"),
+        (
+            "We can schedule a routine Office Visit. "
+            "Is this a routine visit with no new or worsening symptoms?",
+            "I am not sure",
+        ),
+    ],
+)
+def test_unrelated_or_ambiguous_visit_answers_cannot_authorize(
+    tmp_path, monkeypatch, question, answer
+):
+    _, tx, p, _ = make(tmp_path, monkeypatch, clarify=False)
+    tx.present("routine checkup", {})
+    tx.observe_agent("question", question)
+    tx.observe_caller("call", "answer", answer)
+    assert tx.present("routine checkup", {})["status"] == "NEEDS_CLARIFICATION"
+    assert not tx.commit()["completed"] and p.calls == 0
+
+
+def test_declined_routine_visit_does_not_offer_or_write(tmp_path, monkeypatch):
+    _, tx, p, counts = make(tmp_path, monkeypatch, clarify=False)
+    result = tx.present("routine checkup", {})
+    tx.observe_agent("question", result["message"])
+    tx.observe_caller("call", "answer", "No")
+    result = tx.present("routine checkup", {})
+    assert not result["completed"] and "No appointment was booked" in result["message"]
+    assert tx.state == "COMPLETE" and p.calls == counts["smtp"] == 0
+
+
+def test_sentence_chunked_sdk_service_question_is_supported(tmp_path, monkeypatch):
+    _, tx, p, _ = make(tmp_path, monkeypatch, clarify=False)
+    tx.present("routine checkup", {})
+    tx.observe_agent("sentence-1", "We can schedule a routine Office Visit.")
+    tx.observe_agent("sentence-2", "Is this a routine visit with no new or worsening symptoms?")
+    tx.observe_caller("call", "answer", "Yes")
+    assert tx.present("routine checkup", {})["completed"]
+    assert p.calls == 0
+
+
+def test_revised_visit_confirmation_blocks_even_after_booking_yes(tmp_path, monkeypatch):
+    _, tx, p, counts = make(tmp_path, monkeypatch)
+    ready(tx)
+    consent(tx)
+    tx.observe_caller("call", "fixture-service-answer", "No")
+    consent(tx)
+    assert not tx.commit()["completed"] and p.calls == counts["smtp"] == 0

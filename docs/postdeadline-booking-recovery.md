@@ -1,0 +1,15 @@
+# Post-deadline booking recovery
+
+Authorized by the user after the original November 22, 2026 8 PM Eastern cutoff. Separate branch `codex/postdeadline-booking-recovery`, based on `99c319c`. This work is not part of the frozen submitted artifact. Original PR #1 remains unchanged and unmerged.
+
+The genuine PSTN run `run-20261123T005958-39e0c57a0f` verified identity but rejected “routine screening” because `BookingTransaction.present` used a narrow phrase allowlist. No booking or email was attempted. The original raw trace remains unchanged; its hash is in `artifacts/postdeadline-booking-recovery/verification.json`.
+
+Requests now remain free text, grounded in caller speech. Before offering the configured routine Office Visit, the agent clarifies that service and whether this is a routine visit without new or worsening symptoms. This records caller intent; it is not clinical clearance or a clinical validation claim. Only actual session-bound agent/caller speech callbacks establish clarification evidence. Model fields cannot authorize it. A decline routes to the clinic without a write. Missing or ambiguous responses receive bounded clarification, with distinct task fields and duplicate-callback protection. SDK sentence-level agent speech is accumulated for the question. ASR revision or identity/session changes invalidate the proof. Existing urgent-disposition, identity, availability, exact booking/email consent and independent readback guards remain enforced.
+
+The obsolete code-word consent path was removed. Natural Yes is accepted only after the actual exact appointment/recipient readback and a fresh booking/email question. It is not inferred from a model-supplied boolean.
+
+Verification: 261 passing / 11 skipped offline baseline; 282 passing with the real isolated synthetic OpenEMR integration enabled after the fix. Ruff checks pass. Tests include the failed phrase, other free-text reasons, missing/ungrounded requests, declined/ambiguous clarification, model-only completion, stale duplicate tasks, sentence-chunked speech, and revised service consent. These are protocol/local EHR tests, not proof of a new genuine audio call.
+
+Start with `./start-booking-demo.sh`. Both voice transports retain the same backend. One call per launch; restart only after a call ends. Keep the authorized Gmail connector dispatcher active before calling; absent a verified provider acknowledgment the agent must not claim email was sent. The existing 10 AM booking (appointment 88) remains intact. Only the remaining operator-approved 10:30 AM Eastern slot may be offered after fresh conflict checks. The local native OpenEMR calendar is UTC: 10:30 AM EST is 15:30 UTC. Do not shift the stored instant to alter that display.
+
+No new live call success is claimed by this document. Historical evidence, failed attempts and manual labels remain intact. See the saved fallback trace and recording guide in `docs/booking-phone-recording.md`.

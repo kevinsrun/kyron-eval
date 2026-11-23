@@ -750,6 +750,30 @@ def build_lookup_agent(controller):
         )
         session.event("tool", name="booking.available_options", result=result, agent_visible=True)
         if not result["completed"]:
+            status = result.get("status")
+            if status in {"NEEDS_REASON", "NEEDS_CLARIFICATION"}:
+                attempt = getattr(session, "booking_clarification_attempts", 0) + 1
+                session.booking_clarification_attempts = attempt
+                if attempt <= 3:
+                    task = "booking_clarification_" + str(attempt)
+                    session.phase = task
+                    session.booking_clarification_status = status
+                    call.set_task(
+                        task,
+                        objective="Ask exactly this question: "
+                        + result["message"]
+                        + " Accept a natural response. Do not infer clinical clearance "
+                        "or book anything. Record the caller's exact words.",
+                        checklist=[
+                            guava.Field(key=task + "_response", description="Exact caller response")
+                        ],
+                    )
+                    return
+                result["message"] = (
+                    "I could not clarify the visit request. Please contact the clinic. "
+                    "No appointment was booked and no email was sent."
+                )
+            session.phase = "complete"
             call.hangup(result["message"])
             return
         call.send_instruction(
@@ -772,6 +796,30 @@ def build_lookup_agent(controller):
                 )
             ],
         )
+
+    def booking_clarified(call, task):
+        session = controller.session
+        if not session or not session.booking or not session.service.bind_call(call.id):
+            return
+        # The handler's registered task must match the active phase. Duplicate
+        # callbacks for an earlier clarification cannot advance a later task.
+        if task != session.phase:
+            return
+        response = call.get_field(task + "_response")
+        if response is None:
+            return
+        if session.booking_clarification_status == "NEEDS_REASON":
+            session.booking_reason = str(response)
+        session.phase = "booking_preferences"
+        booking_preferences(call)
+
+    def register_clarification(task):
+        @agent.on_task_complete(task)
+        def clarified(call):
+            booking_clarified(call, task)
+
+    for clarification in range(1, 4):
+        register_clarification("booking_clarification_" + str(clarification))
 
     @agent.on_task_complete("booking_option")
     def booking_selected(call):
